@@ -1,1 +1,17 @@
-up
+#+TITLE: PhD Thesis Proposal Summary
+#+SUBTITLE: Mechanized Meta-theory for Gradual Security
+#+OPTIONS: toc:nil
+#+AUTHOR: Tianyu Chen
+#+LATEX_CLASS_OPTIONS: [10pt]
+#+LATEX_HEADER: \usepackage{libertine}
+
+#+MACRO: surface $\lambda_{\mathtt{SEC}}^\star$
+
+In my PhD thesis, I plan to present the formal specifications and
+the mechanized meta-theoretic results for a gradual security-typed
+programming language called {{{surface}}} in the Agda proof assistant.
+The language is /secure/, because the output of running a well-typed
+{{{surface}}} program does not give out information about its input;
+the language is /gradual/, because the programmer can choose between
+enforcing security statically when the program type-checks, versus
+dynamically when the program executes.
