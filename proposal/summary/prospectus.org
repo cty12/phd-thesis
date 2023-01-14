@@ -7,11 +7,16 @@
 
 #+MACRO: surface $\lambda_{\mathtt{SEC}}^\star$
 
-In my PhD thesis, I plan to present the formal specifications and
-the mechanized meta-theoretic results for a gradual security-typed
+In my PhD thesis, I plan to introduce the formal specifications and
+present the mechanized meta-theoretic results for a gradual security-typed
 programming language called {{{surface}}} in the Agda proof assistant.
-The language is /secure/, because the output of running a well-typed
-{{{surface}}} program does not give out information about its input;
-the language is /gradual/, because the programmer can choose between
-enforcing security statically when the program type-checks, versus
-dynamically when the program executes.
+The language is /secure/, because its type system and runtime together
+ensure the information-flow policy that the output of running a well-typed
+{{{surface}}} program does not give out information about its input.
+The language is /gradual/, because it gives programmers the choice
+between enforcing the aforementioned security policy statically,
+when the program type-checks, versus dynamically, when the program
+executes. Due to the sensitive nature of information-flow control,
+there is strong desire to machine-check (mechanize) the proofs.
+Agda is a proof assistant based on a variant of Martin-Löf type theory
+(MLTT), which makes sure that all proofs are correct.
