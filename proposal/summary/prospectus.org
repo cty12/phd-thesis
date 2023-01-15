@@ -20,3 +20,12 @@ executes. Due to the sensitive nature of information-flow control,
 there is strong desire to machine-check (mechanize) the proofs.
 Agda is a proof assistant based on a variant of Martin-Löf type theory
 (MLTT), which makes sure that all proofs are correct.
+
+More formally, I keep two major properties in mind when designing
+and reasoning about {{{surface}}}, namely /noninterference/ and
+/the gradual guarantee/. They are meta-theoretic properties for
+/security/ and /graduality/ respectively. In the setting of
+functional programming, noninterference says that a potentially
+malicious party cannot infer high-security user inputs by
+observing the evaluation results for multiple executions
+of the same program.
