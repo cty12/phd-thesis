@@ -4,28 +4,51 @@
 #+AUTHOR: Tianyu Chen
 #+LATEX_CLASS_OPTIONS: [10pt]
 #+LATEX_HEADER: \usepackage{libertine}
+#+LATEX_HEADER: \usepackage{inconsolata}
 
 #+MACRO: surface $\lambda_{\mathtt{SEC}}^\star$
+#+MACRO: surface $\lambda_{\mathtt{SEC}}^\Rightarrow$
 
 In my PhD thesis, I plan to introduce the formal specifications and
 present the mechanized meta-theoretic results for a gradual security-typed
 programming language called {{{surface}}} in the Agda proof assistant.
-The language is /secure/, because its type system and runtime together
-ensure the information-flow policy that the output of running a well-typed
-{{{surface}}} program does not give out information about its input.
+
+{{{surface}}} is /secure/, because its type system and its runtime work
+together and ensure an information-flow policy that the output of running
+a well-typed {{{surface}}} program does not give out information about its input.
 The language is /gradual/, because it gives programmers the choice
 between enforcing the aforementioned security policy statically,
 when the program type-checks, versus dynamically, when the program
 executes. Due to the sensitive nature of information-flow control,
 there is strong desire to machine-check (mechanize) the proofs.
 Agda is a proof assistant based on a variant of Martin-Löf type theory
-(MLTT), which makes sure that all proofs are correct.
+(MLTT), which ensures that all proofs are indeed correct.
 
-More formally, I keep two major properties in mind when designing
-and reasoning about {{{surface}}}, namely /noninterference/ and
-/the gradual guarantee/. They are meta-theoretic properties for
-/security/ and /graduality/ respectively. In the setting of
-functional programming, noninterference says that a potentially
+In more detail, I keep two major properties in mind when I design
+and reason about {{{surface}}}, namely, /noninterference/ and
+the /gradual guarantee/. They are meta-theoretic properties for
+/security/ and /graduality/ respectively. In the setting of a
+functional programming language, noninterference says that a potentially
 malicious party cannot infer high-security user inputs by
 observing the evaluation results for multiple executions
-of the same program.
+of the same program written in that language. As mentioned above,
+in {{{surface}}}, a programmer may opt for delaying part of
+the enforcement of noninterference from compile-time to runtime.
+In practice, this is done by leaving out some security-level labels on
+type annotations as /statically unknown/.
+The /gradual guarantee/ says that even after changing some security labels
+to be statically unknown, a well-typed program will still be well-typed
+and a successfully running (value-producing) program will continue to do so.
+If the programmer goes the other direction and replaces some unknown
+labels with concrete labels, ~low~ or ~high~, suppose the program remains
+well-typed, it may produce a trapped error instead of running successfully,
+because some of the annotations supplied by the programmer may contain
+mistakes.
+
+I have already finished the language design of {{{surface}}}, including its
+syntax, its type system, and its semantics. I have proved that {{{surface}}}
+indeed satisfies its security guarantee, noninterference. As a byproduct,
+I also proved type safety for {{{surface}}}. All existing proofs have been
+mechanized in Agda. Right now I am working on the simulation-style proof of
+the gradual guarantee. When the gradual guarantee proof is in place,
+I will be able to conclude my thesis work.
