@@ -7,7 +7,6 @@
 #+LATEX_HEADER: \usepackage{inconsolata}
 
 #+MACRO: surface $\lambda_{\mathtt{SEC}}^\star$
-#+MACRO: surface $\lambda_{\mathtt{SEC}}^\Rightarrow$
 
 In my PhD thesis, I plan to introduce the formal specifications and
 present the mechanized meta-theoretic results for a gradual security-typed
