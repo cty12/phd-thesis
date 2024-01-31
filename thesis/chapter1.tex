@@ -12,7 +12,7 @@ third parties. People also worry that their digital photo albums,
 signatures on online legal documents, spreadsheets in cloud storage...
 may be tampered and manipulated by potential attackers.
 
-Indeed, the fears are justified by recent new events.
+Indeed, the fears are justified by recent news events.
 In 2018, the Cambridge Analytica scandal hit the world headlines,
 where the data collected from 87 million social media users was misused
 without their consent
@@ -58,6 +58,71 @@ Consider a web application that receives three fields from its user:
 1) first name 2) last name 3) social security number, the grammar of which
 is defined in figure \ref{fig:grammar}, where terminals are divided into
 low-security and high-security.
+The digits $d$ for social security number, being confidential to users of
+the web application, are of high-security, so they are marked {\color{red}
+  red}, while other terminals, such as the keys of the record and the
+strings $w$ for first name / last name, being safe to disclose, are
+all of low-security, marked in {\color{blue} blue}.
+
+Consider the following user input:
+
+%% \begin{minted}[fontsize=\small]{text}
+%% {FirstName=Mad;LastName=Hatter;SSN=012-34-5678}
+%% \end{minted}
+
+\begin{figure*}[t!]
+  \small
+  \center
+\begin{tikzpicture}
+\tikzset{level distance=30pt}
+\Tree [
+  .{ $\langle RECORD \rangle$ }
+  {\color{blue} \textbf{\{FirstName=}}
+  [ .{ $\langle ID \rangle$ } {\color{blue} \textbf{Mad}} ]
+  {\color{blue} \textbf{;LastName=}}
+  [ .{ $\langle ID \rangle$ } {\color{blue} \textbf{Hatter}} ]
+  {\color{blue} \textbf{;SSN=}}
+                       [ .{ $\langle SSN \rangle$ }
+                         [ .{ $\langle D \rangle$ } {\color{red} \textbf{0}} ]
+                         [ .{ $\langle D \rangle$ } {\color{red} \textbf{1}} ]
+                         [ .{ $\langle D \rangle$ } {\color{red} \textbf{2}} ]
+                         {\color{blue} \textbf{-}}
+                                [ .{ $\langle D \rangle$ } {\color{red} \textbf{3}} ]
+                                [ .{ $\langle D \rangle$ } {\color{red} \textbf{4}} ]
+                                {\color{blue} \textbf{-}}
+                                       [ .{ $\langle D \rangle$ } {\color{red} \textbf{5}} ]
+                                       [ .{ $\langle D \rangle$ } {\color{red} \textbf{6}} ]
+                                       [ .{ $\langle D \rangle$ } {\color{red} \textbf{7}} ]
+                                       [ .{ $\langle D \rangle$ } {\color{red} \textbf{8}} ] ]
+                       {\color{blue} \textbf{\}}}
+]
+\end{tikzpicture}
+\caption{The parse tree generated from the example user input.
+  All terminals are represented as labeled values:
+  the {\color{red} red} ones, such as the digits of SSN,
+  are of high-security, while the {\color{blue} blue} ones, such as the keys
+  of the record and first name / last name, are of low-security.}
+\label{fig:parsetree}
+\end{figure*}
+
+The author of the web application could implement a parser for the
+grammar in Figure \ref{fig:grammar} in a language that enforces
+information flow security.  Each terminal in the grammar would be
+labeled with a security level and the language would guarantee that
+the high-security information is only present in those parts of the
+output parse tree that are marked as high-security.  For example,
+according to the grammar in figure \ref{fig:grammar}, the example user
+input string is parsed into the parse tree in figure
+\ref{fig:parsetree}, where the terminal nodes that represent digits of
+the social security number are of {\color{red} high-security}, while
+the terminals that compose the rest of the input string are of
+{\color{blue} low-security}.  The confidentiality of SSN is guaranteed
+during data processing since the language enforces
+noninterference. When the web application interacts with the outside
+world, such as making a foreign function interface (\textit{FFI}) call
+or storing into a database, the conceptual language need to encrypt
+whatever values labeled as high security before they are passed into a
+foreign routine.
 
 \section{Problem Statement}
 
