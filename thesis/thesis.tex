@@ -35,6 +35,12 @@
 \usepackage{tikz, tikz-qtree, tikz-qtree-compat}
 \usepackage{todonotes}
 
+\usetikzlibrary{shapes,arrows}
+\usetikzlibrary{decorations.markings}
+
+\setlength{\multicolsep}{3pt}
+\setlength{\columnseprule}{0.5pt}
+
 \lstdefinestyle{mystyle}{
   commentstyle=\color{Green},
   keywordstyle=\color{Magenta},
@@ -53,6 +59,124 @@
   tabsize=2
 }
 \lstset{style=mystyle}
+
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+%\newcommand\doubleplus{+\kern-1.3ex+\kern0.8ex}
+%\newcommand\mdoubleplus{\ensuremath{\mathbin{+\mkern-5mu+}}}
+\DeclareSymbolFont{bbsymbol}{U}{bbold}{m}{n}
+\DeclareMathSymbol{\bbsemicolon}{\mathbin}{bbsymbol}{"3B}
+\newcommand\mdoubleplus{\ensuremath{\bbsemicolon}}
+%\newcommand{\done}{\usym{2611}\xspace}
+\newcommand\tikzmark[2]{\tikz[overlay,remember picture, anchor=base] \node (#1) {#2};}
+\renewcommand\theadfont{\bfseries}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{constraint}[theorem]{Constraint}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+
+\newcommand{\yes}{\textcolor{Green}{\ding{51}} Yes}
+\newcommand{\no}{\textcolor{Red}{\ding{55}} No}
+\newcommand{\maybe}{\ding{82} Maybe}
+\newcommand{\redtext}[1]{\textcolor{Maroon}{#1}}
+\newcommand{\bluetext}[1]{\textcolor{NavyBlue}{#1}}
+\newcommand{\orangetext}[1]{\textcolor{BurntOrange}{#1}}
+\newcommand{\graytext}[1]{\textcolor{gray}{#1}}
+\newcommand{\bl}[1]{\ensuremath{\orangetext{#1}}}
+\newcommand{\key}[1]{\ensuremath{\mathtt{#1}}}
+\newcommand{\MID}{\;\mid\;}
+\newcommand{\Surface}{\ensuremath{\lambda_{\mathtt{IFC}}^\star}\xspace}
+\newcommand{\SurfaceOld}{\ensuremath{\lambda_{\mathtt{SEC}}^\star}\xspace}
+\newcommand{\CCOld}{\ensuremath{\lambda_{\mathtt{SEC}}^{\Rightarrow}}\xspace}
+\newcommand{\CC}{\ensuremath{\lambda_{\mathtt{IFC}}^{c}}\xspace}
+\newcommand{\GSLRef}{\ensuremath{\mathrm{GSL}_\mathsf{Ref}}\xspace}
+\newcommand{\GSLRefEps}{\ensuremath{\mathrm{GSL}_\mathsf{Ref}^\epsilon}\xspace}
+\newcommand{\SSLRef}{\ensuremath{\mathrm{SSL}_\mathsf{Ref}}\xspace}
+\newcommand{\lamgif}{\ensuremath{\mathit{\lambda_{gif}}}\xspace}
+\newcommand{\WHILEG}{WHILE\textsuperscript{G}\xspace}
+\newcommand{\high}{\textcolor{OrangeRed}{\key{high}}\xspace}
+\newcommand{\low}{\textcolor{PineGreen}{\key{low}}\xspace}
+\newcommand{\unk}{\textcolor{Maroon}{\key{\star}}\xspace}
+\newcommand{\Bool}{\key{Bool}}
+\newcommand{\Int}{\key{Int}}
+\newcommand{\Unit}{\key{Unit}}
+\newcommand{\Fun}[3]{\ensuremath{{#1}\xrightarrow{{#2}}{#3}}}
+\newcommand{\Refer}[1]{\ensuremath{\key{Ref}\;{#1}}}
+\newcommand{\true}{\key{true}}
+\newcommand{\false}{\key{false}}
+\newcommand{\unit}{\key{unit}}
+\newcommand{\pc}{\ensuremath{\mathit{pc}}\xspace}
+\newcommand{\PC}{\ensuremath{\mathit{PC}}\xspace}
+\newcommand{\gc}{\ensuremath{\mathit{gc}}\xspace}
+\newcommand{\syntax}[1]{\text{\texttt{\textcolor{Purple}{#1}}}}
+\newcommand{\ccsyntax}[1]{\text{\texttt{{#1}}}}
+\newcommand{\const}[2]{\ensuremath{\syntax{(\$}\;{#1}\syntax{)}_{#2}}}
+\newcommand{\lam}[5]{\ensuremath{\syntax{(λ}^{#1}{#2}\syntax{:}{#3}\syntax{.}\,{#4}\syntax{)}_{#5}}}
+\newcommand{\app}[3]{\ensuremath{\syntax{(}{#1}\;{#2}\syntax{)}^{\bl{#3}}}}
+\newcommand{\ifexp}[4]{\ensuremath{\syntax{(if}\;{#1}\;\syntax{then}\;{#2}\;\syntax{else}\;{#3}\syntax{)}^{\bl{#4}}}}
+\newcommand{\refexp}[3]{\ensuremath{\syntax{(ref}\;{#1}\;{#2}\syntax{)}^{\bl{#3}}}}
+\newcommand{\deref}[1]{\ensuremath{\syntax{!}\;{#1}}}
+\newcommand{\assign}[3]{\ensuremath{\syntax{(}{#1}\;\syntax{:=}\;{#2}\syntax{)}^{\bl{#3}}}}
+\newcommand{\ann}[3]{\ensuremath{\syntax{(}{#1}\;\syntax{:}\;{#2}\syntax{)}^{\bl{#3}}}}
+\newcommand{\letexp}[3]{\ensuremath{\syntax{let}\;{#1}={#2}\;\syntax{in}\;{#3}}}
+\newcommand{\ccconst}[1]{\ensuremath{\ccsyntax{\$}\;{#1}}}
+\newcommand{\ccaddr}[1]{\ensuremath{\ccsyntax{addr}\;{#1}}}
+\newcommand{\cclam}[2]{\ensuremath{\ccsyntax{λ}{#1}\ccsyntax{.}\,{#2}}}
+\newcommand{\ccif}[5]{\ensuremath{\ccsyntax{if}\;{#1}\;{#2}\;{#3}\;{#4}\;{#5}}}
+\newcommand{\ccifinj}[4]{\ensuremath{\ccsyntax{if!}\;{#1}\;{#2}\;{#3}\;{#4}}}
+\newcommand{\ccref}[2]{\ensuremath{\ccsyntax{ref}\;{#1}\;{#2}}}
+\newcommand{\ccrefproj}[3]{\ensuremath{\ccsyntax{ref?}^{\bl{#3}}\;{#1}\;{#2}}}
+\newcommand{\ccderef}[3]{\ensuremath{\ccsyntax{!}\;{#1}\;{#2}\;{#3}}}
+\newcommand{\ccderefinj}[2]{\ensuremath{\ccsyntax{!!}\;{#1}\;{#2}}}
+\newcommand{\ccassign}[5]{\ensuremath{\ccsyntax{assign}\;{#1}\;{#2}\;{#3}\;{#4}\;{#5}}}
+\newcommand{\ccassignproj}[5]{\ensuremath{\ccsyntax{assign?}^{\bl{#5}}\;{#1}\;{#2}\;{#3}\;{#4}}}
+\newcommand{\cccast}[2]{\ensuremath{{#1}\,\left\langle{#2}\right\rangle}}
+\newcommand{\ccprot}[4]{\ensuremath{\ccsyntax{prot}\;{#1}\;{#2}\;{#3}\;{#4}}}
+\newcommand{\ccprotinj}[4]{\ensuremath{\ccsyntax{prot!}\;{#1}\;{#2}\;{#3}\;{#4}}}
+\newcommand{\cccastpc}[2]{\ensuremath{\ccsyntax{cast}_{\ccsyntax{pc}}\;{#1}\;{#2}}}
+\newcommand{\cclet}[4]{\ensuremath{\ccsyntax{let}\;{#1}\ccsyntax{=}{#2}\ccsyntax{:}{#3}\;\ccsyntax{in}\;{#4}}}
+\newcommand{\ccapp}[5]{\ensuremath{\ccsyntax{app}\;{#1}\;{#2}\;{#3}\;{#4}\;{#5}}}
+\newcommand{\ccappinj}[4]{\ensuremath{\ccsyntax{app!}\;{#1}\;{#2}\;{#3}\;{#4}}}
+\newcommand{\ccopaque}{\ensuremath{\ccsyntax{●}}}
+\newcommand{\lconsisjoin}{\ensuremath{\,\widetilde{\curlyvee}\,}}  % label consistent join
+\newcommand{\consisjoin}{\ensuremath{\,\widetilde{\vee}\,}}        % type consistent join
+\newcommand{\lconsismeet}{\ensuremath{\,\widetilde{\curlywedge}\,}}  % label consistent meet
+\newcommand{\consismeet}{\ensuremath{\,\widetilde{\wedge}\,}}        % type consistent meet
+\newcommand{\Cast}[3]{\ensuremath{{#1}\Rightarrow^{\bl{#3}}{#2}}}
+\newcommand{\Type}{\textit{Type}}
+\newcommand{\RawType}{\textit{RawType}}
+\newcommand{\Label}{\textit{Label}}
+\newcommand{\compile}[1]{\ensuremath{\mathcal{C}\;{#1}}}
+\newcommand{\applycast}[3]{\ensuremath{\mathbf{Cast}\;{#1}\,,\,{#2}\leadsto{#3}}}
+\newcommand{\blame}[1]{\ensuremath{\key{blame}\;\bl{#1}}}
+\newcommand{\reduce}[5]{\ensuremath{{#1}\mid{#2}\mid{#3}\longrightarrow{#4}\mid{#5}}}
+\newcommand{\Active}[1]{\ensuremath{\mathbf{Active}\;{#1}}}
+\newcommand{\Inert}[1]{\ensuremath{\mathbf{Inert}\;{#1}}}
+\newcommand{\bigstep}[5]{\ensuremath{{#1}\mid{#2}\vdash{#3}\Downarrow{#4}\mid{#5}}}
+\newcommand{\bigstepe}[5]{\ensuremath{{#1}\mid{#2}\vdash{#3}\Downarrow_\epsilon{#4}\mid{#5}}}
+%% coercions
+\newcommand{\id}[1]{\ensuremath{\mathit{\bold{id}}(#1)}}
+\newcommand{\up}{\ensuremath{\boldsymbol{\uparrow}}}
+\newcommand{\inj}[1]{\ensuremath{{#1}\,\boldsymbol{!}}}
+\newcommand{\seq}{\ensuremath{\boldsymbol{;}\,}}
+\newcommand{\err}[3]{\ensuremath{\boldsymbol{\bot}^{\bl{#3}}\;{#1}\;{#2}}}
+\newcommand{\proj}[2]{\ensuremath{{#1}\,\boldsymbol{?}^{\bl{#2}}}}
+\newcommand{\coerc}[2]{\ensuremath{{#1}\boldsymbol{,}\,{#2}}}
+\newcommand{\refco}[2]{\ensuremath{\mathbf{Ref}\;{#1}\;{#2}}}
+\newcommand{\funco}[3]{\ensuremath{{#1}\boldsymbol{,}\,{#2}\boldsymbol{\rightarrow}{#3}}}
+\newcommand{\precctx}[8]{\ensuremath{{#1};{#2};{#3};{#4};{#5};{#6};{#7};{#8}}}
+\newcommand{\ccprec}[4]{\ensuremath{\vdash{#1}\sqsubseteq{#2}\Leftarrow{#3}\sqsubseteq{#4}}}
+
+\newcommand{\highlight}[2]{\colorbox{#1}{\ensuremath{#2}}}
+\newcommand{\highlightblue}[1]{\highlight{White!90!NavyBlue}{#1}}
+\newcommand{\highlightred}[1]{\highlight{White!90!Maroon}{#1}}
+
+\colorlet{red}{OrangeRed}
+\colorlet{green}{PineGreen}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Bibliography

@@ -33,12 +33,12 @@ particularly small-to-medium enterprises~\parencite{sirur2018we,freitas2018gdpr,
 \begin{figure}[tbp]
   \small
   \begin{align*}
-    \langle RECORD \rangle ::= & {\color{blue} \textbf{\{FirstName=}} \langle ID \rangle {\color{blue} \textbf{;}} \\
-                               & \enspace {\color{blue} \textbf{LastName=}} \langle ID \rangle {\color{blue} \textbf{;}} \\
-                               & \enspace {\color{blue} \textbf{SSN=}} \langle SSN \rangle {\color{blue} \textbf{\}}} \\
-    \langle ID \rangle     ::= & w , w \in \{ {\color{blue} \textbf{A}}, ... {\color{blue} \textbf{Z}}, {\color{blue} \textbf{a}}, ... {\color{blue} \textbf{z}} \}^{+} \\
-    \langle SSN \rangle    ::= & \langle D \rangle \langle D \rangle \langle D \rangle {\color{blue} \textbf{-}}
-                                 \langle D \rangle \langle D \rangle {\color{blue} \textbf{-}}
+    \langle RECORD \rangle ::= & {\color{green} \textbf{\{FirstName=}} \langle ID \rangle {\color{green} \textbf{;}} \\
+                               & \enspace {\color{green} \textbf{LastName=}} \langle ID \rangle {\color{green} \textbf{;}} \\
+                               & \enspace {\color{green} \textbf{SSN=}} \langle SSN \rangle {\color{green} \textbf{\}}} \\
+    \langle ID \rangle     ::= & w , w \in \{ {\color{green} \textbf{A}}, ... {\color{green} \textbf{Z}}, {\color{green} \textbf{a}}, ... {\color{green} \textbf{z}} \}^{+} \\
+    \langle SSN \rangle    ::= & \langle D \rangle \langle D \rangle \langle D \rangle {\color{green} \textbf{-}}
+                                 \langle D \rangle \langle D \rangle {\color{green} \textbf{-}}
                                  \langle D \rangle \langle D \rangle \langle D \rangle \langle D \rangle \\
     \langle D \rangle      ::= & d , d \in \{ {\color{red} \textbf{0}}, ... {\color{red} \textbf{9}} \}
   \end{align*}
@@ -62,48 +62,13 @@ The digits $d$ for social security number, being confidential to users of
 the web application, are of high-security, so they are marked {\color{red}
   red}, while other terminals, such as the keys of the record and the
 strings $w$ for first name / last name, being safe to disclose, are
-all of low-security, marked in {\color{blue} blue}.
+all of low-security, marked in {\color{green} green}.
 
 Consider the following user input:
 
-\begin{lstlisting}[numbers=none]
+\begin{lstlisting}[numbers=none,xleftmargin=0.1\textwidth]
 {FirstName=Mad;LastName=Hatter;SSN=012-34-5678}
 \end{lstlisting}
-
-\begin{figure*}[t!]
-  \small
-  \center
-\begin{tikzpicture}[scale=0.8]
-\tikzset{level distance=40pt}
-\Tree [
-  .{ $\langle RECORD \rangle$ }
-  {\color{blue} \textbf{\{FirstName=}}
-  [ .{ $\langle ID \rangle$ } {\color{blue} \textbf{Mad}} ]
-  {\color{blue} \textbf{;LastName=}}
-  [ .{ $\langle ID \rangle$ } {\color{blue} \textbf{Hatter}} ]
-  {\color{blue} \textbf{;SSN=}}
-                       [ .{ $\langle SSN \rangle$ }
-                         [ .{ $\langle D \rangle$ } {\color{red} \textbf{0}} ]
-                         [ .{ $\langle D \rangle$ } {\color{red} \textbf{1}} ]
-                         [ .{ $\langle D \rangle$ } {\color{red} \textbf{2}} ]
-                         {\color{blue} \textbf{-}}
-                                [ .{ $\langle D \rangle$ } {\color{red} \textbf{3}} ]
-                                [ .{ $\langle D \rangle$ } {\color{red} \textbf{4}} ]
-                                {\color{blue} \textbf{-}}
-                                       [ .{ $\langle D \rangle$ } {\color{red} \textbf{5}} ]
-                                       [ .{ $\langle D \rangle$ } {\color{red} \textbf{6}} ]
-                                       [ .{ $\langle D \rangle$ } {\color{red} \textbf{7}} ]
-                                       [ .{ $\langle D \rangle$ } {\color{red} \textbf{8}} ] ]
-                       {\color{blue} \textbf{\}}}
-]
-\end{tikzpicture}
-\caption{The parse tree generated from the example user input.
-  All terminals are represented as labeled values:
-  the {\color{red} red} ones, such as the digits of SSN,
-  are of high-security, while the {\color{blue} blue} ones, such as the keys
-  of the record and first name / last name, are of low-security.}
-\label{fig:parsetree}
-\end{figure*}
 
 The author of the web application could implement a parser for the
 grammar in Figure \ref{fig:grammar} in a language that enforces
@@ -116,13 +81,49 @@ input string is parsed into the parse tree in figure
 \ref{fig:parsetree}, where the terminal nodes that represent digits of
 the social security number are of {\color{red} high-security}, while
 the terminals that compose the rest of the input string are of
-{\color{blue} low-security}.  The confidentiality of SSN is guaranteed
+{\color{green} low-security}.  The confidentiality of SSN is guaranteed
 during data processing since the language enforces
 noninterference. When the web application interacts with the outside
 world, such as making a foreign function interface (\textit{FFI}) call
 or storing into a database, the conceptual language need to encrypt
 whatever values labeled as high security before they are passed into a
 foreign routine.
+
+\begin{figure*}[tbp]
+  \small
+  \center
+\begin{tikzpicture}[scale=0.8]
+\tikzset{level distance=40pt}
+\Tree [
+  .{ $\langle RECORD \rangle$ }
+  {\color{green} \textbf{\{FirstName=}}
+  [ .{ $\langle ID \rangle$ } {\color{green} \textbf{Mad}} ]
+  {\color{green} \textbf{;LastName=}}
+  [ .{ $\langle ID \rangle$ } {\color{green} \textbf{Hatter}} ]
+  {\color{green} \textbf{;SSN=}}
+                       [ .{ $\langle SSN \rangle$ }
+                         [ .{ $\langle D \rangle$ } {\color{red} \textbf{0}} ]
+                         [ .{ $\langle D \rangle$ } {\color{red} \textbf{1}} ]
+                         [ .{ $\langle D \rangle$ } {\color{red} \textbf{2}} ]
+                         {\color{green} \textbf{-}}
+                                [ .{ $\langle D \rangle$ } {\color{red} \textbf{3}} ]
+                                [ .{ $\langle D \rangle$ } {\color{red} \textbf{4}} ]
+                                {\color{green} \textbf{-}}
+                                       [ .{ $\langle D \rangle$ } {\color{red} \textbf{5}} ]
+                                       [ .{ $\langle D \rangle$ } {\color{red} \textbf{6}} ]
+                                       [ .{ $\langle D \rangle$ } {\color{red} \textbf{7}} ]
+                                       [ .{ $\langle D \rangle$ } {\color{red} \textbf{8}} ] ]
+                       {\color{green} \textbf{\}}}
+]
+\end{tikzpicture}
+\caption{The parse tree generated from the example user input.
+  All terminals are represented as labeled values:
+  the {\color{red} red} ones, such as the digits of SSN,
+  are of high-security, while the {\color{green} green} ones, such as the keys
+  of the record and first name / last name, are of low-security.}
+\label{fig:parsetree}
+\end{figure*}
+
 
 \section{Problem Statement}
 
