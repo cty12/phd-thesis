@@ -66,15 +66,15 @@ all of low-security, marked in {\color{blue} blue}.
 
 Consider the following user input:
 
-%% \begin{minted}[fontsize=\small]{text}
-%% {FirstName=Mad;LastName=Hatter;SSN=012-34-5678}
-%% \end{minted}
+\begin{lstlisting}[numbers=none]
+{FirstName=Mad;LastName=Hatter;SSN=012-34-5678}
+\end{lstlisting}
 
 \begin{figure*}[t!]
   \small
   \center
-\begin{tikzpicture}
-\tikzset{level distance=30pt}
+\begin{tikzpicture}[scale=0.8]
+\tikzset{level distance=40pt}
 \Tree [
   .{ $\langle RECORD \rangle$ }
   {\color{blue} \textbf{\{FirstName=}}
