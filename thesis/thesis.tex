@@ -13,13 +13,15 @@
 \usepackage[bookmarks=true, hidelinks]{hyperref}
 \usepackage[page]{appendix}  %for appendices
 \usepackage{rotating}  %for rotated, landscape images
+\usepackage{amsmath}
+\usepackage{xcolor}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Bibliography
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Add your bibliography file here
-\bibliography{references}
+\bibliography{references,all}
 % prevent certain fields in references from printing in bibliography
 \AtEveryBibitem{\clearfield{issn}}
 \AtEveryBibitem{\clearlist{issn}}

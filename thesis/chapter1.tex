@@ -4,21 +4,60 @@
 
 With the development of digital society, people are increasingly
 concerned about the confidentiality of their personal data and
-the integrity of their online assets. People fear that their
-social security numbers, medical records, bank account balances...
-may be revealed to malicious third parties. People also worry
-that their digital photo albums, signatures on online legal documents,
-spreadsheets in cloud storage... may be tampered and manipulated
-by potential attackers.
+the integrity of their online assets. Increasingly relying on
+computing devices and the Internet in their daily life, people fear that
+sensitive personal information, such as social security numbers,
+medical records, bank account balances... may be revealed to malicious
+third parties. People also worry that their digital photo albums,
+signatures on online legal documents, spreadsheets in cloud storage...
+may be tampered and manipulated by potential attackers.
+
+Indeed, the fears are justified by recent new events.
 In 2018, the Cambridge Analytica scandal hit the world headlines,
 where the data collected from 87 million social media users was misused
-without their consent.
+without their consent
+~\parencite{cadwalladr2018facebook,kitchgaessner2017cambridge,gonzalez2019global,hinds2020wouldn}.
+In the healthcare sector, from 2005 to 2019, 249.09 million individuals
+were affected by data breaches that caused exposure of sensitive medical
+data~\parencite{seh2020healthcare}. In respect of data integrity, researchers
+have found ways to tamper the analytics APIs~\parencite{pfeffer2018tampering} and
+the metadata (such as the numbers of likes, follows, and views)~\parencite{paquet2017can}
+of major social media platforms. To deal with the security and privacy
+challenges of the increasingly digitalized world, the European Union introduced
+the General Data Protection Regulation (GDPR) to reform and regulate
+the collection and processing of personal data. However, studies show
+that business entities experience challenges in complying with GDPR
+or auditing for compliance~\parencite{smirnova2024understanding},
+particularly small-to-medium enterprises~\parencite{sirur2018we,freitas2018gdpr,harting2021impacts}.
 
+\begin{figure}[tbp]
+  \small
+  \begin{align*}
+    \langle RECORD \rangle ::= & {\color{blue} \textbf{\{FirstName=}} \langle ID \rangle {\color{blue} \textbf{;}} \\
+                               & \enspace {\color{blue} \textbf{LastName=}} \langle ID \rangle {\color{blue} \textbf{;}} \\
+                               & \enspace {\color{blue} \textbf{SSN=}} \langle SSN \rangle {\color{blue} \textbf{\}}} \\
+    \langle ID \rangle     ::= & w , w \in \{ {\color{blue} \textbf{A}}, ... {\color{blue} \textbf{Z}}, {\color{blue} \textbf{a}}, ... {\color{blue} \textbf{z}} \}^{+} \\
+    \langle SSN \rangle    ::= & \langle D \rangle \langle D \rangle \langle D \rangle {\color{blue} \textbf{-}}
+                                 \langle D \rangle \langle D \rangle {\color{blue} \textbf{-}}
+                                 \langle D \rangle \langle D \rangle \langle D \rangle \langle D \rangle \\
+    \langle D \rangle      ::= & d , d \in \{ {\color{red} \textbf{0}}, ... {\color{red} \textbf{9}} \}
+  \end{align*}
+  \caption{The user input grammar for a hypothetical application}
+  \label{fig:grammar}
+\end{figure}
+
+From a technical perspective, ensuring the security and privacy of
+personal data typically involves tracking and checking
+the flow of information.
 Modern software applications often accept user input where
 selected fields are sensitive, whose confidentiality is required
-during both parsing and processing.
-
-Gradual Typing for Python~\textcite{Vitousek:2014aa}
+during both parsing and processing. To rule out information leaks,
+neither the sensitive fields, nor any data that depends on those fields,
+is allowed to be revealed to a low-privilege observer.
+Consider a web application that receives three fields from its user:
+1) first name 2) last name 3) social security number, the grammar of which
+is defined in figure \ref{fig:grammar}, where terminals are divided into
+low-security and high-security.
 
 \section{Problem Statement}
 
