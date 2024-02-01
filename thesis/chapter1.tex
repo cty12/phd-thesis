@@ -55,8 +55,9 @@ during both parsing and processing. To rule out information leaks,
 neither the sensitive fields, nor any data that depends on those fields,
 is allowed to be revealed to a low-privilege observer.
 Consider a web application that receives three fields from its user:
-1) first name 2) last name 3) social security number, the grammar of which
-is defined in figure \ref{fig:grammar}, where terminals are divided into
+\Circled{1} first name \Circled{2} last name \Circled{3}
+social security number, the grammar of which
+is defined in Figure~\ref{fig:grammar}, where terminals are divided into
 low-security and high-security.
 The digits $d$ for social security number, being confidential to users of
 the web application, are of high-security, so they are marked {\color{red}
@@ -70,22 +71,36 @@ Consider the following user input:
 {FirstName=Mad;LastName=Hatter;SSN=012-34-5678}
 \end{lstlisting}
 
-The author of the web application could implement a parser for the
-grammar in Figure \ref{fig:grammar} in a language that enforces
-information flow security.  Each terminal in the grammar would be
-labeled with a security level and the language would guarantee that
-the high-security information is only present in those parts of the
-output parse tree that are marked as high-security.  For example,
-according to the grammar in figure \ref{fig:grammar}, the example user
-input string is parsed into the parse tree in figure
-\ref{fig:parsetree}, where the terminal nodes that represent digits of
-the social security number are of {\color{red} high-security}, while
-the terminals that compose the rest of the input string are of
+It is tedious for the developer of this imaginary web application
+to track the security level of data and check for information leaks.
+Software developers tend to focus more on functionality
+in order to meet the tight software release schedule and budget,
+thus software security frequently only comes as an afterthought
+~\parencite{assal2018security,sharma2017aspects,steward2012software}.
+Retrofitting security-related code often requires extensive modification to
+an existing code-base and it relies on the programmers' skills
+and experience to decide when and where such code should be placed.
+Furthermore, such modification is error-prone: one single missing
+check could undermine the security of the entire application.
+
+Alternatively, the author of the web application could implement
+a parser for the grammar in Figure~\ref{fig:grammar} in
+a \textit{programming language} that enforces information flow security.
+Each terminal in the grammar would be labeled with a security level and
+the programming language, instead of some ad-hoc checks implemented by
+the programmer of the web application, would guarantee that
+the high-security information is only present in those parts of
+the output parse tree that are marked as high-security.
+For example, according to the grammar in Figure~\ref{fig:grammar},
+the example user input string is parsed into the parse tree in
+Figure~\ref{fig:parsetree}, where the terminal nodes that represent digits of
+the social security number are of {\color{red} high-security},
+while the terminals that compose the rest of the input string are of
 {\color{green} low-security}.  The confidentiality of SSN is guaranteed
-during data processing since the language enforces
+during data processing since the programming language enforces
 noninterference. When the web application interacts with the outside
-world, such as making a foreign function interface (\textit{FFI}) call
-or storing into a database, the conceptual language need to encrypt
+world, such as making a foreign function interface (FFI) call
+or storing into a database, the conceptual language should encrypt
 whatever values labeled as high security before they are passed into a
 foreign routine.
 
