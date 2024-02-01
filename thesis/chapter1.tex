@@ -85,7 +85,7 @@ check could undermine the security of the entire application.
 
 Alternatively, the author of the web application could implement
 a parser for the grammar in Figure~\ref{fig:grammar} in
-a \textit{programming language} that enforces information flow security.
+a \textit{programming language} that enforces information-flow security.
 Each terminal in the grammar would be labeled with a security level and
 the programming language, instead of some ad-hoc checks implemented by
 the programmer of the web application, would guarantee that
@@ -102,8 +102,9 @@ noninterference. When the web application interacts with the outside
 world, such as making a foreign function interface (FFI) call
 or storing into a database, the conceptual language should encrypt
 whatever values labeled as high security before they are passed into a
-foreign routine. The programming language approach of information flow
-control (IFC) alleviates the security burden of software development,
+foreign routine. The programming language-based approach of
+information-flow security~\parencite{sabelfeld2003language}
+alleviates the security burden of software development,
 because it forms an abstraction over the flows of information and
 decouples security from the functionality of a software application.
 
@@ -142,12 +143,61 @@ decouples security from the functionality of a software application.
 \label{fig:parsetree}
 \end{figure*}
 
-Traditionally,
+\section{Programming Language-Based Information-Flow Security}
+
+Information-flow control (IFC) ensures that information transfers
+within a program adhere to a security policy, for example, by
+preventing high-security data from flowing to a low-security
+channel.
+Traditionally, a programming language can enforce IFC either statically
+using a security type system~\parencite{volpano1996sound,Myers:1997aa,myers1999jflow},
+or dynamically using runtime monitoring
+~\parencite{Askarov:2009vq,austin2009efficient,Devriese:2010up,stefan2011flexible,Austin:2017uh},
+or with a combination of the two
+~\parencite{le2005monitoring,le2007automaton,Chandra:2007we,Shroff:2007tg}.
+The two approaches have complementary strengths and weaknesses;
+the dynamic approach requires less effort from the programmer
+while the static approach provides stronger guarantees and
+less runtime overhead. Recently, there has been increasing interest in
+building gradual security-typed languages: taking inspiration from
+gradual typing~\parencite{Siek:2006bh,Siek:2007qy,Tobin-Hochstadt:2006fk, Matthews:2007zr},
+researchers have explored how to give programmers seamless control over
+which parts of the program are secured statically versus dynamically.
+
+\textbf{Static IFC in programming languages}
+The interest in enforcing confidentiality and regulating the flow of
+information in a computer program arises with its defense applications
+in the 1970s \autocite{bell1976secure}.
+\textcite{denning1976lattice}
+builds a information flow model using a lattice of security labels and
+\textcite{denning1977certification} discuss the certification technique
+in further detail, with a proof that a certified program will not give
+away confidential input from non-confidential output.
+\textcite{volpano1996sound} propose a typed-based approach to enforcing
+information flow, by defining a type system for an imperative
+programming language and proving its security with a type soundness
+proof. This idea is further developed by
+\textcite{zdancewic2002programming}.  Such a protection scales well since
+type checking is \textit{compositional}
+\parencite{sabelfeld2003language}. There are projects that apply similar
+techniques but to other languages
+such as bytecode intermediate languages
+\autocite{barthe2005non}, object-oriented languages
+\autocite{amtoft2006logic}, and reactive programming languages
+\autocite{bohannon2009reactive}. Although the aforementioned languages are
+mostly theoretical, efforts have also been made to integrate information
+flow control into widely-used existing languages such as \textit{Jif}
+for Java \autocite{myers1999jflow} and \textit{Flow Caml} for OCaml
+\autocite{pottier2002information, simonet2003flow}.
+
+\textbf{Dynamic IFC in programming languages}
+
+\textbf{\purpletext{Gradual IFC in programming languages}}
+
+\section{A Main Challenge in Gradual Information-Flow Security}
 
 \section{Problem Statement}
 
 \section{Thesis Statement}
 
-%\section{\Surface}
-
-\section{Outline}
+\section{Contributions and Outline}
