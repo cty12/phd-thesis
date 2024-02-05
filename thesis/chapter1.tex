@@ -191,12 +191,15 @@ for Java \autocite{myers1999jflow} and \textit{Flow Caml} for OCaml
 \autocite{pottier2002information, simonet2003flow}.
 
 \textbf{Dynamic IFC in programming languages}
-\textcite{LI20101974} add flow control to Haskell by utilizing
+\textcite{li2006encoding,LI20101974} add flow control to Haskell by utilizing
 existing language features, specifically arrow and typeclass,
 to implement checks. Similarly, the \textit{LIO} library employs
 a labeled IO monad to keep track of the current privilege level,
 which restricts both the observability and the security effect
 ~\parencite{stefan2011flexible,stefan2012flexible}.
+\textcite{austin2009efficient} consider IFC for Javascript and
+propose a purely dynamic approach called no-sensitive-upgrade
+checking to handle implicit flows through the heap.
 
 \textbf{\purpletext{Gradual IFC in programming languages}}
 
