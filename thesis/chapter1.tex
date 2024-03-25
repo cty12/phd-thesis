@@ -1,6 +1,6 @@
 \chapter{Introduction}
 
-\section{Motivation}
+\section{Programming Languages Are Useful in Enforcing Security Policies}
 
 With the development of digital society, people are increasingly
 concerned about the confidentiality of their personal data and
@@ -143,7 +143,8 @@ decouples security from the functionality of a software application.
 \label{fig:parsetree}
 \end{figure*}
 
-\section{Programming Language-Based Information-Flow Security}
+\section{Mechanisms of Programming Language-Based
+  Information-Flow Control: Static, Dynamic, and Gradual}
 
 Information-flow control (IFC) ensures that information transfers
 within a program adhere to a security policy, for example, by
@@ -193,19 +194,21 @@ for Java \autocite{myers1999jflow} and \textit{Flow Caml} for OCaml
 \textbf{Dynamic IFC in programming languages}
 \textcite{li2006encoding,LI20101974} add flow control to Haskell by utilizing
 existing language features, specifically arrow and typeclass,
-to implement checks. Similarly, the \textit{LIO} library employs
-a labeled IO monad to keep track of the current privilege level,
-which restricts both the observability and the security effect
-~\parencite{stefan2011flexible,stefan2012flexible}.
+to implement checks.
+\textcite{stefan2011flexible,stefan2012flexible,STEFAN:2017ta}
+design a Haskell library called \textit{LIO};
+inspired by IFC operating systems
+~\parencite{efstathopoulos2005labels,zeldovich2011making,krohn2007information,vandebogart2007labels},
+\textit{LIO} takes a coarse-grained, floating-label approach that
+employs a labeled IO monad to keep track of the current privilege level,
+which restricts both the observability and the security effect.
 \textcite{austin2009efficient} consider IFC for Javascript and
 propose a purely dynamic approach called no-sensitive-upgrade
 checking to handle implicit flows through the heap.
 
 \textbf{\purpletext{Gradual IFC in programming languages}}
 
-\section{A Main Challenge in Gradual Information-Flow Security}
-
-\section{Problem Statement}
+\section{The Tension Between Noninterference and the Gradual Guarantee}
 
 \section{Thesis Statement}
 
