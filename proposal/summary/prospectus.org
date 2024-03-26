@@ -1,10 +1,13 @@
-#+TITLE: PhD Thesis Proposal Summary
-#+SUBTITLE: Mechanized Meta-theory for Gradual Security
+#+TITLE: PhD Dissertation Prospectus
+#+SUBTITLE: The Holy Grail of Gradual Security
 #+OPTIONS: toc:nil
 #+AUTHOR: Tianyu Chen
 #+LATEX_CLASS_OPTIONS: [10pt]
+#+LATEX_COMPILER: xelatex
+#+LATEX_HEADER: \PassOptionsToPackage{no-math}{fontspec}
+#+LATEX_HEADER: \usepackage{mathspec}
 #+LATEX_HEADER: \usepackage{libertine}
-#+LATEX_HEADER: \usepackage{inconsolata}
+#+LATEX_HEADER: \setallmonofonts[Scale=0.9]{Iosevka}
 
 #+MACRO: surface $\lambda_{\mathtt{SEC}}^\star$
 
