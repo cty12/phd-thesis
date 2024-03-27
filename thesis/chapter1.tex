@@ -54,7 +54,7 @@ flow to inappropriate destinations, so that sensitive personal information
 is not revealed; dually, to ensure integrity, data must not flow from
 inappropriate sources, so that valuable digital assets are not
 corrupted~\cite{sabelfeld2003language,biba1977integrity}.
-In practice, such enforcement of information flow control is often difficult
+In practice, such enforcement of the flow of information is often difficult
 to implement. Take confidentially for example, software applications accept
 user input where selected fields are sensitive, whose confidentiality is required
 during their entire life cycle including both parsing and data processing.
@@ -70,7 +70,6 @@ the web application, are of high-security, so they are marked {\color{red}
   red}, while other terminals, such as the keys of the record and the
 strings $w$ for first name / last name, being safe to disclose, are
 all of low-security, marked in {\color{green} green}.
-
 Consider the following user input:
 
 \begin{lstlisting}[numbers=none,xleftmargin=0.1\textwidth]
@@ -91,7 +90,7 @@ check could undermine the security of the entire application.
 
 Alternatively, the author of the web application could implement
 a parser for the grammar in Figure~\ref{fig:grammar} in
-a \textit{programming language} that enforces information-flow security.
+a programming language that enforces information-flow security.
 Each terminal in the grammar would be labeled with a security level and
 the programming language, instead of some ad-hoc checks implemented by
 the programmer of the web application, would guarantee that
