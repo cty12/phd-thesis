@@ -7,14 +7,32 @@
 #+LATEX_HEADER: \PassOptionsToPackage{no-math}{fontspec}
 #+LATEX_HEADER: \usepackage{mathspec}
 #+LATEX_HEADER: \usepackage{libertine}
+#+LATEX_HEADER: \usepackage{circledsteps}
 #+LATEX_HEADER: \setallmonofonts[Scale=0.9]{Iosevka}
 
-#+MACRO: surface $\lambda_{\mathtt{SEC}}^\star$
+#+MACRO: surface $\lambda_{\mathtt{IFC}}^\star$
+#+MACRO: cc $\lambda_{\mathtt{IFC}}^{c}$
+#+MACRO: dynifc $\lambda_{\mathtt{SEC}}$
 
-In my PhD thesis, I plan to introduce a gradual security-typed
-programming language called {{{surface}}}. I plan to present its
-formal specification and the mechanized meta-theoretic results
-in the Agda proof assistant.
+#+MACRO: unk $\mathtt{\star}$
+#+MACRO: circ @@latex:\Circled{$1}@@
+
+My PhD thesis:
+
+#+BEGIN_CENTER
+/{{{surface}}} satisfies both noninterference and the gradual
+guarantee without sacrifices, by excluding the statically
+unknown label {{{unk}}} from runtime security labels./
+#+END_CENTER
+
+In my PhD dissertation, I will introduce a gradual security-typed programming
+language, {{{surface}}}, which {{{circ(1)}}} enforces information flow security
+by satisfying noninterference, {{{circ(2)}}} satisfies the gradual guarantee,
+{{{circ(3)}}} enjoys type-guided classification, and {{{circ(4)}}}
+utilizes NSU checking to enforce implicit flows through the heap
+with no static analysis required.
+
+* What Gradual Security Is and Why It Matters
 
 {{{surface}}} is /secure/, because its type system and its runtime work
 together and ensure an information-flow policy that the output of running
