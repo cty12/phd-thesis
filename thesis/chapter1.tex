@@ -19,10 +19,11 @@ without their consent
 ~\parencite{cadwalladr2018facebook,kitchgaessner2017cambridge,gonzalez2019global,hinds2020wouldn}.
 In the healthcare sector, from 2005 to 2019, 249.09 million individuals
 were affected by data breaches that caused exposure of sensitive medical
-data~\parencite{seh2020healthcare}. In respect of data integrity, researchers
+data~\parencite{seh2020healthcare}. Researchers
 have found ways to tamper the analytics APIs~\parencite{pfeffer2018tampering} and
-the metadata (such as the numbers of likes, follows, and views)~\parencite{paquet2017can}
-of major social media platforms. To deal with the security and privacy
+damage the integrity of metadata, such as the numbers of likes, follows,
+and views, of major social media platforms~\parencite{paquet2017can}.
+To deal with the security and privacy
 challenges of the increasingly digitalized world, the European Union introduced
 the General Data Protection Regulation (GDPR) to reform and regulate
 the collection and processing of personal data. However, studies show
@@ -48,12 +49,17 @@ particularly small-to-medium enterprises~\parencite{sirur2018we,freitas2018gdpr,
 
 From a technical perspective, ensuring the security and privacy of
 personal data typically involves tracking and checking
-the flow of information.
-Modern software applications often accept user input where
-selected fields are sensitive, whose confidentiality is required
-during both parsing and processing. To rule out information leaks,
-neither the sensitive fields, nor any data that depends on those fields,
-is allowed to be revealed to a low-privilege observer.
+the flow of information. To ensure confidentiality, data must not
+flow to inappropriate destinations, so that sensitive personal information
+is not revealed; dually, to ensure integrity, data must not flow from
+inappropriate sources, so that valuable digital assets are not
+corrupted~\cite{sabelfeld2003language,biba1977integrity}.
+In practice, such enforcement of information flow control is often difficult
+to implement. Take confidentially for example, software applications accept
+user input where selected fields are sensitive, whose confidentiality is required
+during their entire life cycle including both parsing and data processing.
+To rule out information leaks, neither the sensitive fields, nor any data that depends on
+those fields, is allowed to be revealed to a low-privilege observer.
 Consider a web application that receives three fields from its user:
 \Circled{1} first name \Circled{2} last name \Circled{3}
 social security number, the grammar of which
