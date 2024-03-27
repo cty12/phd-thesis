@@ -1,0 +1,69 @@
+\documentclass[10pt, letterpaper]{article}
+
+\usepackage{mathtools}
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{mathabx}
+\usepackage{mathrsfs}
+\usepackage[onehalfspacing]{setspace}
+\usepackage{hyperref}
+\usepackage{libertine}
+\usepackage{fontspec}
+\usepackage{semantic}
+\usepackage{minted}
+\usepackage{multicol}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[numbers]{natbib}
+\usepackage{pifont}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{xspace}
+\usepackage{circledsteps}
+\usepackage[justification=centering]{caption}
+
+\newcommand{\key}[1]{\ensuremath{\mathtt{#1}}}
+\newcommand{\Surface}{\ensuremath{\lambda_{\mathtt{IFC}}^\star}\xspace}
+\newcommand{\SurfaceOld}{\ensuremath{\lambda_{\mathtt{SEC}}^\star}\xspace}
+\newcommand{\CCOld}{\ensuremath{\lambda_{\mathtt{SEC}}^{\Rightarrow}}\xspace}
+\newcommand{\CC}{\ensuremath{\lambda_{\mathtt{IFC}}^{c}}\xspace}
+\newcommand{\DynIFC}{\ensuremath{\lambda_{\mathtt{SEC}}}\xspace}
+\newcommand{\unk}{\key{\star}\xspace}
+
+\setmonofont[Scale=0.9]{Iosevka}
+
+\title{PhD Dissertation Prospectus: \\
+  The Holy Grail of Gradual Security}
+
+\author{Tianyu Chen \\ Computer Science, Indiana University}
+\date{March 2024}
+
+\begin{document}
+
+\maketitle
+
+\fbox{
+	\parbox{0.9\linewidth}{
+    \textbf{My thesis:} \\
+    \Surface satisfies both noninterference and the gradual
+    guarantee without sacrificing type-based reasoning,
+    by excluding the statically unknown label \unk
+    from runtime security labels.
+	}
+}
+\vspace{10pt}
+
+In my PhD dissertation, I will introduce a gradual security-typed programming
+language, \Surface, which \Circled{1} enforces information flow security
+by satisfying noninterference, \Circled{2} satisfies the gradual guarantee,
+\Circled{3} enjoys type-guided classification, and \Circled{4}
+utilizes NSU checking to enforce implicit flows through the heap
+with no static analysis required. The semantics of \Surface is
+given by translation to a novel security cast calculus \CC,
+which is the first to be specified using the coercion calculus
+of~\citet{Henglein:1994nz}.
+
+\section{What Gradual Security Is and Why It Matters}
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{all.bib}
+
+\end{document}

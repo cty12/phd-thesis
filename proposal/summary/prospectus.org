@@ -17,6 +17,8 @@
 #+MACRO: unk $\mathtt{\star}$
 #+MACRO: circ @@latex:\Circled{$1}@@
 
+#+bibliography: all.bib
+
 My PhD thesis:
 
 #+BEGIN_CENTER
@@ -34,17 +36,37 @@ with no static analysis required.
 
 * What Gradual Security Is and Why It Matters
 
-{{{surface}}} is /secure/, because its type system and its runtime work
-together and ensure an information-flow policy that the output of running
-a well-typed {{{surface}}} program does not leak information about its
-sensitive, high-security user input.
-The language is /gradual/, because it gives programmers the choice
-between enforcing the aforementioned security policy statically,
-when the program type-checks, or dynamically, when the program
-executes. Due to the sensitive nature of information-flow control,
-there is strong desire to machine-check (mechanize) the proofs.
-Agda is a proof assistant based on a variant of Martin-Löf type theory
-(MLTT), which ensures that all proofs are indeed correct.
+Information-flow control (IFC) ensures that information transfers
+within a program adhere to a security policy, e.g., by
+preventing high-security data from flowing to a low-security
+channel. This adherence can be enforced statically using a type
+system [cite: @volpano1996sound;@Myers:1997aa;@myers1999jflow]
+
+However, [cite/t:@Toro:2018aa] identified
+
+# {{{citep(volpano1996sound,Myers:1997aa,myers1999jflow)}}}
+# , or
+# dynamically using runtime
+# monitoring~\citep{Askarov:2009vq,austin2009efficient,Devriese:2010up,stefan2011flexible,Austin:2017uh,Xiang:2021ub},
+# or using static analysis to pre-compute information that facilitates runtime monitoring
+# ~\citep{le2005monitoring,le2007automaton,Chandra:2007we,Shroff:2007tg,russo2010dynamic,moore2011static}.
+# The static and dynamic approaches have complementary strengths and weaknesses; the dynamic
+# approach requires less effort from the programmer while the static
+# approach provides stronger guarantees and less runtime overhead.
+
+# {{{surface}}} is /secure/, because its type system and its runtime work
+# together and ensure an information-flow policy that the output of running
+# a well-typed {{{surface}}} program does not leak information about its
+# sensitive, high-security user input.
+# The language is /gradual/, because it gives programmers the choice
+# between enforcing the aforementioned security policy statically,
+# when the program type-checks, or dynamically, when the program
+# executes. Due to the sensitive nature of information-flow control,
+# there is strong desire to machine-check (mechanize) the proofs.
+# Agda is a proof assistant based on a variant of Martin-Löf type theory
+# (MLTT), which ensures that all proofs are indeed correct.
+
+* Key Insights and Technical Contributions
 
 In more detail, I keep two major properties in mind when I design
 and reason about {{{surface}}}, namely, /noninterference/ and
@@ -64,6 +86,8 @@ If the programmer goes the other direction and replaces some unknown
 labels with concrete labels, ~low~ or ~high~, the program may produce a
 compile-time error or a trapped runtime error, because some of
 the annotations supplied by the programmer may contain mistakes.
+
+* Dissertation Timeline
 
 I have already finished the language design of {{{surface}}}, including its
 syntax, its type system, and its semantics. I have proved that {{{surface}}}
