@@ -57,10 +57,11 @@ language, \Surface, which \Circled{1} enforces information flow security
 by satisfying noninterference, \Circled{2} satisfies the gradual guarantee,
 \Circled{3} enjoys type-guided classification, and \Circled{4}
 utilizes NSU checking to enforce implicit flows through the heap
-with no static analysis required. The semantics of \Surface is
-given by translation to a novel security cast calculus \CC,
-which is the first to be specified using the coercion calculus
-of~\citet{Henglein:1994nz}.
+with no static analysis required.
+%% The semantics of \Surface is
+%% given by translation to a novel security cast calculus \CC,
+%% which is the first to be specified using the coercion calculus
+%% of~\citet{Henglein:1994nz}.
 
 \section{What Gradual Security Is and Why It Matters}
 
@@ -91,15 +92,38 @@ one possible source of the tension: the \textit{type-guided classification}
 performed in \GSLRef~\citep{Toro:2018aa}. They propose a new gradually typed language,
 GLIO, which sacrifices type-guided classification and prove both noninterference and
 the gradual guarantee. \citet{bichhawat2021gradual} conjecture that \textit{NSU checking}
-could be another possible source of the tension. As an alternative,
-they propose a hybrid approach that leverages static analysis ahead of program
-execution to determine the write effects in untaken branches. They study a
+could be another possible source of the tension.
+They leverage static analysis ahead of program execution to determine
+the write effects in untaken branches. They study a
 simple imperative language with first-order stores and prove
 noninterference and the gradual guarantee.
 
-\section{Key Insights and Planned Contributions}
+\section{Key Insight and Planned Contributions}
+
+Contrary to the prior work, I show that one does not need
+to give up on type-guided classification or NSU checking to resolve the tension.
+Instead, the tension can be resolved by walking back a design choice in \GSLRef,
+which was to allow \unk as a runtime security label.
+Beside the insight, I plan to make the following technical contributions:
+
+\begin{itemize}
+%% \item Identify the real cause of the tension between information flow security
+%%   and the gradual guarantee.
+\item A coercion calculus for security labels and a coercion calculus for secure values.
+  The two coercion calculi serve as the runtime monitor for IFC.
+\item A cast calculus \CC with IFC that defines the dynamic semantics of \Surface.
+\item A pen-and-paper proof of noninterference for \Surface through the simulation
+  between its cast calculus \CC and a dynamic IFC programming language \DynIFC.
+\item The first design of a gradual security-typed language with type-guided classification
+  that satisfies the gradual guarantee.
+\item A mechanization of \Surface, with the gradual guarantee proved in the Agda
+  proof assistant.
+\end{itemize}
 
 \section{Dissertation Timeline}
+
+I have finished the technical development of \Surface and plan to finish my degree requirements
+before Dec. 31\textsuperscript{th}, 2024.
 
 \clearpage
 \bibliographystyle{ACM-Reference-Format}
