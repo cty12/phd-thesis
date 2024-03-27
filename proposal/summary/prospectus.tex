@@ -86,7 +86,16 @@ differ in the precision of their type annotations should behave the same modulo
 cast errors. Unfortunately, \citet{Toro:2018aa} identify a tension between the
 gradual guarantee and information security; they were unable to satisfy both
 properties in the language \GSLRef and had to settle for only satisfying
-information-flow security (noninterference).
+information-flow security (noninterference). \citet{Amorim:2020aa} conjecture
+one possible source of the tension: the \textit{type-guided classification}
+performed in \GSLRef~\citep{Toro:2018aa}. They propose a new gradually typed language,
+GLIO, which sacrifices type-guided classification and prove both noninterference and
+the gradual guarantee. \citet{bichhawat2021gradual} conjecture that \textit{NSU checking}
+could be another possible source of the tension. As an alternative,
+they propose a hybrid approach that leverages static analysis ahead of program
+execution to determine the write effects in untaken branches. They study a
+simple imperative language with first-order stores and prove
+noninterference and the gradual guarantee.
 
 \section{Key Insights and Planned Contributions}
 
