@@ -26,6 +26,7 @@
 \newcommand{\CCOld}{\ensuremath{\lambda_{\mathtt{SEC}}^{\Rightarrow}}\xspace}
 \newcommand{\CC}{\ensuremath{\lambda_{\mathtt{IFC}}^{c}}\xspace}
 \newcommand{\DynIFC}{\ensuremath{\lambda_{\mathtt{SEC}}}\xspace}
+\newcommand{\GSLRef}{\ensuremath{\mathrm{GSL}_\mathsf{Ref}}\xspace}
 \newcommand{\unk}{\key{\star}\xspace}
 
 \setmonofont[Scale=0.9]{Iosevka}
@@ -63,6 +64,35 @@ of~\citet{Henglein:1994nz}.
 
 \section{What Gradual Security Is and Why It Matters}
 
+Information-flow control (IFC) ensures that information transfers within a
+program adhere to a security policy, e.g., by preventing high-security data from
+flowing to a low-security channel. This adherence can be enforced statically
+using a type system~\citep{volpano1996sound,Myers:1997aa,myers1999jflow}, or
+dynamically using runtime
+monitoring~\citep{Askarov:2009vq,austin2009efficient,Devriese:2010up,
+  stefan2011flexible,Austin:2017uh,Xiang:2021ub}, or using static analysis to
+pre-compute information that facilitates runtime monitoring
+~\citep{le2005monitoring,le2007automaton,Chandra:2007we,Shroff:2007tg,russo2010dynamic,moore2011static}.
+The static and dynamic approaches have complementary strengths and weaknesses;
+the dynamic approach requires less effort from the programmer while the static
+approach provides stronger guarantees and less runtime overhead. Taking
+inspiration from gradual typing~\citep{Siek:2006bh,Siek:2007qy}, researchers
+have explored how to give programmers seamless control over which parts of the
+program are secured statically versus
+dynamically~\citep{Disney:2011fv,Fennell:2013ab,Fennell:2015aa}.
+
+Gradual languages should satisfy the gradual guarantee: programs that only
+differ in the precision of their type annotations should behave the same modulo
+cast errors. Unfortunately, \citet{Toro:2018aa} identify a tension between the
+gradual guarantee and information security; they were unable to satisfy both
+properties in the language \GSLRef and had to settle for only satisfying
+information-flow security (noninterference).
+
+\section{Key Insights and Planned Contributions}
+
+\section{Dissertation Timeline}
+
+\clearpage
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{all.bib}
 
