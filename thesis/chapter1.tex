@@ -148,8 +148,8 @@ decouples security from the functionality of a software application.
 \label{fig:parsetree}
 \end{figure*}
 
-\section{Mechanisms of Programming Language-Based
-  Information-Flow Control: Static, Dynamic, and Gradual}
+\section{Traditional Mechanisms of Programming Language-Based
+         Information-Flow Control: Static, Dynamic, Hybrid}
 
 Information-flow control (IFC) ensures that information transfers
 within a program adhere to a security policy, for example, by
@@ -215,10 +215,28 @@ memory location under a high-security context.
 \textcite{austin2010permissive} study a sound yet more flexible
 enforcement strategy called \textit{permissive-upgrade}, which
 allows more programs to run to completion.
+\textcite{austin2012multiple,Austin:2017uh} propose \textit{faceted values},
+another approach to dynamically handle implicit flows by simulating
+multi-execution in a single process, which, unlike no-sensitive-upgrade
+and permissive-upgrade, avoids conservative monitor failures.
 
-\textbf{\purpletext{Gradual IFC in programming languages}}
+\textbf{Dynamic IFC with static pre-processing}
 
-\section{The Tension Between Noninterference and the Gradual Guarantee}
+\textbf{User-controllable hybrid IFC} Similar to gradual security-typed
+languages, Hybrid LIO (HLIO)~\cite{Buiras:2015aa}
+also supports the choice of static or dynamic IFC in different
+parts of a single program. By default the checking is static, but
+a programmer can insert a \texttt{defer} clause to say that
+the security constraints should be checked at runtime.
+In gradual security-typed languages, the switch between static
+and dynamic is directed by types, so unlike in HLIO, the developer
+does not need to embed explicit casts or \texttt{defer} into the program.
+Moreover, the gradual guarantee relates the runtime behavior
+of programs that differ in the precision of type annotations, but
+there is no comparable theorem about adding and removing \texttt{defer}
+in HLIO.
+
+\section{The Tension Between Gradual Typing and Information-Flow Control}
 
 \section{Thesis Statement}
 
