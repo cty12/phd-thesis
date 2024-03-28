@@ -208,8 +208,13 @@ LIO takes a coarse-grained, floating-label approach that
 employs a labeled IO monad to keep track of the current privilege level,
 which restricts both the observability and the security effect.
 \textcite{austin2009efficient} consider IFC for Javascript and
-propose a purely dynamic approach called no-sensitive-upgrade
-checking to handle implicit flows through the heap.
+propose a purely dynamic approach called \textit{no-sensitive-upgrade}
+checking to handle implicit flows through the heap, by terminating
+the execution whenever a program attempts to modify a low-security
+memory location under a high-security context.
+\textcite{austin2010permissive} study a sound yet more flexible
+enforcement strategy called \textit{permissive-upgrade}, which
+allows more programs to run to completion.
 
 \textbf{\purpletext{Gradual IFC in programming languages}}
 
