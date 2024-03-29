@@ -220,9 +220,16 @@ another approach to dynamically handle implicit flows by simulating
 multi-execution in a single process, which, unlike no-sensitive-upgrade
 and permissive-upgrade, avoids conservative monitor failures.
 
-\textbf{Dynamic IFC with static pre-processing}
+\textbf{Dynamic IFC with static pre-processing} Researchers have also
+explored facilitating runtime IFC with static analysis.
+\textcite{russo2010dynamic} study dynamic IFC in a flow-sensitive setting.
+They utilize a static analysis that detects variables in untaken branches
+whose security must be upgraded at runtime in order to prevent illegal implicit
+flows through the heap. \textcite{moore2011static} improve the efficiency of
+the hybrid monitoring of \textcite{russo2010dynamic} by selectively tracking
+variables and incorporating memory abstractions.
 
-\textbf{User-controllable hybrid IFC} Similar to gradual security-typed
+\textbf{Programmer-controlled hybrid IFC} Similar to gradual security-typed
 languages, Hybrid LIO (HLIO)~\cite{Buiras:2015aa}
 also supports the choice of static or dynamic IFC in different
 parts of a single program. By default the checking is static, but
