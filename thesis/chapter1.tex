@@ -220,13 +220,21 @@ another approach to dynamically handle implicit flows by simulating
 multi-execution in a single process, which, unlike no-sensitive-upgrade
 and permissive-upgrade, avoids conservative monitor failures.
 
-\textbf{Dynamic IFC with static pre-processing} Researchers have also
-explored facilitating runtime IFC with static analysis.
-\textcite{russo2010dynamic} study dynamic IFC in a flow-sensitive setting.
-They utilize a static analysis that detects variables in untaken branches
-whose security must be upgraded at runtime in order to prevent illegal implicit
-flows through the heap. \textcite{moore2011static} improve the efficiency of
-the hybrid monitoring of \textcite{russo2010dynamic} by selectively tracking
+\textbf{Dynamic IFC with static pre-processing} Researchers have also explored
+facilitating runtime IFC with static analysis. \textcite{le2005monitoring}
+explore a hybrid IFC monitor for sequential programs that combines runtime IFC
+with a static analysis that gathers information about the non-executed branches.
+This hybrid IFC accepts programs that are conservatively rejected by fully
+static IFC. They further show that it is possible to alter the behavior of
+executions that may be unsafe by resetting output values using the information
+from their hybrid analysis to reclaim confidentiality. \textcite{le2007automaton}
+extends this hybrid IFC approach to concurrent programs and prove noninterference
+for any execution.
+\textcite{russo2010dynamic} study dynamic IFC in a flow-sensitive setting. They
+utilize a static analysis that detects variables in untaken branches whose
+security must be upgraded at runtime in order to prevent illegal implicit flows
+through the heap. \textcite{moore2011static} improve the efficiency of the
+hybrid monitoring of \textcite{russo2010dynamic} by selectively tracking
 variables and incorporating memory abstractions.
 
 \textbf{Programmer-controlled hybrid IFC} Similar to gradual security-typed
