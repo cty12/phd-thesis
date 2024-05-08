@@ -269,13 +269,25 @@ annotations. The programmer can choose when it is appropriate to increase the
 precision of the type annotations and put in the effort to pass the static
 checks and when it is appropriate to reduce the precision of type annotations,
 deferring the enforcement to runtime.
-%
+
+The main challenge in the design of gradually typed languages is controlling the
+flow of values (and information) between the static and dynamic regions of code,
+which is accomplished using runtime casts. Typically source programs are
+compiled to an intermediate language, called a cast calculus, that includes
+explicit syntax for runtime casts. \textcite{Disney:2011fv} design a cast
+calculus with IFC for a pure lambda calculus and prove noninterference.
+\textcite{Fennell:2013ab} design a cast calculus named ML-GS with mutable
+references using the no-sensitive-upgrade (NSU) runtime checks of
+\textcite{austin2009efficient}. \textcite{Fennell:2015aa} design a cast calculus
+for an imperative, object-oriented language.
+
 The main property of gradually typed languages is the \textit{gradual
   guarantee}~\cite{Siek:2015ac}, which states that removing type
 annotations should not change the runtime behavior. Adding type
 annotations should also result in the same behavior except that it may
 introduce more trapped errors because those new type annotations may
 contain mistakes.
+
 
 \section{Thesis Statement}
 
