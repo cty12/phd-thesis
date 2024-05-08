@@ -281,12 +281,63 @@ references using the no-sensitive-upgrade (NSU) runtime checks of
 \textcite{austin2009efficient}. \textcite{Fennell:2015aa} design a cast calculus
 for an imperative, object-oriented language.
 
+\begin{table}[tbp]
+  \footnotesize
+  \centering
+  \caption{Proposed sources of tension between security and the gradual guarantee}
+  \begin{tabularx}{\textwidth}{X|c|c|c|c|c}
+  \toprule
+  \thead{Language} & \thead{Security \\ (noninterference)} & \thead{Gradual\\Guarantee} &
+  \thead{Type-guided \\ classification} & \thead{NSU \\ checking} & \thead{Runtime \\ security labels} \\
+  \hline
+  \GSLRef    & \tikzmark{a}{\yes}  & \cellcolor{Red!10} \tikzmark{b}{\no} & \yes  & \yes & $\{ \low, \high, \unk \}$ \\[1ex]
+  \hline
+  GLIO      & \yes & \cellcolor{Green!10} \tikzmark{c}{\yes} & \tikzmark{d}{\no}  & \yes & $\{ \low, \high \}$ \\[1ex]
+  \hline
+  \WHILEG & \yes & \cellcolor{Green!10} \tikzmark{e}{\yes} & \yes   & \tikzmark{f}{\no} & $\{ \low, \high, \unk \}$ \\[1ex]
+  \hline
+  \rowcolor{highlight}
+  \Surface~{\scriptsize (this dissertation)} & \yes & \cellcolor{Green!10} \tikzmark{g}{\yes} & \yes & \yes & \tikzmark{h}{$\{ \low, \high \}$} \\[1ex]
+  \bottomrule
+  \end{tabularx}
+\begin{tikzpicture}[overlay, remember picture, yshift=.25\baselineskip, shorten >=.5pt, shorten <=.5pt]
+  \draw[dashed,thick] (a) to [bend right=15] (b);
+  \draw[dashed,thick] (c) to [bend right=15] (d);
+  \draw[dashed,thick] (e) to [bend right=10] (f);
+  \draw[thick]        (g) to [bend right=8 ] (h);
+\end{tikzpicture}
+  \label{tab:cc-features}
+\end{table}
+
 The main property of gradually typed languages is the \textit{gradual
-  guarantee}~\cite{Siek:2015ac}, which states that removing type
-annotations should not change the runtime behavior. Adding type
-annotations should also result in the same behavior except that it may
-introduce more trapped errors because those new type annotations may
-contain mistakes.
+  guarantee}~\cite{Siek:2015ac}, which states that removing type annotations
+should not change the runtime behavior. Adding type annotations should also
+result in the same behavior except that it may introduce more trapped errors
+because those new type annotations may contain mistakes. Since the formulation
+of the gradual guarantee as a criterion for gradually typed
+languages~\cite{Siek:2015ac}, researchers have explored the feasibility of
+satisfying both the gradual guarantee and noninterference.
+\textcite{Toro:2018aa} identify a tension between the gradual guarantee and
+security enforcement. They analyze the semantics of runtime casts through the
+lens of Abstracting Gradual Typing~\parencite{Garcia:2016aa} and propose a
+type-driven semantics for gradual security. However, \textcite{Toro:2018aa}
+discover counterexamples to the gradual guarantee in the \GSLRef language. They
+conjecture that it is not possible to enforce noninterference and satisfy the
+gradual guarantee at the same time.
+
+\textcite{Amorim:2020aa} conjecture one possible source of the tension: the
+\textit{type-guided classification} performed in
+\GSLRef~\parencite{Toro:2018aa}. They propose a new gradually typed language,
+GLIO, which sacrifices type-guided classification. They prove that GLIO
+satisfies both noninterference and the gradual guarantee using a denotational
+semantics.
+%
+\textcite{bichhawat2021gradual} conjecture that \textit{NSU checking} could be
+another possible source of the tension. As an alternative, they propose a hybrid
+approach that leverages static analysis ahead of program execution to determine
+the write effects in untaken branches. They study a simple imperative language
+with first-order stores and prove both noninterference and the gradual
+guarantee.
 
 
 \section{Thesis Statement}

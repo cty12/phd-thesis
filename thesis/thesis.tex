@@ -36,7 +36,10 @@
 \usepackage{circledsteps}
 %\usepackage{newunicodechar}
 %\usepackage{minted}
+\usepackage{booktabs}
 \usepackage{todonotes}
+\usepackage{caption}
+\captionsetup[table]{skip=10pt}
 
 \usetikzlibrary{shapes,arrows}
 \usetikzlibrary{decorations.markings}
@@ -181,6 +184,9 @@
 \newcommand{\highlight}[2]{\colorbox{#1}{\ensuremath{#2}}}
 \newcommand{\highlightblue}[1]{\highlight{White!90!NavyBlue}{#1}}
 \newcommand{\highlightred}[1]{\highlight{White!90!Maroon}{#1}}
+
+\definecolor{highlight}{gray}{0.9}
+\sethlcolor{highlight}
 
 \colorlet{red}{OrangeRed}
 \colorlet{green}{PineGreen}
