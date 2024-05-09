@@ -339,6 +339,14 @@ the write effects in untaken branches. They study a simple imperative language
 with first-order stores and prove both noninterference and the gradual
 guarantee.
 
+Surprisingly, contrary to the prior work, I am going to show in this
+dissertation that one does not have to give up on type-guided classification or
+NSU checking to resolve the tension between noninterference and the gradual
+guarantee. Instead, the real source of the tension is that \GSLRef allows \unk
+as a \textit{runtime} security label. By walking back this usual design choice,
+I am going to present a gradual security-typed programming language \Surface and
+prove that \Surface satisfies both noninterference and the gradual guarantee
+without any sacrifices.
 
 \section{Thesis Statement}
 
