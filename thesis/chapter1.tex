@@ -1,4 +1,5 @@
 \chapter{Introduction}
+\label{ch:intro}
 
 \section{Programming Languages Are Useful in Enforcing Security Policies}
 
@@ -66,7 +67,7 @@ and the strings $w$ for first name / last name, being safe to disclose, are all
 of low-security, marked in {\color{green} green}. Consider the following user
 input:
 
-\begin{lstlisting}[numbers=none,xleftmargin=0.1\textwidth]
+\begin{lstlisting}[numbers=none,xleftmargin=0.15\textwidth]
 {FirstName=Mad;LastName=Hatter;SSN=012-34-5678}
 \end{lstlisting}
 
@@ -265,10 +266,10 @@ of the program are secured statically versus dynamically, directed by
 %
 In general, gradually typed languages support the seamless transition between
 static and dynamic enforcement through the \textit{precision} of type
-annotations. The programmer can choose when it is appropriate to increase the
-precision of the type annotations and put in the effort to pass the static
-checks and when it is appropriate to reduce the precision of type annotations,
-deferring the enforcement to runtime.
+annotations. Gradual security is useful, because the programmer is free to
+choose when it is appropriate to increase the precision of the type annotations
+and put in the effort to pass the static checks and when it is appropriate to
+reduce the precision of type annotations, deferring the enforcement to runtime.
 
 The main challenge in the design of gradually typed languages is controlling the
 flow of values (and information) between the static and dynamic regions of code,
@@ -339,14 +340,18 @@ the write effects in untaken branches. They study a simple imperative language
 with first-order stores and prove both noninterference and the gradual
 guarantee.
 
-Surprisingly, contrary to the prior work, I am going to show in this
-dissertation that one does not have to give up on type-guided classification or
-NSU checking to resolve the tension between noninterference and the gradual
-guarantee. Instead, the real source of the tension is that \GSLRef allows \unk
-as a \textit{runtime} security label. By walking back this usual design choice,
-I am going to present a gradual security-typed programming language \Surface and
-prove that \Surface satisfies both noninterference and the gradual guarantee
-without any sacrifices.
+In my opinion, a ideal gradual security-typed language \Circled{1} should
+enforce security by satisfying noninterference \Circled{2} should satisfy the
+gradual guarantee \Circled{3} should provide type-based reasoning through
+vigilance and type-guided classification \Circled{4} should not require addition
+static analyses prior to program execution. Contrary to the prior work, I am
+going to show in this dissertation that one does not have to give up on any of
+the four requirements to resolve the tension between noninterference and the
+gradual guarantee. Instead, the real source of the tension is that \GSLRef
+allows \unk as a \textit{runtime} security label. By walking back this usual
+design choice, I am going to present a gradual security-typed programming
+language \Surface and prove that \Surface satisfies both noninterference and the
+gradual guarantee without any sacrifices.
 
 \section{Key Enabling Insight and Thesis Statement}
 
@@ -362,9 +367,9 @@ level~\parencite{Askarov:2009vq,austin2009efficient,Devriese:2010up,stefan2011fl
 
 Based on this observation, I propose a new gradual, security-typed language
 \Surface, which \Circled{1} enforces information flow security, \Circled{2}
-satisfies the gradual guarantee, \Circled{3} enjoys type-guided classification,
-and \Circled{4} utilizes NSU checking to enforce implicit flows through the heap
-with no static analysis required.
+satisfies the gradual guarantee, \Circled{3} enjoys type-based reasoning through
+free theorems, and \Circled{4} utilizes NSU checking to enforce implicit flows
+through the heap with no static analysis required.
 %
 In \Surface, runtime security labels do not include \unk, only \low
 and \high.\footnote{Of course, any lattice of security labels could be
@@ -468,3 +473,21 @@ In summary, my dissertation makes the following technical contributions:
   \DynIFC is derived), a language design that is otherwise similar to \Surface
   but gives up type-guided classification.
 \end{enumerate}
+
+The rest of this dissertation is organized as follows:
+
+\begin{itemize}
+  \item In Chapter~\ref{ch:examples}, I first revisit type-system-based static
+    IFC using example programs in \Surface. I show that \Surface allows gradual
+    transition into dynamic IFC when type annotations become less precise. I
+    then revisit the counterexamples of \textcite{Toro:2018aa} and establish the
+    intuition that unlike \GSLRef, the NSU checking in \Surface is carefully
+    designed to satisfy the gradual guarantee. Finally, I show that \Surface
+    supports type-based reasoning through free theorems because \Surface is
+    vigilant and performs type-guided classification.
+  \item In Chapter~\ref{ch:coercion-calculus-labels}, I define a coercion
+    calculus on security labels. I then present security label expressions,
+    which serve as my model for programmer counter (PC), which restricts the
+    security of memory locations where heap write operations are allowed to
+    happen.
+\end{itemize}
