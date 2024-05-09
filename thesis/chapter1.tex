@@ -348,6 +348,119 @@ I am going to present a gradual security-typed programming language \Surface and
 prove that \Surface satisfies both noninterference and the gradual guarantee
 without any sacrifices.
 
-\section{Thesis Statement}
+\section{Key Enabling Insight and Thesis Statement}
 
-\section{Contributions and Outline}
+In \GSLRef{}, one can write a literal such as $\true_{\unk}$ in a program. At
+runtime, the literal becomes a value of unknown security level. I observe that
+allowing \unk as a runtime security label is the main reason that \GSLRef
+violates the gradual guarantee. That design of \GSLRef was unusual because the
+unknown type $\unk$ is traditionally used in gradual languages to represent the
+lack of static information, not the lack of dynamic information. The design is
+also unusual when compared to dynamic systems for IFC, as those systems do not
+use an unknown security
+level~\parencite{Askarov:2009vq,austin2009efficient,Devriese:2010up,stefan2011flexible,Austin:2017uh}.
+
+Based on this observation, I propose a new gradual, security-typed language
+\Surface, which \Circled{1} enforces information flow security, \Circled{2}
+satisfies the gradual guarantee, \Circled{3} enjoys type-guided classification,
+and \Circled{4} utilizes NSU checking to enforce implicit flows through the heap
+with no static analysis required.
+%
+In \Surface, runtime security labels do not include \unk, only \low
+and \high.\footnote{Of course, any lattice of security labels could be
+used in place of \low and \high.}  On the other hand, to support
+gradual typing, the security labels in a type annotation may
+include \unk. Surprisingly, I discover that removing \unk from the
+runtime labels is sufficient to reclaim the gradual guarantee, without
+sacrificing type-guided classification as in GLIO or NSU checking as
+in \WHILEG. This finding is the primary contribution of this dissertation.
+%
+In \Surface, the security level of a literal defaults to \low,
+similar to systems like Jif~\parencite{Myers:2006aa} and GLIO, but
+different from \GSLRef and \WHILEG.
+
+One might think that allowing $\unk$ as a label on literals and therefore on
+values is necessary so that programmers can run legacy code (without any
+security annotations) in a gradual language, by making \unk the default label
+for literals. However, prior information-flow languages use \low security as the
+default security label for literals~\parencite{Myers:2006aa} and for good reasons.
+The security of a literal is something that only the programmer can know. That
+is, the identification of high-security data in a program must be considered as
+an input to an information flow system, and not something that can or should be
+inferred. When migrating legacy code into a system that supports secure
+information flow, a necessary part of the process for the programmer is to
+identify whether there is any high-security information in the legacy code. The
+choice of \low as the default label is because most literals (if not all) in
+real programs are low security. In fact, it is bad practice to embed
+high-security literals, such as passwords, in program text.
+
+\vspace{20pt}
+\fbox{
+	\parbox{0.9\linewidth}{
+    \textbf{My thesis:} \\
+    \Surface satisfies both noninterference and the gradual
+    guarantee without sacrificing type-based reasoning,
+    by excluding the statically unknown label \unk
+    from runtime security labels.
+	}
+}
+
+\section{Technical Contributions and Outline}
+
+The semantics of \Surface is given by translation to a new security cast
+calculus \CC, for which we define a syntax, type system, and operational
+semantics. We compile \Surface into \CC in a type-preserving way.
+
+In \CC, \textit{security coercions} serve as the runtime security monitor, in
+which I adapt ideas from the Coercion
+Calculus~\parencite{Henglein:1994nz,Herman:2010aa} to IFC. A coercions on
+security labels can be an \textit{injection} from a security label to \unk or a
+\textit{projection} from \unk to a security label. Security labels on literals
+in \Surface become the sources of injections in \CC, while runtime NSU checks
+are treated as a special kind of projection where the target is the security
+level of the memory location to modify. Information flow policies are enforced
+when security coercions are reduced to their normal forms. \textit{Composing}
+coercions models \textit{explicit flows}, while the action of \textit{stamping}
+a coercion in normal form models \textit{implicit flows}.
+
+Compared to prior work on gradual IFC languages, the \CC cast calculus supports
+an additional feature called \textit{blame tracking}~\parencite{Findler:2002eu}.
+Blame tracking is important because it enables modular runtime error messages,
+for example, they play an important role in production-quality languages such as
+Typed Racket~\parencite{Tobin-Hochstadt:2008lr,Preston-Tunnell-Wilson:2018aa}.
+
+Compared to prior work on gradual IFC based on abstracting gradual typing
+(AGT)~\parencite{Toro:2018aa}, our use of a cast calculus makes it clear where
+in the program there is runtime overhead from dynamic checking (the casts). This
+is important for the programmer to know because one may wish to avoid runtime
+overhead in hot regions of a programs. In our translation from \Surface to \CC,
+casts are only inserted where there is insufficient information during
+compilation to decide whether a security policy is enforced or not. In
+particular, casts are not inserted in statically typed regions. In this way,
+information flows that are statically ensured to be safe will never be checked
+again at runtime. On the contrary, the AGT mechanism for dynamic checking
+(called evidence) is attached to most nodes in the syntax tree.
+
+In summary, this paper makes the following technical contributions:
+
+%% \begin{itemize}
+%% \item Identify the real cause of the tension between information flow security
+%%   and the gradual guarantee in \GSLRef: the inclusion of \unk in the
+%%   runtime security levels (\S~\ref{sec:examples}).
+%% \item A coercion calculus for security labels (\S~\ref{sec:cexpr})
+%%   and a coercion calculus for secure values (\S~\ref{sec:coercions}).
+%%   The two coercion calculi serve as our runtime IFC monitor.
+%%   Our paper is the first work to apply the coercion calculus to an IFC setting.
+%% \item A cast calculus \CC with IFC that defines the dynamic semantics of
+%%   \Surface (\S~\ref{sec:cast-calculus}).  The proofs of (1) the
+%%   gradual guarantee (\S~\ref{sec:gg}), (2) compilation
+%%   from \Surface to \CC preserves types (\S~\ref{sec:compile}),
+%%   and (3) type safety of \CC (\S~\ref{sec:type-safety}) are
+%%   mechanized in Agda.
+%% \item A proof of noninterference for \Surface
+%%       (\S~\ref{sec:NI-Surface}) through the simulation between its cast calculus
+%%       \CC and a dynamic IFC programming language (\S~\ref{sec:NI}).
+%% \item The first design of a gradual security-typed language with type-guided classification
+%%   that satisfies the gradual guarantee (\S~\ref{sec:surface-to-cc}).
+%% \item We mechanize the proof of the gradual guarantee in the Agda proof assistant.
+%% \end{itemize}
