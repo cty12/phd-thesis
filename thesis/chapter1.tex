@@ -340,18 +340,18 @@ the write effects in untaken branches. They study a simple imperative language
 with first-order stores and prove both noninterference and the gradual
 guarantee.
 
-In my opinion, a ideal gradual security-typed language \Circled{1} should
-enforce security by satisfying noninterference \Circled{2} should satisfy the
-gradual guarantee \Circled{3} should provide type-based reasoning through
-vigilance and type-guided classification \Circled{4} should not require addition
-static analyses prior to program execution. Contrary to the prior work, I am
-going to show in this dissertation that one does not have to give up on any of
-the four requirements to resolve the tension between noninterference and the
-gradual guarantee. Instead, the real source of the tension is that \GSLRef
-allows \unk as a \textit{runtime} security label. By walking back this usual
-design choice, I am going to present a gradual security-typed programming
-language \Surface and prove that \Surface satisfies both noninterference and the
-gradual guarantee without any sacrifices.
+A ideal gradual security-typed language \Circled{1} should enforce security by
+satisfying noninterference \Circled{2} should satisfy the gradual guarantee
+\Circled{3} should provide type-based reasoning through vigilance and
+type-guided classification \Circled{4} should not require addition static
+analyses prior to program execution. Contrary to the prior work, I am going to
+show in this dissertation that one does not have to give up on any of the four
+requirements to resolve the tension between noninterference and the gradual
+guarantee. Instead, the real source of the tension is that \GSLRef allows \unk
+as a \textit{runtime} security label. By walking back this usual design choice,
+I am going to present a gradual security-typed programming language \Surface and
+prove that \Surface satisfies both noninterference and the gradual guarantee
+without any sacrifices.
 
 \section{Key Enabling Insight and Thesis Statement}
 
