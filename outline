@@ -28,3 +28,22 @@ Statements about Connections:
 - LambdaIFCStar is both vigilant and performs type-guided classification
 - LambdaIFCStar satisfies the gradual guarantee
 - LambdaIFCStar is type safe
+
+Level of details:
+          Programmer visible details - intro - examples (show the gist; what problem is being solved?)
+Details /
+        \
+          Implementation details - later chapters
+
+
+design choice with respect to the security of the newly created memory location
+  Flanagan - current PC
+/
+- GSLRef - an interval
+\
+  programmer chooses the label - ours
+
+
+LambdaSEC     LambdaIFCStar       LambdaSEC (in Zdancewic)
+    |---------------|--------------------|
+ (dynamic)       (gradual)            (static)
