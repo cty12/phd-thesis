@@ -16,9 +16,9 @@ Indeed, the fears are justified by recent news events. In 2018, the Cambridge
 Analytica scandal hit the world headlines, where the data collected from 87
 million social media users was misused without their consent
 ~\parencite{cadwalladr2018facebook,kitchgaessner2017cambridge,gonzalez2019global,hinds2020wouldn}.
-In the healthcare sector, from 2005 to 2019, 249.09 million individuals were
+In the healthcare sector, from 2005 to 2019, 249 million people were
 affected by data breaches that caused exposure of sensitive medical
-data~\parencite{seh2020healthcare}. Researchers have found ways to tamper the
+data~\parencite{seh2020healthcare}. Researchers have found ways to tamper with the
 analytics APIs~\parencite{pfeffer2018tampering} and damage the integrity of
 metadata, such as the numbers of likes, follows, and views, of major social
 media platforms~\parencite{paquet2017can}. To deal with the security and privacy
@@ -27,7 +27,7 @@ the General Data Protection Regulation (GDPR) to reform and regulate the
 collection and processing of personal data. However, studies show that business
 entities experience challenges in complying with GDPR or auditing for
 compliance~\parencite{smirnova2024understanding}, particularly small-to-medium
-enterprises~\parencite{sirur2018we,freitas2018gdpr,harting2021impacts}.
+size enterprises~\parencite{sirur2018we,freitas2018gdpr,harting2021impacts}.
 
 \begin{figure}[tbp]
   \small
@@ -143,6 +143,8 @@ application.
 
 \section{Information-Flow Control via Static, Dynamic, and Hybrid Mechanisms}
 
+\todo[inline]{Let's have some examples in this chapter -Jeremy}
+
 Information-flow control (IFC) ensures that information transfers within a
 program adhere to a security policy, for example, by preventing high-security
 data from flowing to a low-security channel. This adherence can be enforced
@@ -162,19 +164,28 @@ statically versus dynamically, so that the programmer can benefit from the
 static and dynamic approaches depending on their most appropriate application
 scenarios.
 
+\todo[inline]{add another sentence that explicitly road-maps the rest of
+this section. -Jeremy}
+
 \textbf{Static IFC in programming languages} The interest in enforcing
 confidentiality and regulating the flow of information in a computer program
-arises with its defense applications in the 1970s \autocite{bell1976secure}.
-\textcite{denning1976lattice} builds a information flow model using a lattice of
-security labels and \textcite{denning1977certification} discuss the
-certification technique in further detail, with a proof that a certified program
-will not give away confidential input from non-confidential output.
+arose with applications to defense in the 1970s \autocite{bell1976secure}.
+\textcite{denning1976lattice} builds an information flow model using a lattice of
+security labels and \textcite{denning1977certification} describe
+a static analysis for information flow, with a proof that a certified program
+will not transmit confidential input to non-confidential output.
+\todo[inline]{What are the main ideas for how this static analysis works? -Jeremy}
 \textcite{volpano1996sound} propose a typed-based approach to enforcing
 information flow, by defining a type system for an imperative programming
-language and proving its security with a type soundness proof. This idea is
-further developed by \textcite{zdancewic2002programming}. Such a protection
+language and proving its security with a type soundness proof.
+\todo[inline]{What are the important differences in the type-based
+  approach? Is it the compositionality? If so, say that right away. -Jeremy}
+This idea is
+further developed by \textcite{zdancewic2002programming}. Such protection
 scales well since type checking is \textit{compositional}
-\parencite{sabelfeld2003language}. There are projects that apply similar
+\parencite{sabelfeld2003language}.
+\todo[inline]{Give the technical definition of compositional.}
+There are research projects that apply similar
 techniques but to other languages such as bytecode intermediate languages
 \autocite{barthe2005non}, object-oriented languages \autocite{amtoft2006logic},
 and reactive programming languages \autocite{bohannon2009reactive}. Although the
@@ -184,25 +195,34 @@ Jif for Java \autocite{myers1999jflow} and Flow Caml for OCaml
 \autocite{pottier2002information, simonet2003flow}.
 
 \textbf{Dynamic IFC in programming languages}
-\textcite{li2006encoding,LI20101974} add flow control to Haskell by utilizing
-existing language features, specifically arrow and typeclass, to implement
-checks. \textcite{stefan2011flexible,stefan2012flexible,STEFAN:2017ta} design a
-Haskell library called LIO; inspired by IFC operating systems
-~\parencite{efstathopoulos2005labels,zeldovich2011making,krohn2007information,vandebogart2007labels},
-LIO takes a coarse-grained, floating-label approach that employs a labeled IO
-monad to keep track of the current privilege level, which restricts both the
-observability and the security effect. \textcite{austin2009efficient} consider
-IFC for Javascript and propose a purely dynamic approach called
-\textit{no-sensitive-upgrade} checking to handle implicit flows through the
-heap, by terminating the execution whenever a program attempts to modify a
-low-security memory location under a high-security context.
-\textcite{austin2010permissive} study a sound yet more flexible enforcement
-strategy called \textit{permissive-upgrade}, which allows more programs to run
-to completion. \textcite{austin2012multiple,Austin:2017uh} propose
-\textit{faceted values}, another approach to dynamically handle implicit flows
-by simulating multi-execution in a single process, which, unlike
-no-sensitive-upgrade and permissive-upgrade, avoids conservative monitor
-failures.
+\textcite{li2006encoding,LI20101974} add dynamic checking of
+information flow control to Haskell by utilizing existing language
+features, specifically arrows and typeclasses.
+\textcite{stefan2011flexible,stefan2012flexible,STEFAN:2017ta} design
+a Haskell library called LIO; inspired by IFC operating systems
+~\parencite{efstathopoulos2005labels,zeldovich2011making,krohn2007information,vandebogart2007labels}.
+LIO takes a coarse-grained, floating-label approach that employs a
+labeled IO monad to keep track of the current privilege level, which
+restricts both the observability and the security
+effect.
+\todo[inline]{The above is for pure (no mutation) languages. -Jeremy}
+\todo[inlin]{What exactly is the dynamic checking doing? -Jeremy }
+\todo[inline]{The NSU stuff is for languages with mutation. -Jeremy}
+\todo[inline]{What's coarse-grained IFC? What's floating label? -Jeremy}
+\textcite{austin2009efficient} consider IFC for Javascript and
+propose a purely dynamic approach called \textit{no-sensitive-upgrade}
+checking to handle implicit flows through the heap, by terminating the
+execution whenever a program attempts to modify a low-security memory
+location under a high-security context.
+\todo[inline]{need to explain ``high-security context''}
+\textcite{austin2010permissive} study a sound yet more flexible
+enforcement strategy called \textit{permissive-upgrade}, which allows
+more programs to run to
+completion. \textcite{austin2012multiple,Austin:2017uh} propose
+\textit{faceted values}, another approach to dynamically handle
+implicit flows by simulating multi-execution in a single process,
+which, unlike no-sensitive-upgrade and permissive-upgrade, avoids
+conservative monitor failures.
 
 \textbf{Dynamic IFC with static pre-processing} Researchers have also explored
 facilitating runtime IFC with static analysis. \textcite{le2005monitoring}
