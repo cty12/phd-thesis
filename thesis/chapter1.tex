@@ -130,11 +130,11 @@ tree in Figure~\ref{fig:parsetree}, where the terminal nodes that represent
 digits of the social security number are of {\color{red} high-security}, while
 the terminals that compose the rest of the input string are of {\color{green}
   low-security}. The confidentiality of SSN is guaranteed during data processing
-since the programming language enforces noninterference. When the web
-application interacts with the outside world, such as making a foreign function
-interface (FFI) call or storing into a database, the conceptual language should
-encrypt whatever values labeled as high security before they are passed into a
-foreign routine. The programming language-based approach of information-flow
+by the programming language itself. When the web application interacts with the
+outside world, such as making a foreign function interface (FFI) call or storing
+into a database, the conceptual language should encrypt whatever values labeled
+as high security before they are passed into a foreign routine. The programming
+language-based approach of information-flow
 security~\parencite{sabelfeld2003language} alleviates the security burden of
 software development, because it forms an abstraction over the flows of
 information and decouples security from the functionality of a software
@@ -143,7 +143,7 @@ application.
 
 \section{Information-Flow Control via Static, Dynamic, and Hybrid Mechanisms}
 
-\todo[inline]{Let's have some examples in this chapter -Jeremy}
+%% \todo[inline]{Let's have some examples in this chapter -Jeremy}
 
 Information-flow control (IFC) ensures that information transfers within a
 program adhere to a security policy, for example, by preventing high-security
@@ -157,48 +157,79 @@ monitoring
 ~\parencite{le2005monitoring,le2007automaton,Chandra:2007we,Shroff:2007tg,russo2010dynamic,moore2011static}.
 The static and dynamic approaches have complementary strengths and weaknesses;
 the dynamic approach requires less effort from the programmer while the static
-approach provides stronger guarantees and less runtime overhead.
-Recently,~\textcite{Buiras:2015aa} propose a hybrid technique that offers the
-programmer control over the regions within a program where IFC is enforced
-statically versus dynamically, so that the programmer can benefit from the
-static and dynamic approaches depending on their most appropriate application
-scenarios.
+approach provides stronger guarantees and less runtime overhead. The main
+theorem of an IFC system is noninterference~\cite{goguen1982security}.
+Informally, noninterference states that, if the secretive user input varies, the
+public output of the program must stay the same.
 
 %% \todo[inline]{add another sentence that explicitly road-maps the rest of this
 %%   section. -Jeremy}
 We are going to review the literature about static and dynamic enforcement of
 IFC in Section~\ref{sec:intro-static-ifc} and Section~\ref{sec:intro-dyn-ifc}
 respectively. We then review dynamic IFC enforcement with static pre-processing
-in Section~\ref{sec:intro-dyn-static}.
+in Section~\ref{sec:intro-dyn-static}. Finally in
+Section~\ref{sec:intro-hybrid}, we briefly review the hybrid technique
+by~\textcite{Buiras:2015aa}, which offers the programmer control over the
+regions where IFC is enforced statically versus dynamically in a single program.
 
 \subsection{Static IFC in Programming Languages}
 \label{sec:intro-static-ifc}
 
-The interest in enforcing
-confidentiality and regulating the flow of information in a computer program
-arose with applications to defense in the 1970s \autocite{bell1976secure}.
-\textcite{denning1976lattice} builds an information flow model using a lattice of
-security labels and \textcite{denning1977certification} describe
-a static analysis for information flow, with a proof that a certified program
-will not transmit confidential input to non-confidential output.
-\todo[inline]{What are the main ideas for how this static analysis works? -Jeremy}
-\textcite{volpano1996sound} propose a typed-based approach to enforcing
-information flow, by defining a type system for an imperative programming
-language and proving its security with a type soundness proof.
-\todo[inline]{What are the important differences in the type-based
-  approach? Is it the compositionality? If so, say that right away. -Jeremy}
-This idea is
-further developed by \textcite{zdancewic2002programming}. Such protection
-scales well since type checking is \textit{compositional}
-\parencite{sabelfeld2003language}.
-\todo[inline]{Give the technical definition of compositional.}
-There are research projects that apply similar
-techniques but to other languages such as bytecode intermediate languages
-\autocite{barthe2005non}, object-oriented languages \autocite{amtoft2006logic},
-and reactive programming languages \autocite{bohannon2009reactive}. Although the
-aforementioned languages are mostly theoretical, efforts have also been made to
-integrate information flow control into widely-used existing languages such as
-Jif for Java \autocite{myers1999jflow} and Flow Caml for OCaml
+The interest in enforcing confidentiality and regulating the flow of information
+in a computer program arose with applications to defense in the 1970s
+\autocite{bell1976secure}. \textcite{denning1976lattice} builds an information
+flow model using a lattice of security labels and
+\textcite{denning1977certification} describe a static analysis for information
+flow, with a proof that a certified program will not transmit confidential input
+to non-confidential output. They distinguish between two types of information
+flows: explicit flow and implicit flow. Consider the assignment \texttt{x := y +
+  z}, there are explicit flows from \key{y} to \key{x} and from \key{z} to
+\key{x}, because both \key{y} and \key{z} affect the value that \key{x} is
+assigned to. The certification checks whether the join (least upper bound) of
+the security of \key{y} and {z} is less than or equal to the security of
+\key{x}. Implicit flows, on the other hand, arise from the branching structure
+of a program. Consider the program \texttt{if x then y := y + 1 else ()}. An
+observer is able to learn whether \key{x} is true or false, by inspecting
+whether \key{y} increments. To control the implicit flow, the certification
+checks whether the security of \key{x} is less than or equal to that of \key{y}.
+%% \todo[inline]{What are the main ideas for how this static analysis works? -Jeremy}
+
+\textcite{volpano1996sound} further develop the static enforcement and propose a
+typed-based approach to IFC, by defining a type system for an imperative
+programming language and proving its security with a type soundness proof. The
+type system approach benefits IFC enforcement because it is compositional: the
+security of the entire program is determined from the security of its
+constituent components; secure components form a larger secure system as long as
+their type signatures agree~\cite{sabelfeld2003language}. By writing a program
+that type checks, the software developer constructs a proof that the program is
+indeed secure.
+%% \todo[inline]{What are the important differences in the
+%%   type-based approach? Is it the compositionality? If so, say that right away.
+%%   -Jeremy}
+%% \todo[inline]{Give the technical definition of compositional.}
+
+We explain how the type system approach defends against illegal explicit and
+implicit information flows using examples. Consider two IO functions:
+\texttt{private-input} and \texttt{publish}: the former returns a high-security
+boolean that represents sensitive input information; the latter takes a
+low-security boolean and publishes it into a publicly visible channel. Consider
+the program with an illegal explicit flow from private input to public output:
+\begin{verbatim}
+  let input = private-input () in publish (¬ input)
+\end{verbatim}
+The program is rejected by the type checker, because \texttt{(¬ input)} is typed
+at $\Bool_{\high}$ but \texttt{publish} expects its argument to be of
+$\Bool_{\low}$, $\high \npreccurlyeq \low$.
+
+\textcite{heintze1998slam} and~\textcite{zdancewic2002programming} further
+develop the idea and support higher-order functions. There are research projects
+that combine IFC type systems with other language features, such as bytecode
+intermediate languages \autocite{barthe2005non}, object-oriented languages
+\autocite{amtoft2006logic}, and reactive programming languages
+\autocite{bohannon2009reactive}. Although the aforementioned languages are
+mostly theoretical, efforts have also been made to integrate information flow
+control into off-the-shelf programming languages, such as Jif for Java
+\autocite{myers1999jflow} and Flow Caml for OCaml
 \autocite{pottier2002information, simonet2003flow}.
 
 \subsection{Dynamic IFC in Programming Languages}
@@ -233,7 +264,7 @@ implicit flows by simulating multi-execution in a single process,
 which, unlike no-sensitive-upgrade and permissive-upgrade, avoids
 conservative monitor failures.
 
-\subsection{Dynamic IFC with Static Pre-processing}
+\subsection{Dynamic IFC with Static Pre-Processing}
 \label{sec:intro-dyn-static}
 
 Researchers have also explored
@@ -267,7 +298,10 @@ accomplish by using fully static or dynamic IFC alone; different from gradual
 typing, papers in this category do not aim at offering programmer the control
 over statically versus dynamically enforced regions in one single program.
 
-\textbf{Programmer-controlled hybrid IFC} Similar to gradual security-typed
+\section{Programmer-Controlled Hybrid IFC}
+\label{sec:intro-hybrid}
+
+Similar to gradual security-typed
 languages and different from dynamic IFC with static pre-processing, Hybrid LIO
 (HLIO)~\cite{Buiras:2015aa} supports the choice of static or dynamic IFC in
 different regions of a single program. By default, the checking is static, but a
