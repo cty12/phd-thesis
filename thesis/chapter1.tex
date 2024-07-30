@@ -208,24 +208,52 @@ indeed secure.
 %%   -Jeremy}
 %% \todo[inline]{Give the technical definition of compositional.}
 
-We explain how the type system approach defends against illegal explicit and
-implicit information flows using examples. Consider two IO functions:
-\texttt{private-input} and \texttt{publish}: the former returns a high-security
-boolean that represents sensitive input information; the latter takes a
-low-security boolean and publishes it into a publicly visible channel. Consider
-the program with an illegal explicit flow from private input to public output:
+We explain how a type system defends against illegal information flow using
+examples. Consider two IO functions: \texttt{private-input} and
+\texttt{publish}: the former returns a high-security boolean that represents
+sensitive user input information; the latter takes a low-security boolean and
+publishes it into a publicly visible channel.
+
+\paragraph{Explicit flow} Consider the program with an illegal explicit flow
+from private input to public output:
 \begin{verbatim}
   let input = private-input () in publish (¬ input)
 \end{verbatim}
 The program is rejected by the type checker, because \texttt{(¬ input)} is typed
 at $\Bool_{\high}$ but \texttt{publish} expects its argument to be of
-$\Bool_{\low}$, $\high \npreccurlyeq \low$.
+$\Bool_{\low}$, $\high \npreccurlyeq \low$. As a result, the type system
+prevents information from leaking through explicit flow. On the other hand, the
+program
+\begin{verbatim}
+  let input = private-input () in publish (¬ true)
+\end{verbatim}
+is accepted by the type checker, because \texttt{(¬ true)} is typed at
+$\Bool_{\low}$, which can flow into \texttt{publish}. Indeed, the output remains
+constant regardless of user input, so no information leaks through the output.
+
+\paragraph{Implicit flow} Guarding against illegal implicit flows is
+more involved: the type system estimates the security of an if-conditional by
+joining the security of its branches with that of the branch condition (often
+referred to as type stamping). Consider the following program with an illegal
+information flow from private input to public output:
+\begin{verbatim}
+  let input = private-input () in
+    publish (if input then false else true)
+\end{verbatim}
+The input influences the output through the branching structure of the program:
+if input is true, the then-branch is taken and the output is false; if input is
+false, the else-branch is taken and the output is true. The branch condition is
+typed at $\Bool_{\high}$ and the branches are typed at $\Bool_{\low}$, so the
+entire \texttt{if} has type $\Bool_{\low \curlyvee \high} = \Bool_{\high}$.
+Again, \texttt{publish} expects $\Bool_{\low}$, so the program is rejected.
+Consequently, the type system guards against the information leak through
+implicit flow.
 
 \textcite{heintze1998slam} and~\textcite{zdancewic2002programming} further
-develop the idea and support higher-order functions. There are research projects
-that combine IFC type systems with other language features, such as bytecode
-intermediate languages \autocite{barthe2005non}, object-oriented languages
-\autocite{amtoft2006logic}, and reactive programming languages
+develop the type system approach to IFC and add support for higher-order
+functions. Researchers also build IFC type systems for bytecode intermediate
+languages \autocite{barthe2005non}, for object-oriented languages
+\autocite{amtoft2006logic}, and for reactive programming languages
 \autocite{bohannon2009reactive}. Although the aforementioned languages are
 mostly theoretical, efforts have also been made to integrate information flow
 control into off-the-shelf programming languages, such as Jif for Java
