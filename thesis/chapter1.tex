@@ -158,7 +158,7 @@ monitoring
 The static and dynamic approaches have complementary strengths and weaknesses;
 the dynamic approach requires less effort from the programmer while the static
 approach provides stronger guarantees and less runtime overhead. The main
-theorem of an IFC system is noninterference~\cite{goguen1982security}.
+theorem of an IFC system is \textit{noninterference}~\cite{goguen1982security}.
 Informally, noninterference states that, if the secretive user input varies, the
 public output of the program must stay the same.
 
@@ -263,34 +263,38 @@ control into off-the-shelf programming languages, such as Jif for Java
 \subsection{Dynamic IFC in Programming Languages}
 \label{sec:intro-dyn-ifc}
 
-\textcite{li2006encoding,LI20101974} add dynamic checking of
-information flow control to Haskell by utilizing existing language
-features, specifically arrows and typeclasses.
-\textcite{stefan2011flexible,stefan2012flexible,STEFAN:2017ta} design
-a Haskell library called LIO; inspired by IFC operating systems
+%% \todo[inline]{The above is for pure (no
+%%   mutation) languages. -Jeremy}
+%% \todo[inline]{What exactly is the dynamic
+%%   checking doing? -Jeremy }
+%% \todo[inline]{The NSU stuff is for languages with
+%%   mutation. -Jeremy}
+%% \todo[inline]{What's coarse-grained IFC? What's floating
+%%   label? -Jeremy}
+
+\textcite{li2006encoding,LI20101974} study purely functional languages (no
+mutable states) and add dynamic checking of information flow control to Haskell,
+by utilizing existing language features, specifically arrows and typeclasses.
+
+
+\textcite{stefan2011flexible,stefan2012flexible,STEFAN:2017ta} design a Haskell
+library called LIO; inspired by IFC operating systems
 ~\parencite{efstathopoulos2005labels,zeldovich2011making,krohn2007information,vandebogart2007labels}.
-LIO takes a coarse-grained, floating-label approach that employs a
-labeled IO monad to keep track of the current privilege level, which
-restricts both the observability and the security
-effect.
-\todo[inline]{The above is for pure (no mutation) languages. -Jeremy}
-\todo[inline]{What exactly is the dynamic checking doing? -Jeremy }
-\todo[inline]{The NSU stuff is for languages with mutation. -Jeremy}
-\todo[inline]{What's coarse-grained IFC? What's floating label? -Jeremy}
+LIO takes a coarse-grained, floating-label approach that employs a labeled IO
+monad to keep track of the current privilege level, which restricts both the
+observability and the security effect.
 \textcite{austin2009efficient} consider IFC for Javascript and
-propose a purely dynamic approach called \textit{no-sensitive-upgrade}
-checking to handle implicit flows through the heap, by terminating the
-execution whenever a program attempts to modify a low-security memory
-location under a high-security context.
-\todo[inline]{need to explain ``high-security context''}
-\textcite{austin2010permissive} study a sound yet more flexible
-enforcement strategy called \textit{permissive-upgrade}, which allows
-more programs to run to
-completion. \textcite{austin2012multiple,Austin:2017uh} propose
-\textit{faceted values}, another approach to dynamically handle
-implicit flows by simulating multi-execution in a single process,
-which, unlike no-sensitive-upgrade and permissive-upgrade, avoids
-conservative monitor failures.
+propose a purely dynamic approach called \textit{no-sensitive-upgrade} checking
+to handle implicit flows through the heap, by terminating the execution whenever
+a program attempts to modify a low-security memory location under a
+high-security context. \todo[inline]{need to explain ``high-security context''}
+\textcite{austin2010permissive} study a sound yet more flexible enforcement
+strategy called \textit{permissive-upgrade}, which allows more programs to run
+to completion. \textcite{austin2012multiple,Austin:2017uh} propose
+\textit{faceted values}, another approach to dynamically handle implicit flows
+by simulating multi-execution in a single process, which, unlike
+no-sensitive-upgrade and permissive-upgrade, avoids conservative monitor
+failures.
 
 \subsection{Dynamic IFC with Static Pre-Processing}
 \label{sec:intro-dyn-static}
