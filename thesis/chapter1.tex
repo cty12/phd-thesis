@@ -338,65 +338,65 @@ on heap write operations and disallows writing to memory locations whose
 security is below the current label. Under the hood, LIO keeps track of the
 current label as a monad.
 
-\subsection{Dynamic IFC with Static Pre-Processing}
+\subsection{Dynamic IFC Augmented With Static Pre-processing}
 \label{sec:intro-dyn-static}
 
-Researchers have also explored
-facilitating runtime IFC with static analysis. \textcite{le2005monitoring}
-explore a hybrid IFC monitor for sequential programs that combines runtime IFC
-with a static analysis that gathers information about the non-executed branches.
-This hybrid IFC accepts programs that are conservatively rejected by fully
-static IFC. They further show that it is possible to alter the behavior of
-executions that may be unsafe by resetting output values using the information
-from their hybrid analysis to reclaim confidentiality.
-\textcite{le2007automaton} extends this hybrid IFC approach to concurrent
-programs and prove noninterference for any execution. \textcite{Shroff:2007tg}
-build a runtime monitor augmented with a pre-computed fixed point of
-dependencies. Similar to \textcite{le2005monitoring}, they observe that this
-hybrid technique is less conservatively than a fully static system. They also
-show that their hybrid monitor is able to support user-defined policy, so that
-different policies can be applied to the same program. \textcite{Chandra:2007we}
-implement a hybrid monitor for the Java virtual machine. Their implementation
-add IFC annotations to a executable file using a static analysis. The runtime
-monitor then uses those annotations to update the labels of variables in
-alternative execution paths to enforce IFC, while maintaining
-backward-compatibility with existing Java class files.
+Researchers have also explored facilitating runtime IFC monitors with static
+analyses prior to program execution, to achieves goals that are hard to
+accomplish by using dynamic IFC alone. It is worth noting that different from
+user-controlled hybrid IFC and gradual IFC (which we are going to discuss in
+Section~\ref{sec:intro-hybrid} and Section~\ref{sec:intro-gradual-ifc}
+respectively), papers in this category do not aim at offering programmer the
+\emph{control} over statically versus dynamically enforced regions in a single
+program.
+
+\textcite{le2005monitoring} explore a
+hybrid IFC monitor for sequential programs that combines runtime IFC with a
+static analysis that gathers information about the non-executed branches. This
+hybrid IFC accepts programs that are conservatively rejected by fully static
+IFC. They further show that it is possible to alter the behavior of executions
+that may be unsafe by resetting output values using the information from their
+hybrid analysis to reclaim confidentiality. \textcite{le2007automaton} extends
+this hybrid IFC approach to concurrent programs and prove noninterference for
+any execution. \textcite{Shroff:2007tg} build a runtime monitor augmented with a
+pre-computed fixed point of dependencies. Similar to
+\textcite{le2005monitoring}, they observe that this hybrid technique is less
+conservatively than a fully static system. They also show that their hybrid
+monitor is able to support user-defined policy, so that different policies can
+be applied to the same program.
+
+\textcite{Chandra:2007we} implement a hybrid monitor for the Java virtual
+machine. Their implementation add IFC annotations to a executable file using a
+static analysis. The runtime monitor then uses those annotations to update the
+labels of variables in alternative execution paths to enforce IFC, while
+maintaining backward-compatibility with existing Java class files.
+
 \textcite{russo2010dynamic} study dynamic IFC in a flow-sensitive setting. They
 utilize a static analysis that detects variables in untaken branches whose
 security must be upgraded at runtime in order to prevent illegal implicit flows
 through the heap. \textcite{moore2011static} improve the efficiency of the
 hybrid monitoring of \textcite{russo2010dynamic} by selectively tracking
-variables and incorporating memory abstractions. This line of research that
-augments dynamic IFC with static analysis achieves goals that are hard to
-accomplish by using fully static or dynamic IFC alone; different from gradual
-typing, papers in this category do not aim at offering programmer the control
-over statically versus dynamically enforced regions in one single program.
+variables and incorporating memory abstractions.
 
 \section{Programmer-Controlled Hybrid IFC}
 \label{sec:intro-hybrid}
 
-Similar to gradual security-typed
-languages and different from dynamic IFC with static pre-processing, Hybrid LIO
-(HLIO)~\cite{Buiras:2015aa} supports the choice of static or dynamic IFC in
-different regions of a single program. By default, the checking is static, but a
-programmer can insert a \texttt{defer} clause to say that the security
-constraints should be checked at runtime. There are two major differences
-between HLIO and a gradual security-typed programming language. In HLIO, the
-developer has to embed explicit \texttt{defer} into the program, while in a
-gradual language, the switch between static and dynamic is directed by types,
-with no \texttt{defer} or explicit casts needed. Moreover, there is no theorem
-about adding and removing \texttt{defer} in HLIO, while in a gradual language
-the gradual guarantee relates the runtime behavior of programs that differ only
-in the precision of type annotations.
-
-%% In gradual security-typed languages,
-%% the switch between static and dynamic is directed by types, so unlike in HLIO,
-%% the developer does not need to embed explicit casts or \texttt{defer} into the
-%% program. Moreover, the gradual guarantee relates the runtime behavior of
-%% programs that differ in the precision of type annotations, but there is no
-%% comparable theorem about adding and removing \texttt{defer} in HLIO.
+Similar to gradual IFC and different from dynamic IFC with static
+pre-processing, Hybrid LIO (HLIO)~\cite{Buiras:2015aa} supports programmer's
+choice of static or dynamic IFC in different regions of a single program. By
+default, the checking is static, but a programmer can insert a \texttt{defer}
+clause to say that the security constraints should be checked at runtime. There
+are two major differences between HLIO and gradual IFC programming languages (we
+are going to discuss gradual IFC in the next section). In HLIO, the developer
+has to embed explicit \texttt{defer} into the program, while in a gradual
+language, the switch between static and dynamic is directed by types, with no
+\texttt{defer} or explicit casts needed. Moreover, there is no theorem about
+adding and removing \texttt{defer} in HLIO, while in a gradual language the
+gradual guarantee relates the runtime behavior of programs that differ only in
+the precision of type annotations.
 
 \section{The Tension Between Gradual Typing and Information-Flow Control}
+\label{sec:intro-gradual-ifc}
 
 Taking inspiration from gradual typing~\parencite{Siek:2006bh,Siek:2007qy},
 researchers have explored new ways to give programmers control over which parts
