@@ -272,6 +272,23 @@ control into off-the-shelf programming languages, such as Jif for Java
 %% \todo[inline]{What's coarse-grained IFC? What's floating
 %%   label? -Jeremy}
 
+IFC can also be enforced dynamically using runtime monitoring. Values typically
+have security labels associated with them and the runtime monitor tracks those
+labels during program execution. In the illegal explicit flow example
+\begin{verbatim}
+  let input = private-input () in publish (¬ true)
+\end{verbatim}
+the value of \texttt{input} is tagged with \high and so is its negation. When
+\texttt{publish} is called, the function checks whether the label on the
+argument is \low. The check fails, so the monitor reports a runtime error. In
+the constant example, \texttt{true} is tagged with \low and so is its negation;
+the monitor succeeds and publishes \texttt{false}. In the illegal implicit flow
+example, the label associated with the evaluation result of the if-conditional
+is the join between that of the branch taken and that of the branch condition;
+in this case, $\low \curlyvee \high = \high$. The \texttt{publish} function
+again checks the label against \low, $\high \npreccurlyeq \low$, so it results
+in a runtime error.
+
 \textcite{li2006encoding,LI20101974} study purely functional languages (no
 mutable states) and add dynamic checking of information flow control to Haskell,
 by utilizing existing language features, specifically arrows and typeclasses.
