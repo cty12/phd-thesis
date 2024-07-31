@@ -57,8 +57,8 @@ selected fields are sensitive, whose confidentiality is required during their
 entire life cycle including both parsing and data processing. To rule out
 information leaks, neither the sensitive fields, nor any data that depends on
 those fields, is allowed to be revealed to a low-privilege observer. Consider a
-web application that receives three fields from its user: \Circled{1} first name
-\Circled{2} last name \Circled{3} social security number, the grammar of which
+web application that receives three fields from its user: (1) first name
+(2) last name (3) social security number, the grammar of which
 is defined in Figure~\ref{fig:grammar}, where terminals are divided into
 low-security and high-security. The digits $d$ for social security number, being
 confidential to users of the web application, are of high-security, so they are
@@ -479,10 +479,10 @@ the write effects in untaken branches. They study a simple imperative language
 with first-order stores and prove both noninterference and the gradual
 guarantee.
 
-A ideal gradual security-typed language \Circled{1} should enforce security by
-satisfying noninterference \Circled{2} should satisfy the gradual guarantee
-\Circled{3} should provide type-based reasoning through vigilance and
-type-guided classification \Circled{4} should not require addition static
+A ideal gradual security-typed language (1) should enforce security by
+satisfying noninterference (2) should satisfy the gradual guarantee
+(3) should provide type-based reasoning through vigilance and
+type-guided classification (4) should not require addition static
 analyses prior to program execution. Contrary to the prior work, I am going to
 show in this dissertation that one does not have to give up on any of the four
 requirements to resolve the tension between noninterference and the gradual
@@ -505,9 +505,9 @@ use an unknown security
 level~\parencite{Askarov:2009vq,austin2009efficient,Devriese:2010up,stefan2011flexible,Austin:2017uh}.
 
 Based on this observation, I propose a new gradual, security-typed language
-\Surface, which \Circled{1} enforces information flow security, \Circled{2}
-satisfies the gradual guarantee, \Circled{3} enjoys type-based reasoning through
-free theorems, and \Circled{4} utilizes NSU checking to enforce implicit flows
+\Surface, which (1) enforces information flow security, (2)
+satisfies the gradual guarantee, (3) enjoys type-based reasoning through
+free theorems, and (4) utilizes NSU checking to enforce implicit flows
 through the heap with no static analysis required.
 %
 In \Surface, runtime security labels do not include \unk, only \low
@@ -595,14 +595,14 @@ In summary, my dissertation makes the following technical contributions:
   and the gradual guarantee in \GSLRef: the inclusion of \unk in the
   runtime security levels.
 \item I design two coercion calculi that serve as the runtime IFC monitor:
-  \Circled{1} a coercion calculus for security labels and \Circled{2} a coercion
+  (1) a coercion calculus for security labels and (2) a coercion
   calculus for secure values. This dissertation is the first work to apply the
   coercion calculus to an IFC setting.
 \item A cast calculus \CC with IFC that defines the dynamic semantics of
   \Surface.
 \item The Agda formalization of \Surface and its cast calculus \CC. I mechanized
-  the proofs for \Circled{1} the gradual guarantee of \Surface, \Circled{2}
-  compilation from \Surface to \CC preserves types, and \Circled{3} type safety
+  the proofs for (1) the gradual guarantee of \Surface, (2)
+  compilation from \Surface to \CC preserves types, and (3) type safety
   of \CC (by progress and preservation).
 \item A proof of noninterference for \Surface through the simulation between its
   cast calculus \CC and a dynamic IFC programming language \DynIFC.
