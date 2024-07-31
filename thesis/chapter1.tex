@@ -320,12 +320,23 @@ multi-execution in a single process, which, unlike no-sensitive-upgrade and
 permissive-upgrade, avoids conservative monitor failures.
 
 \textcite{stefan2011flexible,stefan2012flexible,STEFAN:2017ta} design a Haskell
-library called LIO; inspired by IFC operating systems
-~\parencite{efstathopoulos2005labels,zeldovich2011making,krohn2007information,vandebogart2007labels}.
-LIO takes a coarse-grained, floating-label approach that employs a labeled IO
-monad to keep track of the current privilege level, which restricts both the
-observability and the security effect.
-
+library called LIO. LIO is implemented as a domain specific language (DSL)
+embedded in Haskell. Even though Haskell itself is purely functional, it is
+worth noting that the LIO DSL does support mutable references (\key{LIORef}).
+Inspired by IFC operating systems
+~\parencite{efstathopoulos2005labels,zeldovich2011making,krohn2007information,vandebogart2007labels},
+LIO makes two unique design choices: (1) coarse-grained labeling (2) a floating
+current label. LIO is ``coarse-grained'' in that not all values are labeled by
+default. A programmer need to use the \key{toLabeled} primitive to explicitly
+protect a value. In this way, a programmer may choose to label a value when it
+is necessary to impose flow control policies and omit the labels for
+security-insensitive parts of the program. In LIO, the ``current label'' serves
+as a security upper bound of all values. During program execution, the LIO
+runtime raises the current label to ``float'' above the security of all data
+read by the current computation. Similar to NSU, LIO performs dynamic checking
+on heap write operations and disallows writing to memory locations whose
+security is below the current label. Under the hood, LIO keeps track of the
+current label as a monad.
 
 \subsection{Dynamic IFC with Static Pre-Processing}
 \label{sec:intro-dyn-static}
