@@ -478,24 +478,23 @@ the write effects in untaken branches. They study a simple imperative language
 with first-order stores and prove both noninterference and the gradual
 guarantee.
 
-A ideal gradual security-typed language (1) should enforce security by
-satisfying noninterference (2) should satisfy the gradual guarantee
-(3) should provide type-based reasoning through vigilance and
-type-guided classification (4) should not require addition static
-analyses prior to program execution. Contrary to the prior work, I am going to
-show in this dissertation that one does not have to give up on any of the four
-requirements to resolve the tension between noninterference and the gradual
-guarantee. Instead, the real source of the tension is that \GSLRef allows \unk
-as a \textit{runtime} security label. By walking back this usual design choice,
-I am going to present a gradual security-typed programming language \Surface and
-prove that \Surface satisfies both noninterference and the gradual guarantee
-without any sacrifices.
+A ideal gradual IFC language (1) should enforce security by
+satisfying noninterference (2) should satisfy the gradual guarantee (3) should
+provide type-based reasoning through vigilance and type-guided classification
+(4) should not require addition static analyses prior to program execution.
+Contrary to the prior work, I am going to show in this dissertation that one
+does not have to give up on any of the four requirements to resolve the tension
+between noninterference and the gradual guarantee. Instead, the real source of
+the tension is that \GSLRef allows \unk as a \emph{runtime} security label. By
+walking back this usual design choice, I am going to present a gradual
+IFC programming language \Surface and prove that \Surface satisfies
+both noninterference and the gradual guarantee without any sacrifices.
 
 \section{Key Enabling Insight and Thesis Statement}
 
 In \GSLRef{}, one can write a literal such as $\true_{\unk}$ in a program. At
 runtime, the literal becomes a value of unknown security level. I observe that
-allowing \unk as a runtime security label is the main reason that \GSLRef
+allowing \unk as a \emph{runtime} security label is the main reason that \GSLRef
 violates the gradual guarantee. That design of \GSLRef was unusual because the
 unknown type $\unk$ is traditionally used in gradual languages to represent the
 lack of static information, not the lack of dynamic information. The design is
@@ -503,41 +502,36 @@ also unusual when compared to dynamic systems for IFC, as those systems do not
 use an unknown security
 level~\parencite{Askarov:2009vq,austin2009efficient,Devriese:2010up,stefan2011flexible,Austin:2017uh}.
 
-Based on this observation, I propose a new gradual, security-typed language
-\Surface, which (1) enforces information flow security, (2)
-satisfies the gradual guarantee, (3) enjoys type-based reasoning through
-free theorems, and (4) utilizes NSU checking to enforce implicit flows
-through the heap with no static analysis required.
-%
-In \Surface, runtime security labels do not include \unk, only \low
-and \high.\footnote{Of course, any lattice of security labels could be
-used in place of \low and \high.}  On the other hand, to support
-gradual typing, the security labels in a type annotation may
-include \unk. Surprisingly, I discover that removing \unk from the
-runtime labels is sufficient to reclaim the gradual guarantee, without
-sacrificing type-guided classification as in GLIO or NSU checking as
-in \WHILEG. This finding is the primary contribution of this dissertation.
-%
-In \Surface, the security level of a literal defaults to \low,
-similar to systems like Jif~\parencite{Myers:2006aa} and GLIO, but
-different from \GSLRef and \WHILEG.
+Based on this observation, I propose a new gradual, IFC language \Surface, which
+(1) enforces information flow security, (2) satisfies the gradual guarantee, (3)
+enjoys type-based reasoning through free theorems, and (4) utilizes NSU checking
+to enforce implicit flows through the heap with no static analysis required. In
+\Surface, runtime security labels do not include \unk, only \low and \high (or
+any lattice of security labels). On the other hand, to support gradual typing,
+the security labels in a type annotation may include \unk. Surprisingly, I
+discover that removing \unk from the runtime labels is sufficient to reclaim the
+gradual guarantee, without sacrificing type-guided classification as in GLIO or
+NSU checking as in \WHILEG. This finding is the primary contribution of this
+dissertation. In \Surface, the security level of a literal defaults to \low,
+similar to systems like Jif~\parencite{Myers:2006aa} and GLIO, but different
+from \GSLRef and \WHILEG.
 
 One might think that allowing $\unk$ as a label on literals and therefore on
 values is necessary so that programmers can run legacy code (without any
 security annotations) in a gradual language, by making \unk the default label
 for literals. However, prior information-flow languages use \low security as the
-default security label for literals~\parencite{Myers:2006aa} and for good reasons.
-The security of a literal is something that only the programmer can know. That
-is, the identification of high-security data in a program must be considered as
-an input to an information flow system, and not something that can or should be
-inferred. When migrating legacy code into a system that supports secure
-information flow, a necessary part of the process for the programmer is to
-identify whether there is any high-security information in the legacy code. The
-choice of \low as the default label is because most literals (if not all) in
+default security label for literals~\parencite{Myers:2006aa} and for good
+reasons. The security of a literal is something that only the programmer can
+know. That is, the identification of high-security data in a program must be
+considered as an input to an information flow system, and not something that can
+or should be inferred. When migrating legacy code into a system that supports
+secure information flow, a necessary part of the process for the programmer is
+to identify whether there is any high-security information in the legacy code.
+The choice of \low as the default label is because most literals (if not all) in
 real programs are low security. In fact, it is bad practice to embed
 high-security literals, such as passwords, in program text.
 
-The thesis of this dissertation is that a gradual security-typed programming
+The thesis of this dissertation is that a gradual IFC programming
 language is able to satisfy the gradual guarantee, as long as there is no \unk
 among runtime security labels:
 
@@ -605,7 +599,7 @@ In summary, my dissertation makes the following technical contributions:
   of \CC (by progress and preservation).
 \item A proof of noninterference for \Surface through the simulation between its
   cast calculus \CC and a dynamic IFC programming language \DynIFC.
-\item \Surface, the first gradual security-typed language with type-guided
+\item \Surface, the first gradual IFC language with type-guided
   classification that satisfies the gradual guarantee. To explore the design
   space of gradual security typing, I also present \SurfaceOld (from which
   \DynIFC is derived), a language design that is otherwise similar to \Surface
