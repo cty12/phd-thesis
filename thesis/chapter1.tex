@@ -628,25 +628,27 @@ The rest of this dissertation is organized as follows:
     counter (PC) that restricts the security of memory locations where write
     operations are allowed to happen.
   \item In Chapter~\ref{ch:coercion-calculus-values}, I define a second coercion
-    calculus whose purpose is to cast a program value from one type to another
+    calculus, whose purpose is to cast a program value from one type to another
     type. This coercion calculus serves as the representation of casts in the
     intermediate language \CC.
-  \item In Chapter~\ref{ch:cc}, I present the design of the cast calculus
-    (intermediate language) \CC, by defining its syntax, type system, and
-    operational semantics. I then define a type-preserving compilation from
-    \Surface, so that the semantics of \Surface is given by \CC.
+  \item In Chapter~\ref{ch:cc}, I present the design of my intermediate
+    language, the cast calculus \CC. I define the syntax, the type system, and
+    the operational semantics for \CC. I then define a type-preserving
+    compilation from \Surface to \CC, so that the semantics of \Surface is given
+    by \CC.
   \item In Chapter~\ref{ch:mech-metatheory}, I present the Agda mechanization of
     three major meta-theoretical results, including the gradual guarantee,
     compilation preserves types, and type safety.
   \item In Chapter~\ref{ch:alt-design}, I explore the design space of gradual
-    security and present \SurfaceOld and its cast calculus \CCOld. The semantics
-    of \SurfaceOld differs from that of \Surface in that the former does not
-    support type-guided classification. The noninterference of \CCOld can be proved
-    using the standard erasure technique. I derive a dynamic IFC language with
-    labeled heap, namely \DynIFC. I also prove noninterference for \DynIFC using
-    the same technique. Both noninterference proofs are mechanized in Agda.
+    IFC by presenting \SurfaceOld and its cast calculus \CCOld. The semantics of
+    \SurfaceOld differs from that of \Surface in that the former does not
+    support type-guided classification. The noninterference of \CCOld can be
+    proved using the standard erasure technique. From \SurfaceOld I derive a
+    dynamic IFC language with labeled heap, namely \DynIFC. I prove the
+    noninterference for \DynIFC using the same technique. I mechanized both
+    noninterference proofs in Agda.
   \item In Chapter~\ref{ch:noninterference}, I prove the noninterference theorem
-    for \Surface by simulation with \DynIFC.
-  \item In Chapter~\ref{ch:conclusion}, I summarize this dissertation and
-    discuss possible future research directions in gradual security.
+    for \Surface, by simulating its cast calculus \CC with \DynIFC.
+  \item Finally in Chapter~\ref{ch:conclusion}, I summarize this dissertation
+    and discuss future research directions in gradual IFC.
 \end{itemize}
