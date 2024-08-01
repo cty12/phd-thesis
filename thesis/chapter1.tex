@@ -378,7 +378,7 @@ through the heap. \textcite{moore2011static} improve the efficiency of the
 hybrid monitoring of \textcite{russo2010dynamic} by selectively tracking
 variables and incorporating memory abstractions.
 
-\section{Programmer-Controlled Hybrid IFC}
+\subsection{Programmer-Controlled Hybrid IFC}
 \label{sec:intro-hybrid}
 
 Similar to gradual IFC and different from dynamic IFC with static
@@ -401,14 +401,13 @@ only in the precision of their type annotations.
 Taking inspiration from gradual typing~\parencite{Siek:2006bh,Siek:2007qy},
 researchers have explored new ways to give programmers control over which parts
 of the program are secured statically versus dynamically, directed by
-\textit{type annotations}.
-%
-In general, gradually typed languages support the seamless transition between
-static and dynamic enforcement through the \textit{precision} of type
-annotations. Gradual security is useful, because the programmer is free to
-choose when it is appropriate to increase the precision of the type annotations
-and put in the effort to pass the static checks and when it is appropriate to
-reduce the precision of type annotations, deferring the enforcement to runtime.
+\textit{type annotations}. In general, gradually typed languages support the
+seamless transition between static and dynamic enforcement through the
+\textit{precision} of type annotations. Gradual security is useful, because the
+programmer is free to choose when it is appropriate to increase the precision of
+the type annotations and put in the effort to pass the static checks and when it
+is appropriate to reduce the precision of type annotations, deferring the
+enforcement to runtime.
 
 The main challenge in the design of gradually typed languages is controlling the
 flow of values (and information) between the static and dynamic regions of code,
