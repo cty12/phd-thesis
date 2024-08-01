@@ -537,11 +537,14 @@ among runtime security labels:
 
 \vspace{20pt}
 \fbox{
-	\parbox{0.9\linewidth}{
-    \textbf{\large \Surface satisfies both noninterference and the
-    gradual guarantee and enables type-based reasoning at the
-    same time, by excluding the statically unknown label \unk
-    from runtime security labels. }
+	\parbox{0.9\linewidth}{\textbf{\large \ul{My thesis:}\\ It is possible for a
+      gradual IFC programming language to satisfy both noninterference and the
+      gradual guarantee, by excluding the unknown label \unk from runtime
+      security labels.}
+    %% \textbf{\large \Surface satisfies both noninterference and the
+    %% gradual guarantee and enables type-based reasoning at the
+    %% same time, by excluding the statically unknown label \unk
+    %% from runtime security labels. }
   }
 }
 
@@ -584,43 +587,46 @@ again at runtime. On the contrary, the AGT mechanism for dynamic checking
 In summary, my dissertation makes the following technical contributions:
 
 \begin{enumerate}
-\item Identify the real cause of the tension between information flow security
-  and the gradual guarantee in \GSLRef: the inclusion of \unk in the
-  runtime security levels.
-\item I design two coercion calculi that serve as the runtime IFC monitor:
-  (1) a coercion calculus for security labels and (2) a coercion
-  calculus for secure values. This dissertation is the first work to apply the
-  coercion calculus to an IFC setting.
+\item I identify the real cause of the tension between information flow security
+  and the gradual guarantee in \GSLRef: the inclusion of \unk in the runtime
+  security levels.
+\item I design two coercion calculi that serve as the runtime IFC monitor: a
+  coercion calculus for security labels and a coercion calculus for secure
+  values.
 \item A cast calculus \CC with IFC that defines the dynamic semantics of
   \Surface.
 \item The Agda formalization of \Surface and its cast calculus \CC. I mechanized
   the proofs for (1) the gradual guarantee of \Surface, (2)
   compilation from \Surface to \CC preserves types, and (3) type safety
-  of \CC (by progress and preservation).
+  of \CC by progress and preservation.
 \item A proof of noninterference for \Surface through the simulation between its
   cast calculus \CC and a dynamic IFC programming language \DynIFC.
 \item \Surface, the first gradual IFC language with type-guided
-  classification that satisfies the gradual guarantee. To explore the design
-  space of gradual security typing, I also present \SurfaceOld (from which
-  \DynIFC is derived), a language design that is otherwise similar to \Surface
-  but gives up type-guided classification.
+  classification that satisfies the gradual guarantee.
+\item To explore the design space of gradual IFC, I also present \SurfaceOld, a
+  gradual IFC language design without type-guided classification but otherwise
+  similar to \Surface. From \SurfaceOld I derive \DynIFC, the dynamic extreme of
+  both \SurfaceOld and \Surface.
 \end{enumerate}
 
 The rest of this dissertation is organized as follows:
 
 \begin{itemize}
-  \item In Chapter~\ref{ch:examples}, I first revisit type-system-based static
-    IFC using example programs in \Surface. I show that \Surface allows gradual
-    transition into dynamic IFC when type annotations become less precise. I
-    then revisit the counterexamples of \textcite{Toro:2018aa} and establish the
-    intuition that unlike \GSLRef, the NSU checking in \Surface is carefully
-    designed to satisfy the gradual guarantee. Finally, I show that \Surface
-    supports type-based reasoning through free theorems because \Surface is
-    vigilant and performs type-guided classification.
+  \item In Chapter~\ref{ch:examples}, I demonstrate how \Surface works using
+    examples. I first show that gradual IFC embeds static IFC, by reviewing
+    type-based static IFC using fully-annotated \Surface programs. I then show
+    that \Surface enables a gradual transition into dynamic IFC, when type
+    annotations become less precise. I review the counterexamples of
+    \textcite{Toro:2018aa} and demonstrate that unlike \GSLRef, the NSU checking
+    in \Surface based on security coercions satisfies the gradual guarantee.
+    Finally, I show that \Surface supports type-based reasoning through free
+    theorems, because \Surface is vigilant and performs type-guided
+    classification just like \GSLRef.
   \item In Chapter~\ref{ch:coercion-calculus-labels}, I define a coercion
-    calculus on security labels. I then present security label expressions,
-    which serves as the model of program counter (PC), which restricts the
-    security of memory locations where write operations are allowed to happen.
+    calculus on security labels. Using this coercion calculus, I define security
+    label expressions. Label expressions serve as my model of the program
+    counter (PC) that restricts the security of memory locations where write
+    operations are allowed to happen.
   \item In Chapter~\ref{ch:coercion-calculus-values}, I define a second coercion
     calculus whose purpose is to cast a program value from one type to another
     type. This coercion calculus serves as the representation of casts in the
