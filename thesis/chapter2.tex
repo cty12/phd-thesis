@@ -1,4 +1,40 @@
 \chapter{Gradual Information-Flow Control (IFC) in \Surface}
 \label{ch:examples}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+In this chapter, we first define the gradual IFC surface language \Surface, by
+presenting its syntax and type system in Section~\ref{sec:surface-def}. After
+that, we put \Surface into action. We present example programs to demonstrate
+how \Surface enables a gradual, smooth transition between static and dynamic
+IFC, while supporting type-based reasoning and satisfying the gradual guarantee.
+We review the basics of gradual IFC using \Surface programs in
+Section~\ref{sec:example1}. In Section~\ref{sec:example2}, we show that the
+tension between security and the gradual guarantee can be achieved by removing
+\unk from the runtime security labels. In Section~\ref{sec:example3}, we
+demonstrate that \Surface enables the same type-based reasoning capabilities as
+\GSLRef.
+
+\section{The Gradual IFC Language \Surface}
+\label{sec:surface-def}
+
+We first define the gradual language \Surface. It is similar to \GSLRef with
+respect to syntax and typing rules. The main syntactic difference is that in
+\Surface, the security labels of literals and newly created memory cells default
+to a specific label such as \low, while in \GSLRef they default to a runtime
+unknown security level \unk.
+
+\section{The Gradual Transition Between Static and Dynamic IFC in \Surface}
+\label{sec:example1}
+
+For simplicity, we use the security lattice $\langle \{\high, \low\}
+, \preccurlyeq, \curlyvee , \curlywedge \rangle$, where $\high$ is for
+private data and $\low$ is for publicly disclosable data. The ordering
+is standard: $\low \preccurlyeq \high$ and
+$\high \npreccurlyeq \low$. So information is allowed to flow from
+public sources to private sinks but not the other way around.
+We refer to $\{\high,\low\}$ as \emph{specific security labels}.
+
+\section{Implicit Flow, NSU Checks, Unknown Security, and the Gradual Guarantee}
+\label{sec:example2}
+
+\section{Type-Based Reasoning in \Surface}
+\label{sec:example3}
