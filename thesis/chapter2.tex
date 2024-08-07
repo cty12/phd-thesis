@@ -23,9 +23,9 @@ demonstrate that \Surface enables the same type-based reasoning capabilities as
   \begin{array}{rcll}
     \text{specific security labels} & \ell & \in & \{ \low , \high \} \\
     \text{security labels}  & g    & ::= & \unk \MID \ell \\
-    \text{blame labels}         & \bl{p}, \bl{q}     &      & \\
     \text{base types}               & \iota     & ::= & \Unit \MID \Bool \\
     \text{raw types}                & T, S      & ::= & \iota \MID \Fun{A}{\gc}{B} \mid \Refer{(T_g)} \\
+    \text{blame labels}         & \bl{p}, \bl{q}     &      & \\
     \text{types}                    & A, B      & ::= & T_g \\
     \text{terms}                & L , M , N & ::=  & x \MID \const{k}{\text{\hl{$\ell$}}} \MID \lam{g}{x}{A}{N}{\text{\hl{$\ell$}}} \MID \app{L}{M}{p} \\
     &                                       & \MID & \ifexp{L}{M}{N}{p} \MID \letexp{x}{M}{N} \\
@@ -36,11 +36,35 @@ demonstrate that \Surface enables the same type-based reasoning capabilities as
   \label{fig:surface-syntax}
 \end{figure}
 
-We first define the gradual language \Surface. It is similar to \GSLRef with
-respect to syntax and typing rules. The main syntactic difference is that in
-\Surface, the security labels of literals and newly created memory cells default
-to a specific label such as \low, while in \GSLRef they default to a runtime
-unknown security level \unk.
+We present the syntax of the gradual language \Surface in
+Figure~\ref{fig:surface-syntax}. The figure also includes the definitions for
+security labels, blame labels, and types in \Surface.
+
+For simplicity, we use the security lattice
+$\langle \{\high, \low\} , \preccurlyeq, \curlyvee , \curlywedge \rangle$, where
+$\high$ is for private data and $\low$ is for publicly disclosable data. Of
+course, any lattice of security labels could be used in place of low and high.
+The ordering is standard: $\low \preccurlyeq \high$ and $\high \npreccurlyeq
+\low$. So information is allowed to flow from public sources to private sinks
+but not the other way around. We refer to $\{\high,\low\}$ as \emph{specific
+security labels}.
+
+Types in \Surface have security labels associated with them, for example,
+$\Bool_{\high}$ is the type for booleans with high security, $\Unit_{\low}$ is
+the type for the unit value with low security, and $\Bool_{\unk}$ is the type of
+a boolean whose security level is unknown at compile time. We refer to
+$\{\high,\low,\unk\}$ as \emph{security labels}.
+
+Some terms in \Surface are annotated with an identifier called a blame label
+(\bl{p}). Under the hood, those terms generate casts that may fail. In case a
+cast fails, it raises a cast error, called \textit{blame}, that contains its
+blame label. In this way, the programmer knows which cast is causing the
+problem.
+
+The syntax of \Surface is similar to that of \GSLRef. The main syntactic
+difference is that in \Surface, the security labels of literals and newly
+created memory cells default to a specific label such as \low, while in \GSLRef
+they default to a runtime unknown security level \unk.
 
 \section{The Gradual Transition Between Static and Dynamic IFC in \Surface}
 \label{sec:example1}
@@ -55,6 +79,8 @@ We refer to $\{\high,\low\}$ as \emph{specific security labels}.
 
 \section{Implicit Flow, NSU Checks, Unknown Security, and the Gradual Guarantee}
 \label{sec:example2}
+
+%% TODO define the precision relations here
 
 \section{Type-Based Reasoning in \Surface}
 \label{sec:example3}
