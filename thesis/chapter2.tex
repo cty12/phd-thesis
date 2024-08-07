@@ -16,6 +16,26 @@ demonstrate that \Surface enables the same type-based reasoning capabilities as
 \section{The Gradual IFC Language \Surface}
 \label{sec:surface-def}
 
+\begin{figure}[tbp]
+\raggedright
+  {\small
+  \[
+  \begin{array}{rcll}
+    \text{specific security labels} & \ell & \in & \{ \low , \high \} \\
+    \text{security labels}  & g    & ::= & \unk \MID \ell \\
+    \text{blame labels}         & \bl{p}, \bl{q}     &      & \\
+    \text{base types}               & \iota     & ::= & \Unit \MID \Bool \\
+    \text{raw types}                & T, S      & ::= & \iota \MID \Fun{A}{\gc}{B} \mid \Refer{(T_g)} \\
+    \text{types}                    & A, B      & ::= & T_g \\
+    \text{terms}                & L , M , N & ::=  & x \MID \const{k}{\text{\hl{$\ell$}}} \MID \lam{g}{x}{A}{N}{\text{\hl{$\ell$}}} \MID \app{L}{M}{p} \\
+    &                                       & \MID & \ifexp{L}{M}{N}{p} \MID \letexp{x}{M}{N} \\
+    &                                       & \MID & \refexp{\text{\hl{$\ell$}}}{M}{p} \MID \deref{M}{p} \MID \assign{L}{M}{p} \MID \ann{M}{A}{p}
+  \end{array}
+  \]}
+  \caption{Syntax of \Surface (highlighted security labels \hl{$\ell$} default to \low if omitted)}
+  \label{fig:surface-syntax}
+\end{figure}
+
 We first define the gradual language \Surface. It is similar to \GSLRef with
 respect to syntax and typing rules. The main syntactic difference is that in
 \Surface, the security labels of literals and newly created memory cells default
