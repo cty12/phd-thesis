@@ -73,10 +73,15 @@ error, called \textit{blame}, that contains its blame label. In this way, the
 programmer knows which cast is causing the problem and which part of the program
 generates that cast.
 
-The syntax of \Surface is similar to that of \GSLRef. The main syntactic
-difference is that in \Surface, the security labels of literals and newly
-created memory cells default to a specific label such as \low, while in \GSLRef
-they default to a runtime unknown security level \unk.
+The syntax of \Surface is similar to that of \GSLRef. \Surface supports
+higher-order functions, mutable references, and explicit type annotations. The
+main syntactic difference is that in \Surface, the security labels of literals
+and newly created memory cells default to a specific label such as \low, while
+in \GSLRef they default to a runtime unknown security level \unk. One thing to
+note is that compared with literals, $\lambda$-abstractions in \Surface carry an
+addition security label annotation $g$, which is the type of the PC label
+expression used to evaluate the body of the $\lambda$. Same as the security
+labels in type annotations, $g$ defaults to \unk if omitted by the programmer.
 
 \subsection{Type System of \Surface}
 \label{sec:surface-typing}
