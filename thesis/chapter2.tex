@@ -83,7 +83,7 @@ in \GSLRef they default to a runtime unknown security level \unk. One thing to
 note is that compared with literals, $\lambda$-abstractions in \Surface carry an
 addition security label annotation $g$, which is the type of the PC label
 expression used to evaluate the body of the $\lambda$. Same as the security
-labels in type annotations, $g$ defaults to \unk if omitted by the programmer.
+labels in type annotations, $g$ defaults to \unk if omitted.
 
 \subsection{Type System of \Surface}
 \label{sec:surface-typing}
@@ -149,6 +149,47 @@ operators of security labels and types are analogous to consistent join. The
 stamping operator is a shorthand that computes the consistent join of the
 top-level label of the type with another label, while keeping the rest of the
 type unchanged.
+
+\begin{figure}[ht]
+  \raggedright
+  \fbox{$g_1 \precsim g_2$, $S \lesssim T$, and $A \lesssim B$}
+  \begin{gather*}
+    {\precsim}\unk~
+    \inference{}{g \precsim \unk}
+    \qquad
+    \unk{\precsim}~
+    \inference{}{\unk \precsim g}
+    \qquad
+        {\precsim}\textit{-}\ell~
+        \inference{\ell_1 \preccurlyeq \ell_2}{\ell_1 \precsim \ell_2}
+        \\[2ex]
+          {\lesssim}\textit{-}\iota~
+          \inference{}{\iota \lesssim \iota}
+          \qquad
+              {\lesssim}\textit{-ref}~
+              \inference{A \lesssim B & B \lesssim A}{\Refer{A} \lesssim \Refer{B}}
+              \\[2ex]
+                {\lesssim}\textit{-fun}~
+                \inference{g_2 \precsim g_1 & C \lesssim A & B \lesssim D}
+                          {\Fun{A}{g_1}{B} \lesssim \Fun{C}{g_2}{D}}
+                          \qquad
+                              {\lesssim}\textit{-}\tau~
+                              \inference{g_1 \precsim g_2 & S \lesssim T}{S_{g_1} \lesssim T_{g_2}}
+  \end{gather*}
+  \caption{Consistent subtyping for labels and types}
+  \label{fig:consis-sub}
+\end{figure}
+
+Figure~\ref{fig:consis-sub} presents the definitions of consistent subtyping for
+security labels and types, which will be used in the type system of \Surface.
+Consistent subtyping is the composition of consistency and subtyping. The
+following are equivalent: (1) $A \lesssim B$, (2) $A \sim C <: B$ for some $C$,
+and (3) $A <: D \sim B$ for some $D$. The consistent subtyping relations in
+\Surface are standard, similar to those in \GSLRef and GLIO, with the PC and
+domain type in a function type being contravariant (rule
+${\lesssim}\textit{-fun}$) and the referenced type being invariant
+(rule ${\lesssim}\textit{-ref}$).
+
 
 \begin{figure}[tbp]
 \raggedright
