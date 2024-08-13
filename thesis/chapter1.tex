@@ -537,10 +537,10 @@ among runtime security labels:
 
 \vspace{20pt}
 \fbox{
-	\parbox{0.9\linewidth}{\textbf{\large \ul{My thesis:}\\ It is possible for a
-      gradual IFC programming language to satisfy both noninterference and the
-      gradual guarantee, by excluding the unknown label \unk from runtime
-      security labels.}
+	\parbox{0.9\linewidth}{\textbf{\large \ul{My thesis:}\\ It is possible to
+      design a gradual IFC programming language that satisfies both
+      noninterference and the gradual guarantee, by excluding the unknown label
+      \unk from runtime security labels.}
     %% \textbf{\large \Surface satisfies both noninterference and the
     %% gradual guarantee and enables type-based reasoning at the
     %% same time, by excluding the statically unknown label \unk
@@ -612,43 +612,38 @@ In summary, my dissertation makes the following technical contributions:
 The rest of this dissertation is organized as follows:
 
 \begin{itemize}
-  \item In Chapter~\ref{ch:examples}, I demonstrate how \Surface works using
-    examples. I first show that gradual IFC embeds static IFC, by reviewing
-    type-based static IFC using fully-annotated \Surface programs. I then show
-    that \Surface enables a gradual transition into dynamic IFC, when type
-    annotations become less precise. I review the counterexamples of
-    \textcite{Toro:2018aa} and demonstrate that unlike \GSLRef, the NSU checking
-    in \Surface based on security coercions satisfies the gradual guarantee.
-    Finally, I show that \Surface supports type-based reasoning through free
-    theorems, because \Surface is vigilant and performs type-guided
-    classification just like \GSLRef.
-  \item In Chapter~\ref{ch:coercion-calculus-labels}, I define a coercion
-    calculus on security labels. Using this coercion calculus, I define security
-    label expressions. Label expressions serve as my model of the program
-    counter (PC) that restricts the security of memory locations where write
-    operations are allowed to happen.
-  \item In Chapter~\ref{ch:coercion-calculus-values}, I define a second coercion
-    calculus, whose purpose is to cast a program value from one type to another
-    type. This coercion calculus serves as the representation of casts in the
-    intermediate language \CC.
-  \item In Chapter~\ref{ch:cc}, I present the design of my intermediate
-    language, the cast calculus \CC. I define the syntax, the type system, and
-    the operational semantics for \CC. I then define a type-preserving
-    compilation from \Surface to \CC, so that the semantics of \Surface is given
-    by \CC.
+  \item In Chapter~\ref{ch:examples}, I introduce the gradual IFC language
+    \Surface. I demonstrate how \Surface works using examples. Finally, I define
+    the static and the dynamic extremes of \Surface.
+  \item In Chapter~\ref{ch:sem}, I formalize the operational semantics of
+    \Surface. I take a three-step approach. First, I define a coercion calculus
+    on security labels. Using this coercion calculus, I define security label
+    expressions. Label expressions serve as my model of the program counter (PC)
+    that restricts the security of memory locations where write operations are
+    allowed to happen. Next, I define a second coercion calculus, whose purpose
+    is to cast a program value from one type to another type. This coercion
+    calculus serves as the representation of casts in the intermediate language
+    \CC. Finally, I present the design of my intermediate language, the cast
+    calculus \CC. I define the syntax, the type system, and the operational
+    semantics for \CC. I then define a type-preserving compilation from \Surface
+    to \CC, so that the semantics of \Surface is given by \CC.
   \item In Chapter~\ref{ch:mech-metatheory}, I present the Agda mechanization of
     three major meta-theoretical results, including the gradual guarantee,
     compilation preserves types, and type safety.
+  \item In Chapter~\ref{ch:noninterference}, I prove the noninterference theorem
+    for \Surface, by simulating its cast calculus \CC with the dynamic extreme
+    of \Surface, namely \DynIFC. The noninterference of \DynIFC can be proved
+    using the standard erasure technique.
   \item In Chapter~\ref{ch:alt-design}, I explore the design space of gradual
     IFC by presenting \SurfaceOld and its cast calculus \CCOld. The semantics of
     \SurfaceOld differs from that of \Surface in that the former does not
-    support type-guided classification. The noninterference of \CCOld can be
-    proved using the standard erasure technique. From \SurfaceOld I derive a
-    dynamic IFC language with labeled heap, namely \DynIFC. I prove the
-    noninterference for \DynIFC using the same technique. I mechanized both
-    noninterference proofs in Agda.
-  \item In Chapter~\ref{ch:noninterference}, I prove the noninterference theorem
-    for \Surface, by simulating its cast calculus \CC with \DynIFC.
-  \item Finally in Chapter~\ref{ch:conclusion}, I summarize this dissertation
+    support type-guided classification.
+    %% The noninterference of \CCOld can be
+    %% proved using the standard erasure technique.
+    %% From \SurfaceOld I derive a
+    %% dynamic IFC language with labeled heap, namely \DynIFC. I prove the
+    %% noninterference for \DynIFC using the same technique. I mechanized both
+    %% noninterference proofs in Agda.
+  \item In Chapter~\ref{ch:conclusion}, I summarize this dissertation
     and discuss future research directions in gradual IFC.
 \end{itemize}
