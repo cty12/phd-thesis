@@ -24,7 +24,7 @@ Section~\ref{sec:surface-syntax}. We explain the type system for \Surface in
 Section~\ref{sec:surface-typing}. Finally, we discuss the semantics of \Surface
 by defining the \texttt{eval} function in Section~\ref{sec:surface-semantics}.
 
-\subsection{Syntax of \Surface}
+\subsection{The Syntax of \Surface}
 \label{sec:surface-syntax}
 
 \begin{figure}[tbp]
@@ -85,8 +85,15 @@ addition security label annotation $g$, which is the type of the PC label
 expression used to evaluate the body of the $\lambda$. Same as the security
 labels in type annotations, $g$ defaults to \unk if omitted.
 
-\subsection{Type System of \Surface}
+\subsection{The Type System of \Surface}
 \label{sec:surface-typing}
+
+We first define operators and relations on security labels and types that are
+used by the typing rules in Section~\ref{sec:ops-and-rels}. We then introduce
+the typing rules of \Surface in Section~\ref{sec:surface-typing-rules}.
+
+\subsubsection{Operators and Relations on Security Labels and Types}
+\label{sec:ops-and-rels}
 
 \begin{figure}[tbp]
 \begin{align*}
@@ -128,8 +135,6 @@ Stamping for types}
 \label{fig:grad-ops}
 \end{figure}
 
-Before we describe the type system for \Surface, we first define operators and
-relations on security labels and types that are used by the typing rules.
 Figure~\ref{fig:grad-ops} presents auxiliary operators on security labels and
 types. These operators include join w.r.t precision, consistent join, consistent
 meet, and the stamping operation on types. The operators are standard by following
@@ -190,6 +195,8 @@ domain type in a function type being contravariant (rule
 ${\lesssim}\textit{-fun}$) and the referenced type being invariant
 (rule ${\lesssim}\textit{-ref}$).
 
+\subsubsection{Typing Rules for \Surface}
+\label{sec:surface-typing-rules}
 
 \begin{figure}[tbp]
 \raggedright
@@ -245,12 +252,16 @@ ${\lesssim}\textit{-fun}$) and the referenced type being invariant
     \inference{\Gamma; g \vdash M : A' \\ A' \lesssim A}
               {\Gamma; g \vdash \ann{M}{A}{p} : A}
   \end{gather*}
-  \caption{Typing rules of the surface language \Surface. Side conditions about the heap policy
-  are \highlightblue{\text{highlighted}}}
+  \caption{Typing rules of \Surface. Side conditions about the heap policy are
+    \highlightblue{\text{highlighted}}}
   \label{fig:surface-typing-full}
 \end{figure}
 
-\subsection{Semantics of \Surface}
+The typing rules for \Surface are shown in Figure~\ref{fig:surface-typing-full}.
+They are directly adapted from those of \GSLRef, by changing the security labels
+on values to disallow the \unk label.
+
+\subsection{The Semantics of \Surface}
 \label{sec:surface-semantics}
 
 %% foreshadow the semantics by defining the eval function
