@@ -259,7 +259,38 @@ ${\lesssim}\textit{-fun}$) and the referenced type being invariant
 
 The typing rules for \Surface are shown in Figure~\ref{fig:surface-typing-full}.
 They are directly adapted from those of \GSLRef, by changing the security labels
-on values to disallow the \unk label.
+on values to disallow the \unk label. The type system of \GSLRef is derived from
+its static counterpart \SSLRef by replacing labels and types as well as their
+operators and predicates with the gradual variants, while \SSLRef is in turn an
+adaptation of prior security-typed languages such as \textcite{Fennell:2013ab,
+  heintze1998slam, zdancewic2002programming}.
+
+For example, in \SSLRef the typing rule of application looks like:
+\begin{equation*}
+{\vdash}\textit{app-SSLRef}~
+\inference{\Gamma; \pc \vdash L : (\Fun{A}{\pc'}{B})_\ell & \Gamma; \pc \vdash M : A' \\
+  A' <: A & \pc \preccurlyeq \pc' & \ell \preccurlyeq \pc'}
+{\Gamma; \pc \vdash \app{L}{M}{} : \mathit{stamp}\;B\;\ell}
+\end{equation*}
+where $A' <: A$ is the usual type subsumption of function argument. The side
+conditions $\ell \preccurlyeq \pc'$ and $\pc \preccurlyeq \pc'$ restricts the PC
+label on the function type so that no information is leaked through side
+effects. The type of the application has label that is the join of the label on
+$B$ and $\ell$ ($\mathit{stamp}\;B\;\ell$). In \Surface, the typing judgment
+takes the form $\Gamma ; g \vdash M : A$, where the static PC label $g$ and the
+type $A$ become gradual (may be or contain \unk). Like \GSLRef, we replace label
+partial order with label consistent subtyping, type subtyping with type
+consistent subtyping, and label join with label consistent join and get rule
+${\vdash}\mathit{app}$.
+
+The only major difference from the type system of \GSLRef is that because of the
+concrete label restriction on the syntax of constants and
+$\lambda$-abstractions, these terms must have concrete labels at the top level
+of their respective types (rule ${\vdash}\mathit{const}$ and
+${\vdash}\mathit{lam}$). Similarly, the type of the value in a newly allocated
+cell (rule ${\vdash}\mathit{ref}$) has a concrete top-level label:
+$(\Refer{T_{\text{\hl{$\ell$}}}})_{\low}$. The reference itself has a \low label
+because it is newly created and cannot leak information.
 
 \subsection{The Semantics of \Surface}
 \label{sec:surface-semantics}
