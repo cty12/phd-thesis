@@ -157,7 +157,7 @@ type unchanged.
 
 \begin{figure}[ht]
   \raggedright
-  \fbox{$g_1 \precsim g_2$, $S \lesssim T$, and $A \lesssim B$}
+  \fbox{$g_1 \precsim g_2$}
   \begin{gather*}
     {\precsim}\unk~
     \inference{}{g \precsim \unk}
@@ -167,19 +167,24 @@ type unchanged.
     \qquad
         {\precsim}\textit{-}\ell~
         \inference{\ell_1 \preccurlyeq \ell_2}{\ell_1 \precsim \ell_2}
-        \\[2ex]
+  \end{gather*}
+  \raggedright
+  \fbox{$S \lesssim T$}
+  \begin{gather*}
           {\lesssim}\textit{-}\iota~
           \inference{}{\iota \lesssim \iota}
-          \qquad
+          \quad
               {\lesssim}\textit{-ref}~
-              \inference{A \lesssim B & B \lesssim A}{\Refer{A} \lesssim \Refer{B}}
-              \\[2ex]
-                {\lesssim}\textit{-fun}~
-                \inference{g_2 \precsim g_1 & C \lesssim A & B \lesssim D}
-                          {\Fun{A}{g_1}{B} \lesssim \Fun{C}{g_2}{D}}
-                          \qquad
-                              {\lesssim}\textit{-}\tau~
-                              \inference{g_1 \precsim g_2 & S \lesssim T}{S_{g_1} \lesssim T_{g_2}}
+              \inference{A \lesssim B & B \lesssim A}{\Refer{A} \lesssim \Refer{B}} \quad
+                        {\lesssim}\textit{-fun}~
+                        \inference{g_2 \precsim g_1 & C \lesssim A & B \lesssim D}
+                                  {\Fun{A}{g_1}{B} \lesssim \Fun{C}{g_2}{D}}
+  \end{gather*}
+  \raggedright
+  \fbox{$A \lesssim B$}
+  \begin{gather*}
+    {\lesssim}\textit{-}\tau~
+    \inference{g_1 \precsim g_2 & S \lesssim T}{S_{g_1} \lesssim T_{g_2}}
   \end{gather*}
   \caption{Consistent subtyping for labels and types}
   \label{fig:consis-sub}
