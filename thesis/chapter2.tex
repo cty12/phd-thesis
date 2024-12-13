@@ -1,25 +1,22 @@
 \chapter{Gradual Information-Flow Control (IFC) in \Surface}
 \label{ch:examples}
 
-In this chapter, we first define the gradual IFC surface language \Surface, by
-presenting its syntax and type system in Section~\ref{sec:surface-def}. After
-that, we put \Surface into action. We present example programs to demonstrate
-how \Surface enables a gradual, smooth transition between static and dynamic
-IFC, while supporting type-based reasoning and satisfying the gradual guarantee.
-We review the basics of gradual IFC using \Surface programs in
-Section~\ref{sec:example1}. In Section~\ref{sec:example2}, we show that the
-tension between security and the gradual guarantee can be achieved by removing
-\unk from the runtime security labels. In Section~\ref{sec:example3}, we
-demonstrate that \Surface enables the same type-based reasoning capabilities as
-\GSLRef. To conclude this chapter, we discuss the static and the dynamic
-extremes of \Surface in Section~\ref{sec:embedding}. \Surface enables the
+In this chapter, I first define the gradual IFC surface language \Surface, by
+presenting its syntax, type system, and semantics in
+Section~\ref{sec:surface-def}. After that, I put \Surface into action in
+Section~\ref{sec:examples}. I present example programs to demonstrate how
+\Surface enables a gradual and smooth transition between static and dynamic IFC,
+while supporting type-based reasoning and satisfying the gradual guarantee at
+the same time. I conclude this chapter by discussing the static and the dynamic
+extremes of \Surface in Section~\ref{sec:embedding}. \Surface enables a
 continuum of IFC enforcement between the static and dynamic extremes that it
 embeds.
 
 \section{The Gradual IFC Language \Surface}
 \label{sec:surface-def}
 
-We present the syntax and its supporting definitions in
+This section is organized as follows. I first present the syntax of \Surface and its
+supporting definitions, such as security labels and security types, in
 Section~\ref{sec:surface-syntax}. We explain the type system for \Surface in
 Section~\ref{sec:surface-typing}. Finally, we discuss the semantics of \Surface
 by defining the \texttt{eval} function in Section~\ref{sec:surface-semantics}.
@@ -302,17 +299,32 @@ because it is newly created and cannot leak information.
 
 %% foreshadow the semantics by defining the eval function
 
+I define the semantics of \Surface through a compile function that takes a
+well-typed \Surface program and returns a cast-calculus (\CC) term. The compile
+function takes the form $\compile{M} = M'$, where $M$ is a \Surface program and
+$M'$ is a \CC term.
+
+I define the evaluation function for \Surface by (1) compiling from \Surface to
+\CC and (2) running the compiled \CC term using its operational semantics.
+\begin{align*}
+  \mathit{eval}(M) =&\,V\;\text{if}\;\reducemult{(\compile{M})}{\emptyset}{\low}{V}{\mu} \\
+  \mathit{eval}(M) =&\,\blame{\bl{p}}\;\text{if}\;\reducemult{(\compile{M})}{\emptyset}{\low}{\blame{\bl{p}}}{\mu}
+\end{align*}
+
+I will define the compile function and the operational semantics for \CC in
+Chapter~\ref{ch:sem}.
+
 \section{\Surface in Action}
 \label{sec:examples}
 
-I first show that gradual IFC embeds static IFC, by reviewing type-based static
-IFC using fully-annotated \Surface programs. I then show that \Surface enables a
-gradual transition into dynamic IFC, when type annotations become less precise.
-I review the counterexamples of \textcite{Toro:2018aa} and demonstrate that
-unlike \GSLRef, the NSU checking in \Surface based on security coercions
-satisfies the gradual guarantee. Finally, I show that \Surface supports
-type-based reasoning through free theorems, because \Surface is vigilant and
-performs type-guided classification just like \GSLRef.
+This section is organized as follows. In Section~\ref{sec:example1}, I review
+the basics of gradual IFC using \Surface programs. In
+Section~\ref{sec:example2}, I review the counterexamples of
+\textcite{Toro:2018aa} and demonstrate that the tension between security and the
+gradual guarantee can be solved by removing \unk from the runtime security
+labels. Finally, I show that \Surface enables the same type-based reasoning
+capabilities through free theorems as \GSLRef, because \Surface is vigilant and
+performs type-guided classification.
 
 \subsection{The Gradual Transition Between Static and Dynamic IFC in \Surface}
 \label{sec:example1}
