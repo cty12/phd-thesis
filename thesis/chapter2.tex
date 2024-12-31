@@ -380,10 +380,57 @@ performs type-guided classification.
 \subsection{The Gradual Transition Between Static and Dynamic IFC in \Surface}
 \label{sec:example1}
 
+In this section I review the basic concepts of gradual information flow control
+using \Surface, establishing the intuition that \Surface enables a smooth,
+gradual transition between static and dynamic IFC. I start with fully static
+\Surface programs and show that \Surface can behave like a static security-typed
+language, guarding against both illegal explicit and implicit flows at compile
+time. I then replace some security label annotations in types with \unk, so that
+the programs become partially typed and the typing information alone is
+insufficient to enforce IFC. I show that security coercions, serving as the
+runtime security monitor of \Surface, are able to capture both explicit flow and
+implicit flow violations at runtime, thereby preventing information leakage and
+enforcing security.
+
 I model I/O with two functions, \texttt{user-input} and \texttt{publish}: the
 former returns a high-security boolean that represents sensitive input
 information; the latter takes a low-security boolean and publishes it into a
 publicly visible channel.
+
+\paragraph{Gradual IFC includes static IFC}
+
+For statically typed programs, \Surface behaves just like a statically
+typed IFC language. Consider the following well-behaved \Surface
+program that takes in a high-security user input, passes it to the
+function \texttt{fconst} that ignores the input and
+returns \texttt{false}, which is then published.
+
+\begin{lstlisting}[style=tt]
+  let fconst = |$\lambda$| b : |$\Bool_{\high}$|. false in
+  let input  = user-input () in
+  let result = fconst input in
+    publish result
+\end{lstlisting}
+
+The program type-checks and runs without error, with no need for
+runtime checks to enforce security. Indeed, a malicious party cannot
+infer anything about the high-security input because (1) the return
+value of \texttt{fconst} is always the same value \false~ (2)
+the value \false~is of low security, so the explicit flow
+into \texttt{publish} is allowed.
+
+If we replace \texttt{fconst} with the identity function \texttt{fid} with
+parameter type $\Bool_{\low}$, the program becomes ill-typed as is usual for a
+statically typed IFC language: the type system disallows the explicit flow from
+the high-security input to \texttt{fid}, which expects a low-security boolean
+value.
+
+\begin{lstlisting}[style=tt]
+  let fid    = |$\lambda$| b : |\colorbox{highlight}{$\Bool_{\low}$}|. b in
+  let input  = user-input () in
+  let result = fid input in      |\graytext{// static error}|
+    publish result
+\end{lstlisting}
 
 \subsection{Implicit Flow, NSU Checks, Unknown Security, and the Gradual Guarantee}
 \label{sec:example2}

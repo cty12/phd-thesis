@@ -45,9 +45,6 @@
 \usetikzlibrary{shapes,arrows}
 \usetikzlibrary{decorations.markings}
 
-%% \newunicodechar{ℒ}{\ensuremath{\mathcal{L}}}
-%% \newunicodechar{ℕ}{\ensuremath{\mathbb{N}}}
-
 \setlength{\multicolsep}{3pt}
 \setlength{\columnseprule}{0.5pt}
 
@@ -80,6 +77,7 @@
 %\newcommand{\done}{\usym{2611}\xspace}
 \newcommand\tikzmark[2]{\tikz[overlay,remember picture, anchor=base] \node (#1) {#2};}
 \renewcommand\theadfont{\bfseries}
+\renewcommand{\ttdefault}{cmtt}
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
@@ -193,6 +191,12 @@
 
 \colorlet{red}{OrangeRed}
 \colorlet{green}{PineGreen}
+
+\lstdefinestyle{tt}{
+  basicstyle=\ttfamily\small,
+  autogobble,
+  escapechar=|
+}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Bibliography
