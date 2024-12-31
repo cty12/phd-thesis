@@ -7,18 +7,17 @@ Section~\ref{sec:surface-def}. After that, I put \Surface into action in
 Section~\ref{sec:examples}. I present example programs to demonstrate how
 \Surface enables a gradual and smooth transition between static and dynamic IFC,
 while supporting type-based reasoning and satisfying the gradual guarantee at
-the same time. I conclude this chapter by discussing the static and the dynamic
-extremes of \Surface in Section~\ref{sec:embedding}. \Surface enables a
-continuum of IFC enforcement between the static and dynamic extremes that it
+the same time. Finally, in Section~\ref{sec:embedding}, I conclude the chapter
+by discussing the static and the dynamic extremes of \Surface. \Surface enables
+a continuum of IFC enforcement between the static and dynamic extremes that it
 embeds.
 
 \section{The Gradual IFC Language \Surface}
 \label{sec:surface-def}
 
-This section is organized as follows. I first present the syntax of \Surface and its
-supporting definitions, such as security labels and security types, in
-Section~\ref{sec:surface-syntax}. We explain the type system for \Surface in
-Section~\ref{sec:surface-typing}. Finally, we discuss the semantics of \Surface
+This section is organized as follows. I first present the syntax of \Surface in
+Section~\ref{sec:surface-syntax}. I then present the type system for \Surface in
+Section~\ref{sec:surface-typing}. Finally, I discuss the semantics of \Surface
 by defining the \texttt{eval} function in Section~\ref{sec:surface-semantics}.
 
 \subsection{The Syntax of \Surface}
@@ -44,23 +43,23 @@ by defining the \texttt{eval} function in Section~\ref{sec:surface-semantics}.
   \label{fig:surface-syntax}
 \end{figure}
 
-We present the syntax of the gradual language \Surface in
+The syntax of the gradual language \Surface is shown in
 Figure~\ref{fig:surface-syntax}. The figure also includes the definitions for
-security labels, blame labels, and types in \Surface.
+security labels, security types, and blame labels.
 
-For simplicity, we use the security lattice
-$\langle \{\high, \low\} , \preccurlyeq, \curlyvee , \curlywedge \rangle$, where
-$\high$ is for private data and $\low$ is for publicly disclosable data. Of
-course, any lattice of security labels could be used in place of low and high.
-The ordering is standard: $\low \preccurlyeq \high$ and $\high \npreccurlyeq
-\low$. So information is allowed to flow from public sources to private sinks
-but not the other way around. We refer to $\{\high,\low\}$ as \emph{specific
-security labels}.
+For simplicity, I will use a two-point security lattice $\langle \{\high, \low\}
+, \preccurlyeq, \curlyvee , \curlywedge \rangle$, where $\high$ is for private,
+sensitive data and $\low$ is for public, disclosable data. Of course, any
+lattice of security labels could be used in place of low and high. The ordering
+is standard: $\low \preccurlyeq \high$ and $\high \npreccurlyeq \low$. So
+information is allowed to flow from public sources to private sinks but not the
+other way around. I refer to $\{\high,\low\}$ as \emph{specific security
+labels}.
 
 Types in \Surface have security labels associated with them, for example,
 $\Bool_{\high}$ is the type for booleans with high security, $\Unit_{\low}$ is
 the type for the unit value with low security, and $\Bool_{\unk}$ is the type of
-a boolean whose security level is unknown at compile time. We refer to
+a boolean whose security level is unknown at compile time. I refer to
 $\{\high,\low,\unk\}$ as \emph{security labels}. A function type
 $(\Fun{A}{\gc}{B})_g$ carries an additional security label \gc, which is the
 type of the program counter (PC) to evaluate the body of the function.
@@ -72,21 +71,30 @@ error, called \textit{blame}, that contains its blame label. In this way, the
 programmer knows which cast is causing the problem and which part of the program
 generates that cast.
 
-The syntax of \Surface is similar to that of \GSLRef. \Surface supports
-higher-order functions, mutable references, and explicit type annotations. The
-main syntactic difference is that in \Surface, the security labels of literals
-and newly created memory cells default to a specific label such as \low, while
-in \GSLRef they default to a runtime unknown security level \unk. One thing to
-note is that compared with literals, $\lambda$-abstractions in \Surface carry an
-addition security label annotation $g$, which is the type of the PC label
-expression used to evaluate the body of the $\lambda$. Same as the security
-labels in type annotations, $g$ defaults to \unk if omitted.
+To enable information-flow control, \Surface allows the programmer to annotate
+constants, mutable references, and $\lambda$-abstractions with a specific
+security label. \Surface ensures that if a value is annotated with $\high$, it
+will not flow into a sink that is $\low$ security. If the programmer does not
+annotate a value with a label, \Surface defaults the value's label to \low. So
+\texttt{true} is shorthand for $\mathtt{true}_{\low}$. \Surface supports
+higher-order functions, mutable references, and explicit type annotations. One
+thing to note is that compared with literals, $\lambda$-abstractions in \Surface
+carry an addition security label annotation $g$, which is the type of the PC
+label expression used to evaluate the body of the $\lambda$. Same as the
+security labels in type annotations, $g$ defaults to \unk if omitted. For
+readers familiar with \GSLRef, the syntax of \Surface is similar to that of
+\GSLRef. The main syntactic difference is that in \Surface, the security labels
+of literals and newly created memory cells default to a specific label such as
+\low, while in \GSLRef they default to a runtime unknown security level \unk. I
+am going to show in Section~\ref{sec:example2} that defaulting to a specific
+security label helps us resolve the tension between noninterference and the
+gradual guarantee.
 
 \subsection{The Type System of \Surface}
 \label{sec:surface-typing}
 
-We first define operators and relations on security labels and types that are
-used by the typing rules in Section~\ref{sec:ops-and-rels}. We then introduce
+I first define operators and relations on security labels and types that are
+used by the typing rules in Section~\ref{sec:ops-and-rels}. I then introduce
 the typing rules of \Surface in Section~\ref{sec:surface-typing-rules}.
 
 \subsubsection{Operators and Relations on Security Labels and Types}
@@ -197,6 +205,48 @@ domain type in a function type being contravariant (rule
 ${\lesssim}\textit{-fun}$) and the referenced type being invariant
 (rule ${\lesssim}\textit{-ref}$).
 
+\begin{figure}[tbp]
+  \raggedright
+  \fbox{$g_1 \sqsubseteq g_2$}
+  \begin{gather*}
+    \unk{\sqsubseteq}~
+    \inference{}{\unk \sqsubseteq g}
+    \qquad\quad
+    \ell{\sqsubseteq}\ell~
+    \inference{}{\ell \sqsubseteq \ell}
+  \end{gather*}
+  \fbox{$S \sqsubseteq T$}
+  \begin{gather*}
+    {\sqsubseteq}\textit{-}\iota~
+    \inference{}{\iota \sqsubseteq \iota}
+    \quad
+        {\sqsubseteq}\textit{-ref}~
+        \inference{A \sqsubseteq B}{\Refer{A} \sqsubseteq \Refer{B}}
+        \quad
+            {\sqsubseteq}\textit{-fun}~
+            \inference{g_1 \sqsubseteq g_2 &
+              A \sqsubseteq C &
+              B \sqsubseteq D}
+                      {\Fun{A}{g_1}{B} \sqsubseteq \Fun{C}{g_2}{D}}
+  \end{gather*}
+  \fbox{$A \sqsubseteq B$}
+  \begin{gather*}
+    {\sqsubseteq}\textit{-}\tau~
+    \inference{g_1 \sqsubseteq g_2 & S \sqsubseteq T}{S_{g_1} \sqsubseteq T_{g_2}}
+  \end{gather*}
+  \caption{Precision of security labels and types}
+  \label{fig:type-prec}
+\end{figure}
+
+I define a precision ordering $\sqsubseteq$ on security labels and security
+types. For security labels, the statically unknown label \unk is the most
+imprecise, so $\unk \sqsubseteq g$ for any label $g$ and $\ell \sqsubseteq \ell$
+for any specific security label $\ell$. The precision ordering extends to types
+in a natural way, so for example, $\Bool_{\unk} \sqsubseteq \Bool_{\low}$ and
+$(\Fun{\Bool_{\low}}{\unk}{\Bool_{\high}})_{\unk} \sqsubseteq $.
+Figure~\ref{fig:type-prec} of the Appendix gives the definition of precision on
+types.
+
 \subsubsection{Typing Rules for \Surface}
 \label{sec:surface-typing-rules}
 
@@ -280,7 +330,7 @@ label on the function type so that no information is leaked through side
 effects. The type of the application has label that is the join of the label on
 $B$ and $\ell$ ($\mathit{stamp}\;B\;\ell$). In \Surface, the typing judgment
 takes the form $\Gamma ; g \vdash M : A$, where the static PC label $g$ and the
-type $A$ become gradual (may be or contain \unk). Like \GSLRef, we replace label
+type $A$ become gradual (may be or contain \unk). Like \GSLRef, I replace label
 partial order with label consistent subtyping, type subtyping with type
 consistent subtyping, and label join with label consistent join and get rule
 ${\vdash}\mathit{app}$.
@@ -318,7 +368,8 @@ Chapter~\ref{ch:sem}.
 \label{sec:examples}
 
 This section is organized as follows. In Section~\ref{sec:example1}, I review
-the basics of gradual IFC using \Surface programs. In
+the basics of gradual IFC using \Surface programs. I show that \Surface enables
+a gradual transition between static and dynamic IFC. In
 Section~\ref{sec:example2}, I review the counterexamples of
 \textcite{Toro:2018aa} and demonstrate that the tension between security and the
 gradual guarantee can be solved by removing \unk from the runtime security
@@ -329,13 +380,10 @@ performs type-guided classification.
 \subsection{The Gradual Transition Between Static and Dynamic IFC in \Surface}
 \label{sec:example1}
 
-For simplicity, we use the security lattice $\langle \{\high, \low\}
-, \preccurlyeq, \curlyvee , \curlywedge \rangle$, where $\high$ is for
-private data and $\low$ is for publicly disclosable data. The ordering
-is standard: $\low \preccurlyeq \high$ and
-$\high \npreccurlyeq \low$. So information is allowed to flow from
-public sources to private sinks but not the other way around.
-We refer to $\{\high,\low\}$ as \emph{specific security labels}.
+I model I/O with two functions, \texttt{user-input} and \texttt{publish}: the
+former returns a high-security boolean that represents sensitive input
+information; the latter takes a low-security boolean and publishes it into a
+publicly visible channel.
 
 \subsection{Implicit Flow, NSU Checks, Unknown Security, and the Gradual Guarantee}
 \label{sec:example2}
