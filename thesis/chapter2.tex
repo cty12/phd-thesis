@@ -432,6 +432,42 @@ value.
     publish result
 \end{lstlisting}
 
+Sometimes the observable behaviors of a program can depend on its branching
+structure. If some of the branch conditions have a data dependency on
+high-security input, a malicious party might be able to infer it from the
+observable behaviors, giving rise to illegal \textit{implicit flows}
+~\parencite{denning1976lattice}, which must be ruled out to guarantee security.
+
+Consider the following program in which the function \texttt{flip} contains a
+conditional expression, whose condition is dependent on a high-security user
+input. Its two branches return different low-security booleans, creating a
+potential implicit flow from high to low:
+
+\begin{lstlisting}[style=tt]
+  let flip : |$\Bool_{\high}$| -> |$\Bool_{\low}$| =
+       |$\lambda$| b : |$\Bool_{\high}$|. |\colorbox{highlight}{\texttt{if b then false else true}}| in
+  let input  = user-input () in
+  let result = flip input in
+    publish result
+\end{lstlisting}
+
+%% \noindent As is typical of statically typed IFC languages,
+%% the type system of \Surface rejects this program, thereby preventing
+%% an information leak through an implicit flow.
+%% %% Perhaps the programmer
+%% %% mistakenly annotated the return type of \texttt{flip} thinking that it
+%% %% must return $\Bool_{\low}$, because both branches contain low-security
+%% %% values.
+%% To see why, note that the branch condition is of high security, so the
+%% type of the \texttt{if} expression as a whole is $\Bool_{\high}$. In
+%% particular, the type checker computes the security level of
+%% an \texttt{if} to be the join of its branches (both \low) and the
+%% condition (\high), yielding $\low \curlyvee \high
+%% = \high$. The \texttt{flip} function is expected to return
+%% $\Bool_{\low}$ according to its type annotation, but returns
+%% $\Bool_{\high}$ because of the conditional,
+%% $\high \npreccurlyeq \low$, so the program is ill-typed.
+
 \subsection{Implicit Flow, NSU Checks, Unknown Security, and the Gradual Guarantee}
 \label{sec:example2}
 
