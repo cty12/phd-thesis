@@ -441,7 +441,7 @@ observable behaviors, giving rise to illegal \textit{implicit flows}
 Consider the following program in which the function \texttt{flip} contains a
 conditional expression, whose condition is dependent on a high-security user
 input. Its two branches return different low-security booleans, creating a
-potential implicit flow from high to low:
+potential implicit flow from high to low.
 
 \begin{lstlisting}[style=tt]
   let flip : |$\Bool_{\high}$| -> |$\Bool_{\low}$| =
@@ -467,6 +467,80 @@ but returns $\Bool_{\high}$ because of the conditional, $\high \npreccurlyeq
 To summarize, \Surface behaves just like a static security-typed language in the
 above examples. When everything is statically typed, the type system of \Surface
 guards against illegal information flows, whether explicit or implicit.
+
+\paragraph{Gradual IFC enables a mixture of static and dynamic IFC}
+
+I have shown that security labels (\low and \high) can appear in type
+annotations in a program, such as $\Bool_{\low}$ and $\Bool_{\high}$. \Surface
+also provides the \textit{unknown security label}, written \unk, for use in type
+annotations. I will explain how the unknown security label works in the
+following discussion.
+
+Let us return to the \texttt{fconst} example, except this time the type of
+parameter \texttt{b} is $\Bool_{\unk}$.
+
+\begin{lstlisting}[style=tt]
+  let fconst = |$\lambda$| b : |\colorbox{highlight}{$\Bool_{\unk}$}|. false in
+  let input  = user-input () in
+  let result = fconst input in
+    publish result
+\end{lstlisting}
+
+\noindent The type system of \Surface accepts this program because, in
+the function call \texttt{fconst input}, it allows an implicit conversion from
+the type of \texttt{input}, which is $\Bool_{\high}$, to the parameter
+type $\Bool_{\unk}$. This program runs to completion and publishes
+\texttt{false}.
+
+Now suppose I again replace \texttt{fconst} with \texttt{fid}, but keep the
+parameter type of $\Bool_{\unk}$.
+
+\begin{lstlisting}[style=tt]
+  let fid    = |$\lambda$| b : |\colorbox{highlight}{$\Bool_{\unk}$}|. b in
+  let input  = user-input () in
+  let result = fid input in
+    publish result
+\end{lstlisting}
+
+\noindent The type system of \Surface still accepts this program. The type of
+\texttt{result} changes to $\Bool_{\unk}$ but in the call \texttt{publish
+  result}, the type system allows an implicit conversion from $\Bool_{\unk}$ to
+$\Bool_{\low}$. The security leak in this program is not caught statically;
+instead it is caught dynamically.
+
+The dynamic semantics of \Surface is defined by compilation into the \CC
+calculus by inserting casts. In \CC, explicit casts are represented as
+\textit{security coercions} that monitor the flow of information. I use the
+standard syntax for coercions~\parencite{Henglein:1994nz} but with adaptations
+to handle IFC. A coercion whose target is \unk (and source is not \unk) is an
+\emph{injection}, and is indicated by an exclamation mark. A coercion whose
+source is \unk (and target is not \unk) is a \emph{projection}, and is indicated
+by a question mark. The projections perform runtime checks that may fail.
+
+The translation from \Surface to \CC inserts a security coercion wherever an
+implicit cast occurred in the type checking of the \Surface term. Here is the
+result of cast insertion on the above program:
+
+\begin{lstlisting}[style=tt]
+  let fid    = |$\lambda$| b. b in
+  let input  = user-input () in
+  let result = fid (input |\colorbox{highlight}{\textlangle\,\inj{\high}\,\textrangle}|) in
+    publish (result |\colorbox{highlight}{\textlangle\,\proj{\low}{p}\,\textrangle}|)
+\end{lstlisting}
+
+The coercion on Line 3 (\inj{\high}) is an injection, casting from \high to
+\unk.
+%
+The coercion on line 4 (\proj{\low}{p}) is a projection, casting from \unk to
+\low.
+%
+At runtime, a projection checks whether the incoming value has a security level
+that is less than or equal to the target security level.
+%
+Now suppose we run the above example with input \texttt{true}. The injection on
+line 3 will create an injected value $\cccast{\true_{\high}}{\inj{\high}}$. This
+value is passed to and returned from \texttt{fid}, and then projected to $\low$.
+Because $\high$ is greater than $\low$, the projection fails.
 
 \subsection{Implicit Flow, NSU Checks, Unknown Security, and the Gradual Guarantee}
 \label{sec:example2}
