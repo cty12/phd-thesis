@@ -542,6 +542,35 @@ line 3 will create an injected value $\cccast{\true_{\high}}{\inj{\high}}$. This
 value is passed to and returned from \texttt{fid}, and then projected to $\low$.
 Because $\high$ is greater than $\low$, the projection fails.
 
+Each projection is annotated with an identifier called a blame label
+(\bl{p}).  In case a projection fails, it raises a cast error,
+called \textit{blame}, that contains its blame label. In this way, the
+programmer knows which cast is causing the problem.  This feature is
+often referred to as
+\textit{blame tracking}~\parencite{Findler:2002eu,Wadler:2009qv}.
+Blame tracking is especially useful during the software development
+process, but in the context of IFC, one may not want blame to be
+observable in a production system as it could reveal information.
+This can be handled by causing the program to diverge whenever blame
+is detected, possibly sending a private error message to the software
+developer.
+
+Next let us return to the \texttt{flip} example to see how gradual IFC prevents
+illegal implicit flows. Suppose that I change the parameter type of the
+$\lambda$ from $\Bool_{\high}$ to $\Bool_{\unk}$. The return type remains
+$\Bool_{\low}$, to conform with the signature of \texttt{publish}. The
+definition of \texttt{flip} (line 1 and line 2) thus becomes:
+
+\begin{lstlisting}[style=tt]
+  let flip : |\colorbox{highlight}{$\Bool_{\unk}$}| -> |$\Bool_{\low}$| =
+       |$\lambda$| b : |\colorbox{highlight}{$\Bool_{\unk}$}|. if b then false else true in
+\end{lstlisting}
+
+\noindent This change makes the program well-typed in \Surface. The IFC
+enforcement of the implicit flow is deferred until runtime because the branch
+condition now has type $\Bool_{\unk}$, with an unknown security level. Next, I
+will discuss the runtime behavior of this program.
+
 \subsection{Implicit Flow, NSU Checks, Unknown Security, and the Gradual Guarantee}
 \label{sec:example2}
 
