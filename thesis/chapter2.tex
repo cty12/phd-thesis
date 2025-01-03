@@ -451,22 +451,22 @@ potential implicit flow from high to low:
     publish result
 \end{lstlisting}
 
-%% \noindent As is typical of statically typed IFC languages,
-%% the type system of \Surface rejects this program, thereby preventing
-%% an information leak through an implicit flow.
-%% %% Perhaps the programmer
-%% %% mistakenly annotated the return type of \texttt{flip} thinking that it
-%% %% must return $\Bool_{\low}$, because both branches contain low-security
-%% %% values.
-%% To see why, note that the branch condition is of high security, so the
-%% type of the \texttt{if} expression as a whole is $\Bool_{\high}$. In
-%% particular, the type checker computes the security level of
-%% an \texttt{if} to be the join of its branches (both \low) and the
-%% condition (\high), yielding $\low \curlyvee \high
-%% = \high$. The \texttt{flip} function is expected to return
-%% $\Bool_{\low}$ according to its type annotation, but returns
-%% $\Bool_{\high}$ because of the conditional,
-%% $\high \npreccurlyeq \low$, so the program is ill-typed.
+\noindent Perhaps the programmer mistakenly annotated the return type of
+\texttt{flip} thinking that it must return $\Bool_{\low}$, because both branches
+contain low-security values. As is typical of statically typed IFC languages,
+the type system of \Surface rejects this program, thereby preventing an
+information leak through an implicit flow. To see why, note that the branch
+condition is of high security, so the type of the \texttt{if} expression as a
+whole is $\Bool_{\high}$. In particular, the type checker computes the security
+level of an \texttt{if} to be the join of its branches (both \low) and the
+condition (\high), yielding $\low \curlyvee \high = \high$. The \texttt{flip}
+function is expected to return $\Bool_{\low}$ according to its type annotation,
+but returns $\Bool_{\high}$ because of the conditional, $\high \npreccurlyeq
+\low$, so the program is ill-typed.
+
+To summarize, \Surface behaves just like a static security-typed language in the
+above examples. When everything is statically typed, the type system of \Surface
+guards against illegal information flows, whether explicit or implicit.
 
 \subsection{Implicit Flow, NSU Checks, Unknown Security, and the Gradual Guarantee}
 \label{sec:example2}
