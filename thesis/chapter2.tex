@@ -568,8 +568,64 @@ definition of \texttt{flip} (line 1 and line 2) thus becomes:
 
 \noindent This change makes the program well-typed in \Surface. The IFC
 enforcement of the implicit flow is deferred until runtime because the branch
-condition now has type $\Bool_{\unk}$, with an unknown security level. Next, I
-will discuss the runtime behavior of this program.
+condition now has type $\Bool_{\unk}$, with an unknown security level.
+
+Next, let us consider the runtime behavior of this program. The result of cast
+insertion on the \Surface program is the following \CC term:
+
+\begin{lstlisting}[style=tt]
+  let flip   = |$\lambda$| b. ((if|${\star}$| b then (false |\colorbox{highlight}{\texttt{⟨\,\inj{\low}\,⟩}}|)
+                            else (true |\colorbox{highlight}{\texttt{⟨\,\inj{\low}\,⟩}}|)) |\colorbox{highlight}{\texttt{⟨\,\proj{\low}{p}\,⟩}}|) in
+  let input  = user-input () in
+  let result = flip (input |\colorbox{highlight}{\texttt{⟨\,\inj{\high}\,⟩}}|) in
+    publish result
+\end{lstlisting}
+
+\noindent where the \texttt{if} is changed
+to $\mathtt{if}\star$ because the condition expression has static
+security level \unk{}.  The type checking rule for $\mathtt{if}\star$
+requires the two branches to have security level \unk{} and the
+security level of the $\mathtt{if}\star$ is a whole is also \unk{}.
+%
+If we run the program with \texttt{true} or \texttt{false} as input, the \CC
+term reduces to \texttt{blame} \bl{p} with either input, thus capturing the
+illegal implicit flow and preventing the leakage of the private user input. The
+following reduction shows the highlights of running this program with input
+\texttt{true} (\texttt{false} is analogous):
+
+{\small
+  \begin{align*}
+    \longrightarrow^{*}
+    \begin{split}
+      &\quad \texttt{let result = ($\lambda$ b. ((if${\star}$ b then (false ⟨\,\inj{\low}\,⟩)} \\[-3pt]
+      &\quad\quad\qquad\texttt{else (true ⟨\,\inj{\low}\,⟩)) ⟨\,\proj{\low}{p}\,⟩)) (true ⟨\,\inj{\high}\,⟩) in ...}
+    \end{split} \\[1ex]
+    \longrightarrow^{*}
+    \begin{split}
+      &\quad \texttt{let result = prot \low ((if${\star}$ (true ⟨\,\inj{\high}\,⟩) then (false ⟨\,\inj{\low}\,⟩)} \\[-3pt]
+      &\quad\quad\qquad\texttt{else (true ⟨\,\inj{\low}\,⟩)) ⟨\,\proj{\low}{p}\,⟩) in ...}
+    \end{split}\\[1ex]
+    \longrightarrow^{*} &
+    \quad \texttt{let result = prot \low ((prot \high (false ⟨\,\inj{\low}\,⟩)) ⟨\,\proj{\low}{p}\,⟩) in ...} \\[1ex]
+    \longrightarrow^{*} &
+    \quad\texttt{let result = prot \low (false ⟨\,\up\seq\inj{\high}\,⟩ ⟨\,\proj{\low}{p}\,⟩) in ...} \\
+    \longrightarrow^{*} &
+    \quad\texttt{blame \bl{p}}
+\end{align*}}
+
+First, the $\lambda$ is bound to \texttt{flip} and the input \texttt{true} is
+bound to the \texttt{input} variable. We then inject the input, producing the
+value $(\cccast{\true_{\high}}{\inj{\high}})$. We call \texttt{flip} and the
+$\mathtt{if}\star$ branches on this injected boolean, evaluating the ``then''
+branch to the result $(\cccast{\false_{\low}}{\inj{\low}})$ and then, to protect
+against implicit flows, the $\mathtt{if}\star$ upgrades the result to $\high$ to
+match the runtime security level of the condition
+$(\cccast{\true_{\high}}{\inj{\high}})$, producing
+$(\cccast{\false_{\low}}{\up\seq\inj{\high}})$. The subtype coercion $\up$ sends
+the security level of \texttt{false} from $\low$ to $\high$. The last step in
+the body of \texttt{flip} is to apply the coercion \texttt{\proj{\low}{p}} to
+the value $(\cccast{\false_{\low}}{\up\seq\inj{\high}})$, which errors because
+$\high$ is greater than $\low$.
 
 \subsection{Implicit Flow, NSU Checks, Unknown Security, and the Gradual Guarantee}
 \label{sec:example2}
