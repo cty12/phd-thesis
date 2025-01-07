@@ -762,6 +762,31 @@ the program, at the assignment on line 3, an NSU check happens and the
 assignment to high-security memory under high PC is allowed. As a result, the
 less-precise program also evaluates successfully to unit.
 
+One might worry that the less precise program has a heavy annotation burden.
+However, as we mentioned, the default security label is \low so the programmer
+does not have to label constants in \Surface. So we can remove the labels on
+constants to obtain the following program, which also reduces successfully to
+unit:
+\begin{lstlisting}[style=tt]
+  let x = user-input () in
+  let y : |$(\Refer{\Bool_{\unk}})_{\unk}$| = ref |\high|true in
+    if x then (y := false) else ()
+\end{lstlisting}
+\noindent The low-security \texttt{true} is classified as high security during
+reference creation because the security level of the cell is \high (line 2).
+Similarly, during assignment the \texttt{false} is also classified as high
+security because the security level of the cell (line 3). Assigning to a
+high-security memory cell is allowed under a high PC by the NSU check, so the
+program evaluates successfully to unit.
+
+One might think that requiring the programmer to annotate the reference creation
+with \high (line 2) is still a burden and that \GSLRef is better in this regard.
+However, while \GSLRef allows the unannotated version of this program to
+compile, it errors during program execution. It is better to require the
+programmer to annotate references during program development than to have the
+programs compile but then fail during program execution, perhaps only detected
+after the program is deployed.
+
 \subsection{Type-Based Reasoning in \Surface}
 \label{sec:example3}
 
