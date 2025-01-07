@@ -721,6 +721,39 @@ This is because \GSLRef considers \unk as corresponding to the interval $[\low,
 the \high PC label. So we see that this more precise program (\bluetext{right})
 runs successfully while the less precise one (\redtext{left}) errors in \GSLRef.
 
+\begin{figure}[tbp]
+  \raggedright
+  \fbox{$\vdash M \sqsubseteq N$}
+  {\small
+  \begin{gather*}
+    {\sqsubseteq}\textit{-const}~
+    \inference{}{\vdash \const{k}{\ell} \sqsubseteq \const{k}{\ell}}
+    \quad
+    {\sqsubseteq}\textit{-var}~
+    \inference{}{\vdash x \sqsubseteq x}
+    \\[1ex]
+    {\sqsubseteq}\textit{-lam}~
+    \inference{g_1 \sqsubseteq g_2 & A_1 \sqsubseteq A_2 & \vdash N_1 \sqsubseteq N_2 }
+              {\vdash \lam{g_1}{x}{A_1}{N_1}{\ell} \sqsubseteq \lam{g_2}{x}{A_2}{N_2}{\ell}}
+    \;
+    {\sqsubseteq}\textit{-app}~
+    \inference{\vdash L_1 \sqsubseteq L_2 & \vdash M_1 \sqsubseteq M_2}
+              {\vdash \app{L_1}{M_1}{p} \sqsubseteq \app{L_2}{M_2}{p}}
+    \\[1ex]
+    {\sqsubseteq}\textit{-if}~
+    \inference{\vdash L_1 \sqsubseteq L_2 & \vdash M_1 \sqsubseteq M_2 & \vdash N_1 \sqsubseteq N_2}
+              {\vdash \ifexp{L_1}{M_1}{N_1}{p} \sqsubseteq \ifexp{L_2}{M_2}{N_2}{p}}
+    \\[1ex]
+    \inference{\vdash M_1 \sqsubseteq M_2}
+              {\vdash \refexp{\ell}{M_1}{p} \sqsubseteq \refexp{\ell}{M_2}{p}}
+    \\[1ex]
+    \inference{\vdash M_1 \sqsubseteq M_2 & A_1 \sqsubseteq A_2}
+              {\vdash \ann{M_1}{A_1}{p} \sqsubseteq \ann{M_2}{A_2}{p}}
+  \end{gather*}}
+  \caption{Precision rules of \Surface}
+  \label{fig:surface-precision}
+\end{figure}
+
 In \Surface, the \unk security label can be used in type annotations, as one
 would expect of a gradually-typed language, but \unk is not allowed as a runtime
 security label and therefore also not allowed as a label on program literals and
