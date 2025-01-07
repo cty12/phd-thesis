@@ -479,12 +479,14 @@ following discussion.
 Let us return to the \texttt{fconst} example, except this time the type of
 parameter \texttt{b} is $\Bool_{\unk}$.
 
+\begin{minipage}{1.0\textwidth}
 \begin{lstlisting}[style=tt]
   let fconst = |$\lambda$| b : |\colorbox{highlight}{$\Bool_{\unk}$}|. false in
   let input  = user-input () in
   let result = fconst input in
     publish result
 \end{lstlisting}
+\end{minipage}
 
 \noindent The type system of \Surface accepts this program because, in
 the function call \texttt{fconst input}, it allows an implicit conversion from
@@ -630,7 +632,135 @@ $\high$ is greater than $\low$.
 \subsection{Implicit Flow, NSU Checks, Unknown Security, and the Gradual Guarantee}
 \label{sec:example2}
 
-%% TODO define the precision relations here
+%% TODO define the precision relations in this section
+
+The tension between information-flow security and the gradual guarantee arises
+from an interaction between implicit flows and the use of no-sensitive-upgrade
+checks to guard writes to mutable references. In brief, when \unk is allowed as
+a runtime security label, some NSU checks have to conservatively trigger an
+error to preserve noninterference, even though no error would occur if the label
+was instead \high. But the gradual guarantee says that if a program with a
+precise annotation runs without error, it should also run without error when
+that annotation is changed to \unk.
+
+In preparation to discuss this scenario in more detail, I first review the
+no-sensitive-upgrade technique~\parencite{austin2009efficient} that protects against
+illegal implicit flows through writes to mutable references. I then show how
+allowing \unk as a runtime security label leads to a situation where a language
+designer is forced to choose between noninterference and the gradual guarantee.
+Finally, I show how this problem is resolved in the \Surface language by walking
+back the choice of allowing \unk as a runtime security label.
+
+The main idea of no-sensitive-upgrades is to prevent data leaks through the
+mutable references by terminating execution whenever the program attempts to
+modify a low-security heap cell in a high-security execution context. In
+\Surface, NSU checks happen at runtime when type information is insufficient to
+statically decide whether a heap-modifying operation is secure or not. Consider
+the following well-typed program in \Surface:
+
+\begin{lstlisting}[style=tt]
+  let input : |$\Bool_{\unk}$| = user-input () in
+  let a     = ref |\low| true in
+  let _     = if input then a := false else a := true in
+    publish (! a)
+\end{lstlisting}
+
+\noindent
+The assignments to \texttt{a} in the two branches try to write different
+low-security booleans into the cell at the address in \texttt{a}, depending on a
+branch condition whose security level is statically unknown. However, at runtime
+the \texttt{user-input} function returns a high-security boolean, so the branch
+condition is actually high security, and if the writes were successful, the
+program would leak information via an implicit flow. Fortunately, if we run this
+program, it reduces to blame regardless of the input. The way NSU checking works
+in \Surface is that a security level is associated with the current program
+counter. At the point of every write that requires an NSU, the system projects
+the program counter's security level to the level of the memory location, making
+sure that the later is at least as high as the former. In the above example, the
+NSU check fails because the program counter's security is $\high$ but the write
+is to a $\low$ security location.
+
+In \GSLRef \parencite{Toro:2018aa}, the dynamic enforcement of IFC through the
+heap is also based on NSU checks. Consider the following pair of programs
+adapted from Section 6.3 of their paper. The program on the left is derived from
+the program on the right by replacing some of the {\high} annotations with the
+unknown label \unk. Both variants of the program type check but the more precise
+variant runs to completion while the less precise variant triggers an error,
+thus violating the gradual guarantee. Let us examine their runtime behavior in
+further detail.
+
+\begin{multicols}{2}
+  \small
+  \noindent
+  \redtext{\textbf{Less precise, more dynamic:}}
+  %% \vspace{-10pt}
+  \begin{lstlisting}[style=tt,basicstyle=\ttfamily\footnotesize]
+    let x = user-input () in
+    let y = ref |$\Bool_{\unk}$| |$\true_{\unk}$| in
+    if x then (y := |$\false_{\high}$|) else ()
+  \end{lstlisting}
+  \columnbreak
+  \bluetext{\textbf{More precise, more static:}}
+  %% \vspace{-7pt}
+  \begin{lstlisting}[style=tt,basicstyle=\ttfamily\footnotesize]
+    let x = user-input () in
+    let y = ref |$\Bool_{\high}$| |$\true_{\high}$| in
+    if x then (y := |$\false_{\high}$|) else ()
+  \end{lstlisting}
+\end{multicols}
+
+\noindent The program on the \bluetext{right} runs without error in \GSLRef
+because, at the assignment on line 3, variable \texttt{y} references a memory
+cell of \high security and the PC's security level is also \high, so the
+assignment is allowed.
+
+In contrast, when the program on the \redtext{left} is run with input
+$\true_{\high}$, the assignment is conservatively rejected by the NSU check.
+This is because \GSLRef considers \unk as corresponding to the interval $[\low,
+  \high]$, and the lower bound of this interval is not greater than or equal to
+the \high PC label. So we see that this more precise program (\bluetext{right})
+runs successfully while the less precise one (\redtext{left}) errors in \GSLRef.
+
+In \Surface, the \unk security label can be used in type annotations, as one
+would expect of a gradually-typed language, but \unk is not allowed as a runtime
+security label and therefore also not allowed as a label on program literals and
+other introduction forms.
+%
+The following adapts the above examples from \GSLRef to \Surface. The fully
+static variant (\bluetext{down}) is nearly identical to its \GSLRef counterpart.
+To obtain the less-precise program (\redtext{up}), we change the type annotation
+on variable \texttt{y} to model the similar loss of precision in the \GSLRef
+counterpart. We do not change the labels on the \texttt{ref} or \texttt{true} to
+$\unk$ because that is not allowed in \Surface as we just mentioned.
+
+\noindent
+\redtext{\small\textbf{Less precise, more dynamic:}}
+\begin{lstlisting}[style=tt,basicstyle=\ttfamily\footnotesize]
+  let x = user-input () in
+  let y : |$(\Refer{\Bool_{\unk}})_{\unk}$| = ref |\high $\true_{\high}$| in
+    if x then (y := |$\false_{\high}$|) else ()
+\end{lstlisting}
+\noindent
+\bluetext{\small\textbf{More precise, more static:}}
+\begin{lstlisting}[style=tt,basicstyle=\ttfamily\footnotesize]
+  let x = user-input () in
+  let y : |$(\Refer{\Bool_{\high}})_{\high}$| = ref |\high $\true_{\high}$| in
+    if x then (y := |$\false_{\high}$|) else ()
+\end{lstlisting}
+
+\noindent Branching on high-security input and assigning to a high-security
+memory location should be allowed. Indeed, both variants reduce to the unit
+value regardless of the input, thereby not violating the gradual guarantee. The
+fully annotated version (\bluetext{down}) evaluates to unit without any
+overhead from runtime checking.
+
+In the less-precise program (\redtext{up}), $(\Refer{\Bool_{\unk}})_{\unk}$
+replaces $(\Refer{\Bool_{\high}})_{\high}$. This change in type annotation means
+that both the security level of the memory and the security of the reference
+itself are statically unknown and should be checked at runtime. When executing
+the program, at the assignment on line 3, an NSU check happens and the
+assignment to high-security memory under high PC is allowed. As a result, the
+less-precise program also evaluates successfully to unit.
 
 \subsection{Type-Based Reasoning in \Surface}
 \label{sec:example3}
