@@ -397,7 +397,7 @@ former returns a high-security boolean that represents sensitive input
 information; the latter takes a low-security boolean and publishes it into a
 publicly visible channel.
 
-\paragraph{Gradual IFC includes static IFC}
+\subsubsection{Gradual IFC includes static IFC}
 
 For statically typed programs, \Surface behaves just like a statically
 typed IFC language. Consider the following well-behaved \Surface
@@ -468,7 +468,7 @@ To summarize, \Surface behaves just like a static security-typed language in the
 above examples. When everything is statically typed, the type system of \Surface
 guards against illegal information flows, whether explicit or implicit.
 
-\paragraph{Gradual IFC enables a mixture of static and dynamic IFC}
+\subsubsection{Gradual IFC enables a mixture of static and dynamic IFC}
 
 I have shown that security labels (\low and \high) can appear in type
 annotations in a program, such as $\Bool_{\low}$ and $\Bool_{\high}$. \Surface
@@ -479,14 +479,12 @@ following discussion.
 Let us return to the \texttt{fconst} example, except this time the type of
 parameter \texttt{b} is $\Bool_{\unk}$.
 
-\begin{minipage}{1.0\textwidth}
 \begin{lstlisting}[style=tt]
   let fconst = |$\lambda$| b : |\colorbox{highlight}{$\Bool_{\unk}$}|. false in
   let input  = user-input () in
   let result = fconst input in
     publish result
 \end{lstlisting}
-\end{minipage}
 
 \noindent The type system of \Surface accepts this program because, in
 the function call \texttt{fconst input}, it allows an implicit conversion from
@@ -844,6 +842,67 @@ after the program is deployed.
 
 \subsection{Type-Based Reasoning in \Surface}
 \label{sec:example3}
+
+Type-based reasoning in gradual IFC languages arises from two language design
+choices: vigilance and type-guided classification. Vigilance gives us type-based
+reasoning for explicit flows, while type-guided classification provides
+type-based reasoning about implicit flows. In this section, I am going to show
+that \Surface is both vigilant and performs typed-guided classification, so
+\Surface enables type-based reasoning in the sense of \textcite{Toro:2018aa}.
+
+\subsubsection{\Surface is Vigilant}
+
+A language with casts is \textit{vigilant} if it checks whether all the casts
+that are applied to the same value are consistent with each other, and triggers
+an error if they are not.
+
+\textcite{Toro:2018aa} present the following example to demonstrate how vigilance
+is needed for type-based reasoning and free theorems in the sense of
+\citet{Wadler:1989fk}. The example involves casts from $\low$ (line 3, the label
+annotation on $\key{5}_{\low}$) to $\high$ (line 1, the type annotation
+$\Int_{\high}$ in the signature of \texttt{mix}) and then back to $\low$ via the
+unknown security level $\unk$ (line 2, the nested type annotations $\Int_{\unk}$
+and $\Int_{\low}$):
+
+%% \begin{minted}[xleftmargin=\parindent,autogobble,linenos,escapeinside=||]{text}
+%%   let mix : |$\Int_{\low}$| → |\colorbox{White!80!Maroon}{$\Int_{\high}$}| → |$\Int_{\low}$| =
+%%       λ pub priv . if pub < (priv : |\colorbox{White!80!Purple}{$\Int_{\unk}$}| : |\colorbox{White!80!NavyBlue}{$\Int_{\low}$}|) then 1 else 2 in
+%%   mix 1|$_{\low}$| |\colorbox{White!70!YellowGreen}{$\key{5}_{\low}$}|
+%% \end{minted}
+
+%% \noindent The type signature of \texttt{mix} should guarantee the
+%% free theorem that either (1) the result of \texttt{mix}, which is low
+%% security, never depends on the high-security \texttt{priv} argument or
+%% (2) \texttt{mix} produces a runtime error.  In this case, the output
+%% of \texttt{mix} does depend on \texttt{priv} via an implicit flow, so
+%% the free theorem says that an error should be triggered at runtime.
+%% Let us focus on the three casts applied to $\key{5}_{\low}$, where
+%% the first cast sends the security level from \low to \high because
+%% of the type annotation on line 1, the second cast is an injection
+%% due to the first type annotation on line 2, and the third cast is a
+%% projection to \low due to the second type annotation on line 2:
+%% \[
+%% \cccast{
+%%   \cccast{
+%%     \cccast{\colorbox{White!70!YellowGreen}{$\key{5}_{\low}$}}{\colorbox{White!70!YellowGreen}{\low} \Rightarrow \colorbox{White!80!Maroon}{\high}}
+%%   }{\colorbox{White!80!Maroon}{\high} \Rightarrow \colorbox{White!80!Purple}{\unk}}}
+%%   {\colorbox{White!80!Purple}{\unk} \Rightarrow \colorbox{White!80!NavyBlue}{\low}}
+%% \]
+%% In \Surface, these casts produce the sequence of coercions:
+%% $\colorbox{White!70!YellowGreen}{$\key{5}_{\low}$} \left\langle \colorbox{White!80!Maroon}{\up} \seq \colorbox{White!80!Purple}{\inj{\high}} \seq \colorbox{White!80!NavyBlue}{\proj{\low}{p}} \right\rangle$,
+%% which trigger an error when $\high$ collides with $\low$, blaming label $\bl{p}$.
+
+%% Similarly, the interval refinement mechanism of \GSLRef detects the
+%% conflict between the intermediate cast to $\high$ and the final cast
+%% to $\low$. Surprisingly, in GLIO and in systems prior
+%% to \GSLRef \citep{Disney:2011fv, Fennell:2013ab}, the program runs
+%% successfully and produces $\key{1}_{\low}$ because they are
+%% forgetful~\citep{Greenberg:2014aa} regarding the intermediate cast of
+%% $\key{5}_{\low}$ to $\high$ and only check that $\key{5}_{\low}$ can
+%% be cast to \low \footnote{Those systems still satisfy noninterference,
+%% because the labels \textit{on values} track their security similar to fully dynamic IFC.
+%% It is just that the security labels on \textit{type annotations} will not trigger
+%% errors at runtime, even if they are inconsistent. }.
 
 \section{The Static and Dynamic Extremes of \Surface}
 \label{sec:embedding}
