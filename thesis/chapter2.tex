@@ -858,51 +858,52 @@ an error if they are not.
 
 \textcite{Toro:2018aa} present the following example to demonstrate how vigilance
 is needed for type-based reasoning and free theorems in the sense of
-\citet{Wadler:1989fk}. The example involves casts from $\low$ (line 3, the label
+\textcite{Wadler:1989fk}. The example involves casts from $\low$ (line 3, the label
 annotation on $\key{5}_{\low}$) to $\high$ (line 1, the type annotation
 $\Int_{\high}$ in the signature of \texttt{mix}) and then back to $\low$ via the
 unknown security level $\unk$ (line 2, the nested type annotations $\Int_{\unk}$
 and $\Int_{\low}$):
 
-%% \begin{minted}[xleftmargin=\parindent,autogobble,linenos,escapeinside=||]{text}
-%%   let mix : |$\Int_{\low}$| → |\colorbox{White!80!Maroon}{$\Int_{\high}$}| → |$\Int_{\low}$| =
-%%       λ pub priv . if pub < (priv : |\colorbox{White!80!Purple}{$\Int_{\unk}$}| : |\colorbox{White!80!NavyBlue}{$\Int_{\low}$}|) then 1 else 2 in
-%%   mix 1|$_{\low}$| |\colorbox{White!70!YellowGreen}{$\key{5}_{\low}$}|
-%% \end{minted}
+\begin{lstlisting}[style=tt]
+  let mix : |$\Int_{\low}$| -> |\colorbox{White!80!Maroon}{$\Int_{\high}$}| -> |$\Int_{\low}$| =
+    |$\lambda$| pub priv . if pub < (priv : |\colorbox{White!80!Purple}{$\Int_{\unk}$}| : |\colorbox{White!80!NavyBlue}{$\Int_{\low}$}|) then 1 else 2 in
+  mix 1|$_{\low}$| |\colorbox{White!70!YellowGreen}{$\key{5}_{\low}$}|
+\end{lstlisting}
 
-%% \noindent The type signature of \texttt{mix} should guarantee the
-%% free theorem that either (1) the result of \texttt{mix}, which is low
-%% security, never depends on the high-security \texttt{priv} argument or
-%% (2) \texttt{mix} produces a runtime error.  In this case, the output
-%% of \texttt{mix} does depend on \texttt{priv} via an implicit flow, so
-%% the free theorem says that an error should be triggered at runtime.
-%% Let us focus on the three casts applied to $\key{5}_{\low}$, where
-%% the first cast sends the security level from \low to \high because
-%% of the type annotation on line 1, the second cast is an injection
-%% due to the first type annotation on line 2, and the third cast is a
-%% projection to \low due to the second type annotation on line 2:
-%% \[
-%% \cccast{
-%%   \cccast{
-%%     \cccast{\colorbox{White!70!YellowGreen}{$\key{5}_{\low}$}}{\colorbox{White!70!YellowGreen}{\low} \Rightarrow \colorbox{White!80!Maroon}{\high}}
-%%   }{\colorbox{White!80!Maroon}{\high} \Rightarrow \colorbox{White!80!Purple}{\unk}}}
-%%   {\colorbox{White!80!Purple}{\unk} \Rightarrow \colorbox{White!80!NavyBlue}{\low}}
-%% \]
-%% In \Surface, these casts produce the sequence of coercions:
-%% $\colorbox{White!70!YellowGreen}{$\key{5}_{\low}$} \left\langle \colorbox{White!80!Maroon}{\up} \seq \colorbox{White!80!Purple}{\inj{\high}} \seq \colorbox{White!80!NavyBlue}{\proj{\low}{p}} \right\rangle$,
-%% which trigger an error when $\high$ collides with $\low$, blaming label $\bl{p}$.
+\noindent The type signature of \texttt{mix} should guarantee the free theorem
+that either (1) the result of \texttt{mix}, which is low security, never depends
+on the high-security \texttt{priv} argument or (2) \texttt{mix} produces a
+runtime error. In this case, the output of \texttt{mix} does depend on
+\texttt{priv} via an implicit flow, so the free theorem says that an error
+should be triggered at runtime. Let us focus on the three casts applied to
+$\key{5}_{\low}$, where the first cast sends the security level from \low to
+\high because of the type annotation on line 1, the second cast is an injection
+due to the first type annotation on line 2, and the third cast is a projection
+to \low due to the second type annotation on line 2:
+\[
+\cccast{
+  \cccast{
+    \cccast{\colorbox{White!70!YellowGreen}{$\key{5}_{\low}$}}{\colorbox{White!70!YellowGreen}{\low} \Rightarrow \colorbox{White!80!Maroon}{\high}}
+  }{\colorbox{White!80!Maroon}{\high} \Rightarrow \colorbox{White!80!Purple}{\unk}}}
+  {\colorbox{White!80!Purple}{\unk} \Rightarrow \colorbox{White!80!NavyBlue}{\low}}
+\]
+In \Surface, these casts produce the sequence of coercions:
+$\colorbox{White!70!YellowGreen}{$\key{5}_{\low}$} \left\langle
+\colorbox{White!80!Maroon}{\up} \seq \colorbox{White!80!Purple}{\inj{\high}}
+\seq \colorbox{White!80!NavyBlue}{\proj{\low}{p}} \right\rangle$, which trigger
+an error when $\high$ collides with $\low$, blaming label $\bl{p}$.
 
-%% Similarly, the interval refinement mechanism of \GSLRef detects the
-%% conflict between the intermediate cast to $\high$ and the final cast
-%% to $\low$. Surprisingly, in GLIO and in systems prior
-%% to \GSLRef \citep{Disney:2011fv, Fennell:2013ab}, the program runs
-%% successfully and produces $\key{1}_{\low}$ because they are
-%% forgetful~\citep{Greenberg:2014aa} regarding the intermediate cast of
-%% $\key{5}_{\low}$ to $\high$ and only check that $\key{5}_{\low}$ can
-%% be cast to \low \footnote{Those systems still satisfy noninterference,
-%% because the labels \textit{on values} track their security similar to fully dynamic IFC.
-%% It is just that the security labels on \textit{type annotations} will not trigger
-%% errors at runtime, even if they are inconsistent. }.
+Similarly, the interval refinement mechanism of \GSLRef detects the conflict
+between the intermediate cast to $\high$ and the final cast to $\low$.
+Surprisingly, in GLIO and in systems prior to \GSLRef \parencite{Disney:2011fv,
+  Fennell:2013ab}, the program runs successfully and produces $\key{1}_{\low}$
+because they are forgetful~\parencite{Greenberg:2014aa} regarding the
+intermediate cast of $\key{5}_{\low}$ to $\high$ and only check that
+$\key{5}_{\low}$ can be cast to \low. Those systems still satisfy
+noninterference, because the labels \textit{on values} track their security
+similar to fully dynamic IFC. It is just that the security labels on
+\textit{type annotations} will not trigger errors at runtime, even if they are
+inconsistent.
 
 \section{The Static and Dynamic Extremes of \Surface}
 \label{sec:embedding}
