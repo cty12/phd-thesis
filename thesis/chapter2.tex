@@ -356,9 +356,15 @@ $M'$ is a \CC term.
 
 I define the evaluation function for \Surface by (1) compiling from \Surface to
 \CC and (2) running the compiled \CC term using its operational semantics.
+
+Suppose $M$ is a well-typed \Surface program $\emptyset ; \low \vdash M :
+\iota_g$ where $\iota \in \{\Unit, \Bool\}$, $g \in \{\low, \high, \unk\}$, and
+$k \in \{\true, \false, \unit\}$:
 \begin{align*}
-  \mathit{eval}(M) =&\,V\;\text{if}\;\reducemult{(\compile{M})}{\emptyset}{\low}{V}{\mu} \\
-  \mathit{eval}(M) =&\,\blame{\bl{p}}\;\text{if}\;\reducemult{(\compile{M})}{\emptyset}{\low}{\blame{\bl{p}}}{\mu}
+  \mathit{eval}(M) =&\,k\;&\text{if}\;\reducemult{(\compile{M})}{\emptyset}{\low}{k}{\mu} \\
+  \mathit{eval}(M) =&\,k\;&\text{if}\;\reducemult{(\compile{M})}{\emptyset}{\low}{\cccast{k}{\mathbf{c}}}{\mu}\text{~and $\mathbf{c}$ is irreducible} \\
+  \mathit{eval}(M) =&\,\blame{\bl{p}}\;&\text{if~}\reducemult{(\compile{M})}{\emptyset}{\low}{\blame{\bl{p}}}{\mu} \\
+  \mathit{eval}(M) =&\,\text{diverge}\;&\text{if~}\reducemult{(\compile{L})}{\emptyset}{\low}{M}{\mu}, \exists N,\mu'.\,\reduce{M}{\mu}{\low}{N}{\mu'}
 \end{align*}
 
 I will define the compile function and the operational semantics for \CC in
