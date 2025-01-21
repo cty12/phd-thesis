@@ -101,7 +101,7 @@
 \newcommand{\SurfaceOld}{\ensuremath{\lambda_{\mathtt{SEC}}^\star}\xspace}
 \newcommand{\CCOld}{\ensuremath{\lambda_{\mathtt{SEC}}^{\Rightarrow}}\xspace}
 \newcommand{\CC}{\ensuremath{\lambda_{\mathtt{IFC}}^{c}}\xspace}
-\newcommand{\DynIFC}{\ensuremath{\lambda_{\mathtt{SEC}}}\xspace}
+\newcommand{\DynIFC}{\ensuremath{\lambda_{\mathtt{IFC}}^{\mathtt{DYN}}}\xspace}
 \newcommand{\GSLRef}{\ensuremath{\mathrm{GSL}_\mathsf{Ref}}\xspace}
 \newcommand{\GSLRefEps}{\ensuremath{\mathrm{GSL}_\mathsf{Ref}^\epsilon}\xspace}
 \newcommand{\SSLRef}{\ensuremath{\mathrm{SSL}_\mathsf{Ref}}\xspace}
@@ -180,6 +180,17 @@
 \newcommand{\funco}[3]{\ensuremath{{#1}\boldsymbol{,}\,{#2}\boldsymbol{\rightarrow}{#3}}}
 \newcommand{\precctx}[8]{\ensuremath{{#1};{#2};{#3};{#4};{#5};{#6};{#7};{#8}}}
 \newcommand{\ccprec}[4]{\ensuremath{\vdash{#1}\sqsubseteq{#2}\Leftarrow{#3}\sqsubseteq{#4}}}
+
+% DynIFC: dynamic IFC with a labeled heap
+\newcommand{\dynconst}[2]{\ensuremath{\ccsyntax{(\$}\;{#1}\ccsyntax{)}_{#2}}}
+\newcommand{\dynaddr}[2]{\ensuremath{\ccsyntax{(addr}\;{#1}\ccsyntax{)}_{#2}}}
+\newcommand{\dynlam}[3]{\ensuremath{\ccsyntax{(${\lambda}$}{#1}\ccsyntax{.}\,{#2}\ccsyntax{)}_{#3}}}
+\newcommand{\dynif}[3]{\ensuremath{\ccsyntax{if}\;{#1}\;{#2}\;{#3}}}
+\newcommand{\dynlet}[3]{\ensuremath{\ccsyntax{let}\;{#1}={#2}\;\ccsyntax{in}\;{#3}}}
+\newcommand{\dynref}[3]{\ensuremath{\ccsyntax{ref}^{\ccsyntax{#1}}\;{#2}\;{#3}}}
+\newcommand{\dynderef}[1]{\ensuremath{\ccsyntax{!}\;{#1}}}
+\newcommand{\dynassign}[3]{\ensuremath{{#1}\;\ccsyntax{:=}^{\ccsyntax{#2}}\;{#3}}}
+\newcommand{\dynprot}[2]{\ensuremath{\ccsyntax{prot}\;{#1}\;{#2}}}
 
 \newcommand{\highlight}[2]{\colorbox{#1}{\ensuremath{#2}}}
 \newcommand{\highlightblue}[1]{\highlight{White!90!NavyBlue}{#1}}

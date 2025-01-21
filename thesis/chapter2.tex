@@ -364,7 +364,7 @@ $k \in \{\true, \false, \unit\}$:
   \mathit{eval}(M) =&\,k\;&\text{if}\;\reducemult{(\compile{M})}{\emptyset}{\low}{k}{\mu} \\
   \mathit{eval}(M) =&\,k\;&\text{if}\;\reducemult{(\compile{M})}{\emptyset}{\low}{\cccast{k}{\mathbf{c}}}{\mu}\text{~and $\mathbf{c}$ is irreducible} \\
   \mathit{eval}(M) =&\,\blame{\bl{p}}\;&\text{if~}\reducemult{(\compile{M})}{\emptyset}{\low}{\blame{\bl{p}}}{\mu} \\
-  \mathit{eval}(M) =&\,\text{diverge}\;&\text{if~}\reducemult{(\compile{L})}{\emptyset}{\low}{M}{\mu}, \exists N,\mu'.\,\reduce{M}{\mu}{\low}{N}{\mu'}
+  \mathit{eval}(M) =&\,\text{diverge}\;&\text{if~}\reducemult{(\compile{L})}{\emptyset}{\low}{M}{\mu}, \exists N\,\mu'.\,\reduce{M}{\mu}{\low}{N}{\mu'}
 \end{align*}
 
 I will define the compile function and the operational semantics for \CC in
@@ -914,5 +914,104 @@ inconsistent.
 \section{The Static and Dynamic Extremes of \Surface}
 \label{sec:embedding}
 
-Same as \GSLRef, the static extreme of \Surface is \SSLRef: all security labels
-in types are statically known, and the type system alone enforces IFC.
+Same as \GSLRef, the static extreme of \Surface is \SSLRef. Similar to other
+static IFC languages in the literature (such as $\lambda_{\text{SEC}}$ of
+~\textcite{zdancewic2002programming} and SLam of~\textcite{heintze1998slam}), in
+\SSLRef all security labels in types are statically known, and the type system
+alone enforces IFC.
+
+In the dynamic extreme of \GSLRef, all security labels in types are unknown
+(\unk). The dynamic extreme of \GSLRef is a dynamic IFC programming language
+with a labeled heap. We call this language \DynIFC. We present the syntax and
+semantics of \DynIFC in Figure~\ref{fig:dyn-ifc}. \DynIFC is different from a
+typical dynamic IFC language in the literature (such as
+$\lambda^{\textit{info}}$ of~\textcite{austin2009efficient}), in that each
+memory location of \DynIFC is labeled with a fixed security level. This security
+level is given by the programmer and remains unchanged during program execution.
+As we are going to show in Chapter~\ref{ch:mech-metatheory}, this choice of the
+dynamic extreme is intentional, so that \Surface satisfies the gradual
+guarantee.
+
+%% \begin{align*}
+%%     \small
+%%     \compile{x}=\;&x \\
+%%     \compile{\const{k}{\ell}}=\;&\dynconst{k}{\ell} \\
+%%     \compile{\lam{\unk}{x}{A}{N}{\ell}}=\;&\dynlam{x}{\compile{N}}{\ell} \\
+%%     \compile{\app{L}{M}{p}}=\;&(\compile{L})\;(\compile{M}) \\
+%%     \compile{\ifexp{L}{M}{N}{p}}=\;&\dynif{(\compile{L})}{(\compile{M})}{(\compile{N})} \\
+%%     \compile{\assign{L}{M}{p}}=\;&\dynassign{(\compile{L})}{?}{(\compile{M})} \\
+%%     \compile{(\letexp{x}{M}{N})}=\;&(\dynlet{x}{\compile{M}}{\compile{N}}) \\
+%%     \compile{\refexp{\ell}{M}{p}}=\;&\dynref{?}{\ell}{(\compile{M})}
+%% \end{align*}
+
+\begin{figure}[tbp]
+  \raggedright
+  {\small \[
+  \begin{array}{rcll}
+    \text{terms}  & L , M , N & ::=  & x \MID \dynconst{k}{\ell} \MID \dynaddr{n_{\hat{\ell}}}{\ell} \MID \dynlam{x}{N}{\ell} \\
+                           &  & \MID & L \; M \MID \dynif{L}{M}{N} \\
+                           &  & \MID & \dynref{?}{\ell}{M} \MID \dynderef{M} \MID \dynassign{L}{?}{M} \MID \dynprot{\ell}{M} \MID \key{error} \\
+    \text{values}     & V, W     & ::=  & \dynconst{k}{\ell} \MID \dynaddr{n_{\hat{\ell}}}{\ell} \MID \dynlam{x}{N}{\ell} \\
+    \text{frames} & F & ::= & \Box\;M \MID V\;\Box \MID \dynif{\Box}{M}{N} \MID \dynref{?}{\ell}{\Box}
+                              \MID \dynderef{\Box} \MID \dynassign{\Box}{?}{M} \MID \dynassign{V}{?}{\Box}
+  \end{array}
+  \]}
+  \fbox{$\reduce{M}{\mu}{\pc}{N}{\mu'}$}
+  {\small
+  \begin{gather*}
+  \xi~
+  \inference
+  {\reduce{M}{\mu}{\pc}{M'}{\mu'}}
+  {\reduce{\mathit{plug}\;M\;F}{\mu}{\pc}{\mathit{plug}\;M'\;F}{\mu'}}
+  \quad
+  \xi\textit{-err}~
+  \inference{}{\reduce{\mathit{plug}\;\key{error}\;F}{\mu}{\pc}{\key{error}}{\mu}}
+  \\[1ex]
+  \textit{prot-val}~
+  \inference{}{\reduce{\dynprot{\ell}{V}}{\mu}{\pc}{V \curlyvee \ell}{\mu}}
+  \quad
+  \textit{prot-ctx}~
+  \inference
+  {\reduce{M}{\mu}{\pc \curlyvee \ell}{M'}{\mu'}}
+  {\reduce{\dynprot{\ell}{M}}{\mu}{\pc}{\dynprot{\ell}{M'}}{\mu'}}
+  \\[1ex]
+  \textit{prot-err}~
+  \inference{}{\reduce{\dynprot{\ell}{\key{error}}}{\mu}{\pc}{\key{error}}{\mu}}
+  \\[1ex]
+  \beta~
+  \inference{}{\reduce{\dynlam{x}{N}{\ell} \; V}{\mu}{\pc}{\dynprot{\ell}{(N [x := V])}}{\mu}}
+  \\[1ex]
+  \beta\textit{-if-true}~
+  \inference{}{\reduce{\dynif{\dynconst{\true}{\ell}}{M}{N}}{\mu}{\pc}{\dynprot{\ell}{M}}{\mu}}
+  \\[1ex]
+  \beta\textit{-if-false}~
+  \inference{}{\reduce{\dynif{\dynconst{\false}{\ell}}{M}{N}}{\mu}{\pc}{\dynprot{\ell}{N}}{\mu}}
+  \\[1ex]
+  \textit{ref?-ok}~
+  \inference
+  {\highlightred{\pc \preccurlyeq \ell} & n \; \mathbf{FreshIn} \; \mu(\ell)}
+  {\reduce{\dynref{?}{\ell}{V}}{\mu}{\pc}{\dynaddr{n_{\ell}}{\low}}{(\mu, \ell \mapsto n \mapsto (V \curlyvee \ell))}}
+  \\[1ex]
+  \textit{ref?-fail}~
+  \inference
+  {\pc \npreccurlyeq \ell}
+  {\reduce{\dynref{?}{\ell}{V}}{\mu}{\pc}{\key{error}}{\mu}}
+  \\[1ex]
+  \textit{deref}~
+  \inference
+  {\mathit{\mu(\hat{\ell},n) = V}}
+  {\reduce{\dynderef{\dynaddr{n_{\hat{\ell}}}{\ell}}}{\mu}{\pc}{\dynprot{\ell}{V}}{\mu}}
+  \\[1ex]
+  \textit{assign?-ok}~
+  \inference
+  {\highlightred{\pc \curlyvee \ell \preccurlyeq \hat{\ell}}}
+  {\reduce{\dynassign{\dynaddr{n_{\hat{\ell}}}{\ell}}{?}{V}}{\mu}{\pc}{\dynconst{\unit}{\low}}{[\hat{\ell} \mapsto n \mapsto (V \curlyvee \hat{\ell})] \mu}}
+  \\[1ex]
+  \textit{assign?-fail}~
+  \inference
+  {\pc \curlyvee \ell \npreccurlyeq \hat{\ell}}
+  {\reduce{\dynassign{\dynaddr{a}{\ell}}{?}{V}}{\mu}{\pc}{\key{error}}{\mu}}
+  \end{gather*}}
+  \caption{The syntax and the reduction semantics of \DynIFC}
+  \label{fig:dyn-ifc}
+\end{figure}
