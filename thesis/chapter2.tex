@@ -922,15 +922,14 @@ alone enforces IFC.
 
 In the dynamic extreme of \GSLRef, all security labels in types are unknown
 (\unk). The dynamic extreme of \GSLRef is a dynamic IFC programming language
-with a labeled heap. We call this language \DynIFC. We present the syntax and
-semantics of \DynIFC in Figure~\ref{fig:dyn-ifc}. \DynIFC is different from a
-typical dynamic IFC language in the literature (such as
-$\lambda^{\textit{info}}$ of~\textcite{austin2009efficient}), in that each
-memory location of \DynIFC is labeled with a fixed security level. This security
-level is given by the programmer and remains unchanged during program execution.
-As we are going to show in Chapter~\ref{ch:mech-metatheory}, this choice of the
-dynamic extreme is intentional, so that \Surface satisfies the gradual
-guarantee.
+with a labeled heap, namely \DynIFC. I present the syntax and semantics of
+\DynIFC in Figure~\ref{fig:dyn-ifc}. \DynIFC is different from a typical dynamic
+IFC language in the literature (such as $\lambda^{\textit{info}}$
+of~\textcite{austin2009efficient}), in that each memory location of \DynIFC is
+labeled with a fixed security level. This security level is given by the
+programmer and remains unchanged during program execution. I will show in
+Chapter~\ref{ch:mech-metatheory} that this choice of the dynamic extreme makes
+it possible that \Surface satisfies the gradual guarantee.
 
 %% \begin{align*}
 %%     \small

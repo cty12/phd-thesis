@@ -179,74 +179,185 @@ source to sink: in the example above, $\low \Rightarrow \high \Rightarrow \unk
 \Rightarrow \unk \Rightarrow \low$, we validate that \low can flow to \high
 before we check the flow from \high through \unk to \low.
 
-%% \subsection{Monitoring Explicit and Implicit Flows}
-%% \label{sec:cexpr-comp-stamp}
+\subsection{Monitoring Explicit and Implicit Flows}
+\label{sec:cexpr-comp-stamp}
 
-%% \begin{figure}[tbp]
-%% \raggedright
-%%   \fbox{$\bar{c}\mdoubleplus\bar{c} = \bar{c}$}
-%%   {\small
-%% \begin{align*}
-%% \bar{c} \mdoubleplus \err{g_2}{g_3}{p} &= \err{g_1}{g_3}{p}  \quad\text{,where $\vdash \bar{c} : g_1 \Rightarrow g_2$} \\
-%% \bar{c} \mdoubleplus \id{g} &= \bar{c} \seq \id{g} \\
-%% \bar{c}_1 \mdoubleplus (\bar{c}_2 \seq c) &= (\bar{c}_1 \mdoubleplus \bar{c}_2) \seq c
-%% \end{align*}
-%%   }
+\begin{figure}[tbp]
+\raggedright
+  \fbox{$\bar{c}\mdoubleplus\bar{c} = \bar{c}$}
+  {\small
+\begin{align*}
+\bar{c} \mdoubleplus \err{g_2}{g_3}{p} &= \err{g_1}{g_3}{p}  \quad\text{where $\vdash \bar{c} : g_1 \Rightarrow g_2$} \\
+\bar{c} \mdoubleplus \id{g} &= \bar{c} \seq \id{g} \\
+\bar{c}_1 \mdoubleplus (\bar{c}_2 \seq c) &= (\bar{c}_1 \mdoubleplus \bar{c}_2) \seq c
+\end{align*}
+  }
 
-%%   \fbox{$\mathit{stamp}\,\bar{c}\, \ell = \bar{c}$}\hfill
-%%   {\small
-%% \begin{align*}
-%% \mathit{stamp} \; \bar{c} \; \low &= \bar{c} \\
-%% \mathit{stamp} \; \id{\low} \; \high &= \id{\low}\seq\up \\
-%% \mathit{stamp} \; \id{\high} \; \high &= \id{\high} \\
-%% \mathit{stamp} \; (\id{\low}\seq\inj{\low}) \; \high &= \id{\low}\seq\up\seq\inj{\high} \\
-%% \mathit{stamp} \; (\id{\high}\seq\inj{\high}) \; \high &= \id{\high}\seq\inj{\high} \\
-%% \mathit{stamp} \; (\id{\low}\seq\up\seq\inj{\high}) \; \high &= \id{\low}\seq\up\seq\inj{\high} \\
-%% \mathit{stamp} \; (\id{\low}\seq\up) \; \high &= \id{\low}\seq\up
-%% \end{align*}
-%% }
+  \fbox{$\mathit{stamp} \; \bar{c} \; \ell = \bar{c}$}\hfill
+  {\small
+\begin{align*}
+\mathit{stamp} \; \bar{c} \; \low &= \bar{c} \\
+\mathit{stamp} \; \id{\low} \; \high &= \id{\low}\seq\up \\
+\mathit{stamp} \; \id{\high} \; \high &= \id{\high} \\
+\mathit{stamp} \; (\id{\low}\seq\inj{\low}) \; \high &= \id{\low}\seq\up\seq\inj{\high} \\
+\mathit{stamp} \; (\id{\high}\seq\inj{\high}) \; \high &= \id{\high}\seq\inj{\high} \\
+\mathit{stamp} \; (\id{\low}\seq\up\seq\inj{\high}) \; \high &= \id{\low}\seq\up\seq\inj{\high} \\
+\mathit{stamp} \; (\id{\low}\seq\up) \; \high &= \id{\low}\seq\up
+\end{align*}
+}
 
-%%   \fbox{$\mathit{stamp!}\,\bar{c}\, \ell = \bar{c}$}
-%%   {\small
-%% \begin{align*}
-%% \mathit{stamp!} \; \bar{c} \; \low &=
-%%   \begin{cases}
-%%   \bar{c} & \text{, if} \vdash \bar{c} : \ell \Rightarrow \unk \\
-%%   \bar{c}\seq\inj{\ell_2} & \text{, if} \vdash \bar{c} : \ell_1 \Rightarrow \ell_2
-%%   \end{cases}
-%%   \\
-%% \mathit{stamp!} \; \id{\low} \; \high &= \id{\low}\seq\up\seq\inj{\high} \\
-%% \mathit{stamp!} \; \id{\high} \; \high &= \id{\high}\seq\inj{\high} \\
-%% \mathit{stamp!} \; (\id{\low}\seq\inj{\low}) \; \high &= \id{\low}\seq\up\seq\inj{\high} \\
-%% \mathit{stamp!} \; (\id{\high}\seq\inj{\high}) \; \high &= \id{\high}\seq\inj{\high} \\
-%% \mathit{stamp!} \; (\id{\low}\seq\up\seq\inj{\high}) \; \high &= \id{\low}\seq\up\seq\inj{\high} \\
-%% \mathit{stamp!} \; (\id{\low}\seq\up) \; \high &= \id{\low}\seq\up\seq\inj{\high}
-%% \end{align*}
-%% }
-%%   \caption{Composing and stamping coercions}
-%%   \label{fig:comp-stampc}
-%% \end{figure}
+  \fbox{$\mathit{stamp!} \; \bar{c} \; \ell = \bar{c}$}
+  {\small
+\begin{align*}
+\mathit{stamp!} \; \bar{c} \; \low &=
+  \begin{cases}
+  \bar{c} & \text{~if} \vdash \bar{c} : \ell \Rightarrow \unk \\
+  \bar{c}\seq\inj{\ell_2} & \text{~if} \vdash \bar{c} : \ell_1 \Rightarrow \ell_2
+  \end{cases}
+  \\
+\mathit{stamp!} \; \id{\low} \; \high &= \id{\low}\seq\up\seq\inj{\high} \\
+\mathit{stamp!} \; \id{\high} \; \high &= \id{\high}\seq\inj{\high} \\
+\mathit{stamp!} \; (\id{\low}\seq\inj{\low}) \; \high &= \id{\low}\seq\up\seq\inj{\high} \\
+\mathit{stamp!} \; (\id{\high}\seq\inj{\high}) \; \high &= \id{\high}\seq\inj{\high} \\
+\mathit{stamp!} \; (\id{\low}\seq\up\seq\inj{\high}) \; \high &= \id{\low}\seq\up\seq\inj{\high} \\
+\mathit{stamp!} \; (\id{\low}\seq\up) \; \high &= \id{\low}\seq\up\seq\inj{\high}
+\end{align*}
+}
+  \caption{Composing and stamping coercions}
+  \label{fig:comp-stampc}
+\end{figure}
 
-%% We model explicit flow using security coercions. We can compose two coercion
-%% sequences ($\bar{c} \mdoubleplus \bar{d}$), where $\bar{c} : g_1 \Rightarrow
-%% g_2$ and $\bar{d} : g_2 \Rightarrow g_3$, to form a flow from $g_1$ to $g_3$,
-%% which is defined in Figure~\ref{fig:comp-stampc}.
+We model explicit flow using security coercions. We can compose two coercion
+sequences ($\bar{c} \mdoubleplus \bar{d}$), where $\bar{c} : g_1 \Rightarrow
+g_2$ and $\bar{d} : g_2 \Rightarrow g_3$, to form a flow from $g_1$ to $g_3$,
+which is defined in Figure~\ref{fig:comp-stampc}.
 
-%% The stamping operation captures the intuition of an implicit flow from the
-%% security level $\ell'$ to a coercion sequence $\bar{c}$. We define the stamping
-%% operation in Figure~\ref{fig:comp-stampc} as two functions,
-%% $\mathit{stamp}(\bar{c},\ell)$ and $\mathit{stamp!}(\bar{c},\ell)$. Both
-%% function require $\bar{c}$ to be in normal form and that its source label is not
-%% \unk. The $\mathit{stamp!}$ operator promotes the security of the coercion
-%% $\bar{c}$ to be at least $\ell$ and then injects the coercion if necessary,
-%% while $\mathit{stamp}$ only promotes the security but does not inject. These
-%% stamping operations satisfy the gradual guarantee, because when stamping on a
-%% more precise coercion sequence and a less precise coercion sequence, stamping
-%% preserves the precision relation (Section~\ref{sec:sim-cexpr}) between them
-%% (Lemma~\ref{lem:cexpr-stamp-sim}). The stamping operations of coercion sequences
-%% are used in the stamping operations of (1) label expressions, which are our
-%% representation of PC and (2) values in the cast calculus. Those three types of
-%% stamping together formalize the notion of implicit flow in \Surface.
+The stamping operation captures the intuition of an implicit flow from the
+security level $\ell'$ to a coercion sequence $\bar{c}$. We define the stamping
+operation in Figure~\ref{fig:comp-stampc} as two functions,
+$\mathit{stamp}(\bar{c},\ell)$ and $\mathit{stamp!}(\bar{c},\ell)$. Both
+function require $\bar{c}$ to be in normal form and that its source label is not
+\unk. The $\mathit{stamp!}$ operator promotes the security of the coercion
+$\bar{c}$ to be at least $\ell$ and then injects the coercion if necessary,
+while $\mathit{stamp}$ only promotes the security but does not inject. These
+stamping operations satisfy the gradual guarantee, because when stamping on a
+more precise coercion sequence and a less precise coercion sequence, stamping
+preserves the precision relation (Section~\ref{sec:sim-cexpr}) between them
+(Lemma~\ref{lem:cexpr-stamp-sim}). The stamping operations of coercion sequences
+are used in the stamping operations of (1) label expressions, which are our
+representation of PC and (2) values in the cast calculus. Those three types of
+stamping together formalize the notion of implicit flow in \Surface.
+
+\subsection{Security Label Expressions}
+\label{sec:lexpr}
+
+In this section we introduce security label expressions, which we use
+to model the security level of the PC. Security label expressions are
+crucial for implementing NSU checking in a way that satisfies the
+gradual guarantee.
+
+\begin{figure}[tbp]
+\raggedright
+  \[
+  \begin{array}{rcll}
+    \text{label expressions} & e & ::= & \ell \MID \blame{p} \MID \cccast{e}{\bar{c}} \\
+  \end{array}
+  \]
+  \fbox{$\vdash e \Leftarrow g$}
+  {\small
+  \begin{gather*}
+    {\vdash}\textit{l}~
+    \inference{}{\vdash \ell \Leftarrow \ell}
+    \quad
+    {\vdash}\textit{lcast}~
+    \inference{\vdash e \Leftarrow g_1 & \vdash \bar{c} : g_1 \Rightarrow g_2}
+    {\vdash \cccast{e}{\bar{c}} \Leftarrow g_2}
+    \\[1ex]
+    {\vdash}\textit{lblame}~
+    \inference{}
+    {\vdash \blame{p} \Leftarrow g}
+  \end{gather*}}
+  \fbox{$\mathbf{Irreducible}\; \bar{c}$}
+  {\small
+    \begin{gather*}
+      \inference{\mathbf{NF} \; \bar{c} & \vdash \bar{c} : g_1 \Rightarrow g_2 & g_1 \neq g_2}
+                {\mathbf{Irreducible} \; \bar{c}}
+  \end{gather*}}
+  \fbox{$\mathbf{NF} \; e$}
+  {\small
+  \begin{gather*}
+  \inference{}{\mathbf{NF} \; \ell}
+  \qquad
+  \inference{\mathbf{Irreducible} \; \bar{c}}{\mathbf{NF} \; (\cccast{\ell}{\bar{c}})}
+  \end{gather*}}
+  \fbox{$e_1 \longrightarrow e_2$}
+  {\small
+  \begin{gather*}
+  \xi\textit{-l}~
+  \inference{e_1 \longrightarrow e_2}
+  {\cccast{e_1}{\bar{c}} \longrightarrow \cccast{e_2}{\bar{c}}}
+  \qquad
+  \xi\textit{-lblame}~
+  \inference{}{\cccast{\blame{p}}{\bar{c}} \longrightarrow \blame{p}}
+  \\[2ex]
+  \beta\textit{-id}~
+  \inference{}{\cccast{\ell}{\id{\ell}} \longrightarrow \ell}
+  \qquad
+  \textit{lcast}~
+  \inference{\bar{c} \longrightarrow^{+} \bar{d} & \mathbf{NF} \; \bar{d}}
+  {\cccast{\ell}{\bar{c}} \longrightarrow \cccast{\ell}{\bar{d}}}
+  \\[2ex]
+  \textit{lblame}~
+  \inference{\bar{c} \longrightarrow^{*} \err{\ell}{g}{p}}
+  {\cccast{\ell}{\bar{c}} \longrightarrow \blame{p}}
+  \qquad
+  \textit{lcomp}~
+  \inference{\mathbf{Irreducible} \; \bar{c}}
+  {\cccast{\cccast{\ell}{\bar{c}}}{\bar{d}} \longrightarrow \cccast{\ell}{\bar{c} \mdoubleplus \bar{d}}}
+  \end{gather*}}
+  \caption{Syntax, typing, normal forms, and semantics of label expressions}
+  \label{fig:lexpr}
+\end{figure}
+
+A label expression is either (1) a specific security label, (2) blame (to
+signify an error), or (3) a coercion applied to a label expression
+(Figure~\ref{fig:lexpr}).
+%
+A label expression is in normal form ($\mathbf{NF}$) if it is either (1) a
+specific security label or (2) an irreducible coercion applied to a specific
+security label. (A coercion is irreducible if it is a non-identity coercion in
+normal form). \PC ranges over label expressions in normal form.
+%
+The reduction relation for label expressions steps a label expression towards
+its normal form. The idea is that given a label expression of the form
+$\cccast{e}{\bar{d}}$, we first reduce $e$ to normal form and then apply the
+coercion $\bar{d}$. For example, if $e$ reduces to a label wrapped in coercion
+$\cccast{\ell}{\bar{c}}$, then the \textit{lcomp} rule says to reduce by
+composing the two coercions, producing $\cccast{\ell}{\bar{c} \mdoubleplus
+  \bar{d}}$. Furthermore, in a label expression of the form
+$\cccast{e}{\bar{d}}$, the coercion $\bar{d}$ may also need to be reduced, which
+is accomplished by the \textit{lcast} rule that refers to the reduction relation
+for coercion sequences (Figure~\ref{fig:cexpr}). If the coercion reduces to an
+identity, then the coercion application goes away ($\beta$\textit{-id}), whereas
+if the coercion reduces to a failure, then the label expression reduces to blame
+(\textit{lblame}).
+
+The stamping and security level operators for label expressions are defined in
+Figure~\ref{fig:stamp-lval} of the Appendix. They both require their input to be
+in normal form, which can be either (1) a specific security label $\ell$, or (2)
+a label wrapped with an irreducible coercion sequence $\cccast{\ell}{\bar{c}}$.
+For (1), stamping \low with \high results in \cccast{\low}{\up}, otherwise the
+label expression remains unchanged; for (2), we directly stamp the coercion
+sequence using \textit{stamp} for coercion sequences defined in
+Figure~\ref{fig:comp-stampc}. The definition of \textit{stamp!} is analogous,
+except that it turns to the \textit{stamp!} operator of coercion sequences. The
+security level operator $|{-}|$ is defined such that (1) a specific security
+label indicates the security level for itself and (2) the security of the
+coercion sequence $|\bar{c}|$ records the security level for
+$\cccast{\ell}{\bar{c}}$.
+
+In Section~\ref{sec:cc}, I am going to describe how label expressions are used
+to implement NSU checks, which enforce the heap policy for write operations.
 
 \section{A Coercion Calculus on Values}
 \label{sec:coercion-calc-values}
