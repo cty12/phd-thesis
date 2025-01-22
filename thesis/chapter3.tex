@@ -1,16 +1,262 @@
 \chapter{The Operational Semantics of \Surface}
 \label{ch:sem}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+In this chapter, I first present a coercion calculus for security labels in
+Section~\ref{sec:coercion-calc-labels}. I show that coercion on labels can model
+both explicit and implicit information flows. I then define a second coercion
+calculus whose purpose is to cast a program value from one type to another type
+in Section~\ref{sec:coercion-calc-values}. I use this second coercion calculus
+as the representation of casts in the intermediate language \CC. With this cast
+representation in hand, I am going to present the full definition of \CC in
+Section~\ref{sec:cc}. Finally, I show that \Surface can be compiled into \CC in
+Section~\ref{sec:compile}. As a result, the semantics of \Surface is given by
+the semantics of \CC.
 
 \section{A Coercion Calculus for Security Labels}
+\label{sec:coercion-calc-labels}
 
-TBA
+In this section, I describe a coercion calculus on security labels. This
+coercion calculus is an important stepping stone to our representation of casts
+between security types. I first explain the motivation of using coercions to
+represent information flows (Section~\ref{sec:motiv}). I then demonstrate that
+we can use coercion composition to model explicit flows and use coercion
+stamping to model implicit flows (Section~\ref{sec:cexpr-comp-stamp}). Finally,
+I define how these coercions act on security labels by defining a language of
+label expressions whose meaning is defined by a reduction relation
+(Section~\ref{sec:lexpr}). Label expressions are used to model security checks
+for the heap policy in \CC.
+
+\subsection{Why Coercions?}
+\label{sec:motiv}
+
+\begin{figure}[tbp]
+\raggedright
+  \[
+  \begin{array}{rcll}
+    \text{specific security labels} & \ell & \in & \{ \low , \high \} \\
+    \text{security labels}  & g    & ::= & \unk \MID \ell \\
+    \text{blame labels}         & \bl{p}, \bl{q}     &      & \\
+    \text{security coercions}            & c, d     & ::=  & \id{g} \MID \up \MID \inj{\ell} \MID \proj{\ell}{p} \MID \bot^{\bl{p}} \\
+    \text{coercion sequences} & \bar{c}, \bar{d} & ::=  & \id{g} \MID \err{g_1}{g_2}{p} \MID \bar{c} \seq c
+  \end{array}
+  \]
+  \fbox{$\vdash c : g_1 \Rightarrow g_2$}
+  {\small
+  \begin{gather*}
+    \inference{}{\vdash \id{g} : g \Rightarrow g}
+    \quad
+    \inference{}
+              {\vdash \,\up\, : \low \Rightarrow \high}
+    \quad
+    \inference{}
+              {\vdash \inj{\ell} : \ell \Rightarrow \unk}
+    \\[1ex]
+    \inference{}
+              {\vdash \proj{\ell}{p} : \unk \Rightarrow \ell}
+    \qquad
+    \inference{}
+              {\vdash \bot^{\bl{p}} : \high \Rightarrow \low}
+  \end{gather*}}
+  \fbox{$\vdash \bar{c} : g_1 \Rightarrow g_2$}
+  {\small
+  \begin{gather*}
+    \inference{}{\vdash \id{g} : g \Rightarrow g}
+    \quad
+    \inference{\vdash \bar{c} : g_1 \Rightarrow g_2 & \vdash c : g_2 \Rightarrow g_3}
+              {\vdash \bar{c} \seq c : g_1 \Rightarrow g_3}
+    \quad
+    \inference{}
+              {\vdash \err{g_1}{g_2}{p} : g_1 \Rightarrow g_2}
+  \end{gather*}}
+  \fbox{$\mathbf{NF}\; \bar{c}$}
+  {\small
+  \begin{gather*}
+  \inference{}{\mathbf{NF}\; \id{g}}
+  \quad
+  \inference{}{\mathbf{NF}\; \id{\unk} \seq \proj{\ell}{p}}
+  \quad
+  \inference{\mathbf{NF}\; \bar{c}}{\mathbf{NF}\; \bar{c}\seq\inj{\ell}}
+  \quad
+  \inference{\mathbf{NF}\; \bar{c}}{\mathbf{NF}\; \bar{c}\seq\up}
+  \end{gather*}}
+  \fbox{$c \mathrel{;} c \longrightarrow c$}
+  {\small
+  \begin{gather*}
+  \textit{?-id}~
+  \inference{}
+            {\inj{\ell} \seq \proj{\ell}{p} \longrightarrow \id{\ell}}
+  \quad
+  \textit{?-}\uparrow~
+  \inference{}
+            {\inj{\low} \seq \proj{\high}{p} \longrightarrow \;\;\up}
+  \quad
+  \textit{?-}\bot~
+  \inference{}
+            {\inj{\high} \seq \proj{\low}{p} \longrightarrow \bot^{\bl{p}}}
+  \end{gather*}}
+  \fbox{$\bar{c} \longrightarrow \bar{d}$}
+  {\small
+  \begin{gather*}
+  \textit{id}~
+  \inference{\mathbf{NF}\; \bar{c}}
+            {\bar{c} \seq \id{g} \longrightarrow \bar{c}}
+  \qquad
+  \bot~
+  \inference{\mathbf{NF}\; \bar{c} & \vdash \bar{c} : g_1 \Rightarrow g_2}
+            {\bar{c} \seq \bot^{\bl{p}} \longrightarrow \err{g_1}{\low}{p} }
+  \qquad
+  \xi\textit{-}\bot~
+  \inference{\vdash c : g_2 \Rightarrow g_3}
+    {\err{g_1}{g_2}{p} \seq c \longrightarrow \err{g_1}{g_3}{p}}
+  \\[1ex]
+  \xi_L~
+  \inference{\bar{c} \longrightarrow \bar{d}}{\bar{c} \seq c \longrightarrow \bar{d} \seq c}
+  \qquad
+  \xi_R~
+  \inference{\mathbf{NF}\; \bar{c} & c \seq d \longrightarrow c'}
+            {\bar{c} \seq c \seq d \longrightarrow \bar{c}; c'}
+  \end{gather*}}
+  \caption{Syntax, typing, normal forms, and semantics of security coercions and coercion sequences}
+  \label{fig:cexpr}
+\end{figure}
+
+As we have seen in Section~\ref{sec:examples}, gradual information flows can be
+modeled as casts. For example, the cast sequence $\high \Rightarrow \unk
+\Rightarrow \low$ should be statically accepted but dynamically rejected, while
+the sequence $\low \Rightarrow \unk \Rightarrow \high$ should be statically and
+dynamically accepted, promoting the security of data to high. Such sequences of
+casts can be arbitrarily long (for example, $\low \Rightarrow \high \Rightarrow
+\unk \Rightarrow \unk \Rightarrow \low$), which motivates us to model the casts
+on security labels as coercions.
+
+In \Surface, the source security label of a coercion sequence comes from
+literals, while the sink is whatever security level that the observer has: for
+example, the \texttt{publish} function of Section~\ref{sec:examples} is of \low.
+Coercions can be easily sequenced and composed. Checking information flow at
+runtime is accomplished by reducing coercion sequences to their normal forms.
+
+There are two noteworthy benefits of the coercion representation for IFC. First,
+coercions can be used to represent NSU checking while satisfying the gradual
+guarantee. In brief, whenever a memory location is written to, the current PC is
+coerced to the security level of that location. We are going to formally
+introduce label expressions as our representation for PC in
+Section~\ref{sec:lexpr} and discuss NSU in detail in
+Section~\ref{sec:semantics}. Second, the coercion representation benefits
+mechanization because it enables modular reasoning. The main simulation lemma
+(Lemma~\ref{lem:sim}) depends on the simulation results of coercion sequences
+and label expressions, which are stated as separate lemmas and reasoned
+independently in our Agda code.
+
+The syntax and typing for security coercions and coercion sequences is defined
+in Figure~\ref{fig:cexpr}. A security label is either $\low$, $\high$, or
+statically unknown (\unk). There are five security coercions: identity (\id{g}),
+subtype (\up), injection (\inj{\ell}), and projection (\proj{\ell}{p}), and
+blame ($\boldsymbol{\bot}^{\bl{p}}$). Projection, which corresponds to the
+notion of a runtime check, is the only one responsible for blame, so it carries
+a blame label \bl{p}. A coercion sequence $\bar{c}$ starts with either success
+\id{g} or failure (\err{g_1}{g_2}{p}). Each coercion has a source and target
+type $g_1 \Rightarrow g_2$. The \id{g} casts the label $g$ to itself;
+\up~promotes security from \low to \high; injection casts to \unk from a
+specific label $\ell$ and projection does the opposite. Appending a single
+coercion to a coercion sequence makes the target security label that of the
+single coercion.
+
+Information flow is enforced in the reduction semantics of security coercions,
+shown in Figure~\ref{fig:cexpr}. Injection followed by projection to the same
+label collapses to the identity (\textit{?-id}). Flowing from \low to \high is
+allowed, so an injection from \low followed by a projection to \high collapses
+into the \up{} coercion~($\textit{?-}\uparrow$). An information flow from \high
+to \low is prohibited, so an injection to \high followed by a projection to \low
+triggers an error that blames the projection ($\textit{?-}\bot$). The predicate
+$\mathbf{NF}$ that specifies the normal forms of coercion sequences. The
+reduction rules for coercion sequences are also defined in
+Figure~\ref{fig:cexpr}. Appending \id{g} onto a coercion sequence reduces to the
+that sequence (\textit{id}). The failure coercions annihilate the other
+coercions in the sequence ($\bot$ and $\xi\textit{-}\bot$). We choose the
+evaluation order in a coercion sequence to be from left to right ($\xi_L$ and
+$\xi_R$), because that corresponds to the direction of information flow from
+source to sink: in the example above, $\low \Rightarrow \high \Rightarrow \unk
+\Rightarrow \unk \Rightarrow \low$, we validate that \low can flow to \high
+before we check the flow from \high through \unk to \low.
+
+%% \subsection{Monitoring Explicit and Implicit Flows}
+%% \label{sec:cexpr-comp-stamp}
+
+%% \begin{figure}[tbp]
+%% \raggedright
+%%   \fbox{$\bar{c}\mdoubleplus\bar{c} = \bar{c}$}
+%%   {\small
+%% \begin{align*}
+%% \bar{c} \mdoubleplus \err{g_2}{g_3}{p} &= \err{g_1}{g_3}{p}  \quad\text{,where $\vdash \bar{c} : g_1 \Rightarrow g_2$} \\
+%% \bar{c} \mdoubleplus \id{g} &= \bar{c} \seq \id{g} \\
+%% \bar{c}_1 \mdoubleplus (\bar{c}_2 \seq c) &= (\bar{c}_1 \mdoubleplus \bar{c}_2) \seq c
+%% \end{align*}
+%%   }
+
+%%   \fbox{$\mathit{stamp}\,\bar{c}\, \ell = \bar{c}$}\hfill
+%%   {\small
+%% \begin{align*}
+%% \mathit{stamp} \; \bar{c} \; \low &= \bar{c} \\
+%% \mathit{stamp} \; \id{\low} \; \high &= \id{\low}\seq\up \\
+%% \mathit{stamp} \; \id{\high} \; \high &= \id{\high} \\
+%% \mathit{stamp} \; (\id{\low}\seq\inj{\low}) \; \high &= \id{\low}\seq\up\seq\inj{\high} \\
+%% \mathit{stamp} \; (\id{\high}\seq\inj{\high}) \; \high &= \id{\high}\seq\inj{\high} \\
+%% \mathit{stamp} \; (\id{\low}\seq\up\seq\inj{\high}) \; \high &= \id{\low}\seq\up\seq\inj{\high} \\
+%% \mathit{stamp} \; (\id{\low}\seq\up) \; \high &= \id{\low}\seq\up
+%% \end{align*}
+%% }
+
+%%   \fbox{$\mathit{stamp!}\,\bar{c}\, \ell = \bar{c}$}
+%%   {\small
+%% \begin{align*}
+%% \mathit{stamp!} \; \bar{c} \; \low &=
+%%   \begin{cases}
+%%   \bar{c} & \text{, if} \vdash \bar{c} : \ell \Rightarrow \unk \\
+%%   \bar{c}\seq\inj{\ell_2} & \text{, if} \vdash \bar{c} : \ell_1 \Rightarrow \ell_2
+%%   \end{cases}
+%%   \\
+%% \mathit{stamp!} \; \id{\low} \; \high &= \id{\low}\seq\up\seq\inj{\high} \\
+%% \mathit{stamp!} \; \id{\high} \; \high &= \id{\high}\seq\inj{\high} \\
+%% \mathit{stamp!} \; (\id{\low}\seq\inj{\low}) \; \high &= \id{\low}\seq\up\seq\inj{\high} \\
+%% \mathit{stamp!} \; (\id{\high}\seq\inj{\high}) \; \high &= \id{\high}\seq\inj{\high} \\
+%% \mathit{stamp!} \; (\id{\low}\seq\up\seq\inj{\high}) \; \high &= \id{\low}\seq\up\seq\inj{\high} \\
+%% \mathit{stamp!} \; (\id{\low}\seq\up) \; \high &= \id{\low}\seq\up\seq\inj{\high}
+%% \end{align*}
+%% }
+%%   \caption{Composing and stamping coercions}
+%%   \label{fig:comp-stampc}
+%% \end{figure}
+
+%% We model explicit flow using security coercions. We can compose two coercion
+%% sequences ($\bar{c} \mdoubleplus \bar{d}$), where $\bar{c} : g_1 \Rightarrow
+%% g_2$ and $\bar{d} : g_2 \Rightarrow g_3$, to form a flow from $g_1$ to $g_3$,
+%% which is defined in Figure~\ref{fig:comp-stampc}.
+
+%% The stamping operation captures the intuition of an implicit flow from the
+%% security level $\ell'$ to a coercion sequence $\bar{c}$. We define the stamping
+%% operation in Figure~\ref{fig:comp-stampc} as two functions,
+%% $\mathit{stamp}(\bar{c},\ell)$ and $\mathit{stamp!}(\bar{c},\ell)$. Both
+%% function require $\bar{c}$ to be in normal form and that its source label is not
+%% \unk. The $\mathit{stamp!}$ operator promotes the security of the coercion
+%% $\bar{c}$ to be at least $\ell$ and then injects the coercion if necessary,
+%% while $\mathit{stamp}$ only promotes the security but does not inject. These
+%% stamping operations satisfy the gradual guarantee, because when stamping on a
+%% more precise coercion sequence and a less precise coercion sequence, stamping
+%% preserves the precision relation (Section~\ref{sec:sim-cexpr}) between them
+%% (Lemma~\ref{lem:cexpr-stamp-sim}). The stamping operations of coercion sequences
+%% are used in the stamping operations of (1) label expressions, which are our
+%% representation of PC and (2) values in the cast calculus. Those three types of
+%% stamping together formalize the notion of implicit flow in \Surface.
 
 \section{A Coercion Calculus on Values}
+\label{sec:coercion-calc-values}
 
 TBA
 
 \section{The Cast Calculus \CC: An Intermediate Language For Gradual IFC}
+\label{sec:cc}
 
 TBA
+
+\section{Compiling from \Surface to \CC}
+\label{sec:compile}
