@@ -12,6 +12,8 @@ by discussing the static and the dynamic extremes of \Surface. \Surface enables
 a continuum of IFC enforcement between the static and dynamic extremes that it
 embeds.
 
+\todo[inline]{Add a scientific story about our experiments of different design choices}
+
 \section{The Gradual IFC Language \Surface}
 \label{sec:surface-def}
 
@@ -22,6 +24,9 @@ by defining the \texttt{eval} function in Section~\ref{sec:surface-semantics}.
 
 \subsection{The Syntax of \Surface}
 \label{sec:surface-syntax}
+
+\todo[inline]{Describe the syntax in the order of importance. Relate the order
+  to the experiments}
 
 \begin{figure}[tbp]
 \raggedright
@@ -354,21 +359,23 @@ well-typed \Surface program and returns a cast-calculus (\CC) term. The compile
 function takes the form $\compile{M} = M'$, where $M$ is a \Surface program and
 $M'$ is a \CC term.
 
-I define the evaluation function for \Surface by (1) compiling from \Surface to
-\CC and (2) running the compiled \CC term using its operational semantics.
+\todo[inline]{Define a down arrow and an up arrow in Chapter 3 and get rid of the
+  reduction relation in eval}
 
-Suppose $M$ is a well-typed \Surface program $\emptyset ; \low \vdash M :
-\iota_g$ where $\iota \in \{\Unit, \Bool\}$, $g \in \{\low, \high, \unk\}$, and
-$k \in \{\true, \false, \unit\}$:
+I define the evaluation function (\textit{eval}, see below) for \Surface by (1)
+compiling from \Surface to \CC and (2) running the compiled \CC term using its
+operational semantics. I will define the compile function and the operational
+semantics for \CC in Chapter~\ref{ch:sem}. The \textit{eval} function takes a
+well-typed \Surface program $\emptyset ; \low \vdash M : \iota_g$, where $\iota
+\in \{\Unit, \Bool\}$, $g \in \{\low, \high, \unk\}$, and $k \in \{\true,
+\false, \unit\}$. The \textit{eval} function evaluates the program to a
+constant, signals a runtime error, or diverges:
 \begin{align*}
   \mathit{eval}(M) =&\,k\;&\text{if}\;\reducemult{(\compile{M})}{\emptyset}{\low}{k}{\mu} \\
   \mathit{eval}(M) =&\,k\;&\text{if}\;\reducemult{(\compile{M})}{\emptyset}{\low}{\cccast{k}{\mathbf{c}}}{\mu}\text{~and $\mathbf{c}$ is irreducible} \\
   \mathit{eval}(M) =&\,\blame{\bl{p}}\;&\text{if~}\reducemult{(\compile{M})}{\emptyset}{\low}{\blame{\bl{p}}}{\mu} \\
-  \mathit{eval}(M) =&\,\text{diverge}\;&\text{if~}\reducemult{(\compile{L})}{\emptyset}{\low}{M}{\mu}, \exists N\,\mu'.\,\reduce{M}{\mu}{\low}{N}{\mu'}
+  \mathit{eval}(M) =&\,\text{diverge}\;&\text{if~}\forall L.\reducemult{(\compile{M})}{\emptyset}{\low}{L}{\mu} \text{~and~} \exists N\,\mu'.\,\reduce{L}{\mu}{\low}{N}{\mu'}
 \end{align*}
-
-I will define the compile function and the operational semantics for \CC in
-Chapter~\ref{ch:sem}.
 
 \section{\Surface in Action}
 \label{sec:examples}
@@ -920,16 +927,22 @@ static IFC languages in the literature (such as $\lambda_{\text{SEC}}$ of
 \SSLRef all security labels in types are statically known, and the type system
 alone enforces IFC.
 
+\todo[inline]{Compare with LambdaINFO and LIO. Discuss the reason}
 In the dynamic extreme of \GSLRef, all security labels in types are unknown
-(\unk). The dynamic extreme of \GSLRef is a dynamic IFC programming language
-with a labeled heap, namely \DynIFC. I present the syntax and semantics of
-\DynIFC in Figure~\ref{fig:dyn-ifc}. \DynIFC is different from a typical dynamic
-IFC language in the literature (such as $\lambda^{\textit{info}}$
-of~\textcite{austin2009efficient}), in that each memory location of \DynIFC is
-labeled with a fixed security level. This security level is given by the
-programmer and remains unchanged during program execution. I will show in
-Chapter~\ref{ch:mech-metatheory} that this choice of the dynamic extreme makes
-it possible that \Surface satisfies the gradual guarantee.
+(\unk). The dynamic extreme of \GSLRef is a new dynamic IFC programming language
+named \DynIFC, where every memory location has a fixed security level. I present
+the syntax and semantics of \DynIFC in Figure~\ref{fig:dyn-ifc}. \DynIFC is
+different from a typical dynamic IFC language in the literature (such as
+$\lambda^{\textit{info}}$ of~\textcite{austin2009efficient}), in that each
+memory location of \DynIFC is labeled with a fixed security level. This security
+level is given by the programmer and remains unchanged during program execution.
+I will show in Chapter~\ref{ch:mech-metatheory} that this choice of the dynamic
+extreme makes it possible that \Surface satisfies the gradual guarantee.
+
+\todo[inline]{Discuss GG. Also discuss how to work around}
+\todo[inline]{Foreshadow that the dynamic extreme is used by the noninterference proof}
+\todo[inline]{Relate the heap design to the reduction rules}
+\todo[inline]{Talk about prot}
 
 %% \begin{align*}
 %%     \small
