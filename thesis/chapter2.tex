@@ -1,6 +1,18 @@
 \chapter{Gradual Information-Flow Control (IFC) in \Surface}
 \label{ch:examples}
 
+%%\todo[inline]{Add a scientific story about our experiments of different design choices}
+As discussed in Chapter~\ref{ch:intro}, there are two major differences between
+\GSLRef~\parencite{Toro:2018aa} and GLIO~\parencite{Amorim:2020aa}: (1) \GSLRef
+supports type-guided classification while GLIO does not; (2) \GSLRef includes
+the unknown security label \unk in runtime security labels while GLIO does not.
+In particular,~\textcite{Amorim:2020aa} identify the exclusion of type-guided
+classification as the reason that GLIO is able to reconcile noninterference and
+the gradual guarantee, while \GSLRef only satisfies noninterference but not the
+gradual guarantee. I started the journey of \Surface by retrofitting GLIO with
+vigilance and blame tracking, while leaving out type-guided classification and
+excluding \unk from runtime security labels.
+
 In this chapter, I first define the gradual IFC surface language \Surface, by
 presenting its syntax, type system, and semantics in
 Section~\ref{sec:surface-def}. After that, I put \Surface into action in
@@ -11,8 +23,6 @@ the same time. Finally, in Section~\ref{sec:embedding}, I conclude the chapter
 by discussing the static and the dynamic extremes of \Surface. \Surface enables
 a continuum of IFC enforcement between the static and dynamic extremes that it
 embeds.
-
-\todo[inline]{Add a scientific story about our experiments of different design choices}
 
 \section{The Gradual IFC Language \Surface}
 \label{sec:surface-def}
