@@ -653,43 +653,39 @@ dissertation:
 
 \begin{enumerate}
 \item I will identify the real cause of the tension between information flow
-  security and the gradual guarantee: the inclusion of \unk in the runtime
-  security labels.
+  security and the gradual guarantee.
 \item I will present \Surface, the first gradual IFC language with type-guided
   classification that satisfies the gradual guarantee.
 \item I will design two coercion calculi that serve as the runtime IFC monitor:
   a coercion calculus for security labels and a coercion calculus for secure
   values.
-\item I will design an IFC cast calculus \CC. \CC defines the dynamic semantics
-  of \Surface.
+\item I will design an IFC cast calculus, named \CC. \CC defines the dynamic
+  semantics of \Surface.
 \item I will mechanize in Agda the proofs for (1) the gradual guarantee of
   \Surface, (2) compilation from \Surface to \CC preserves types, and (3) type
   safety of \CC by progress and preservation.
-\item I will prove noninterference for \Surface through the simulation between
-  its cast calculus \CC and a dynamic IFC programming language \DynIFC.
+\item I will prove noninterference for \Surface.
 \end{enumerate}
 
-I defined the syntax, the type system, and the semantics of \Surface. In
-particular, I defined the semantics of \Surface by translation to a new security
-cast calculus \CC. I defined a syntax, type system, and operational semantics
-for \CC. I then compiled \Surface into \CC in a type-preserving way.
+I have completed the technical development of \Surface. I defined the syntax,
+the type system, and the semantics of \Surface. In particular, I defined the
+semantics of \Surface by translation to a new security cast calculus \CC. I
+defined a syntax, type system, and operational semantics for \CC. I then
+compiled \Surface into \CC in a type-preserving way. In \CC, \textit{security
+  coercions} serve as the runtime security monitor, in which I adapted ideas
+from the Coercion Calculus~\citep{Henglein:1994nz,Herman:2010aa} to IFC. A
+coercions on security labels can be an \textit{injection} from a security label
+to \unk or a \textit{projection} from \unk to a security label. Security labels
+on literals in \Surface become the sources of injections in \CC, while runtime
+NSU checks are treated as a special kind of projection where the target is the
+security level of the memory location to modify. Information flow policies are
+enforced when security coercions are reduced to their normal forms.
+\textit{Composing} coercions models \textit{explicit flows}, while the action of
+\textit{stamping} a coercion in normal form models \textit{implicit flows}. In
+particular, security coercions are designed such that \Surface satisfies the
+gradual guarantee.
 
-In \CC, \textit{security coercions} serve as the runtime security monitor, in
-which I adapted ideas from the Coercion
-Calculus~\citep{Henglein:1994nz,Herman:2010aa} to IFC. A coercions on
-security labels can be an \textit{injection} from a security label to \unk or a
-\textit{projection} from \unk to a security label. Security labels on literals
-in \Surface become the sources of injections in \CC, while runtime NSU checks
-are treated as a special kind of projection where the target is the security
-level of the memory location to modify. Information flow policies are enforced
-when security coercions are reduced to their normal forms. \textit{Composing}
-coercions models \textit{explicit flows}, while the action of \textit{stamping}
-a coercion in normal form models \textit{implicit flows}. In particular,
-security coercions are designed such that \Surface satisfies the gradual
-guarantee.
-
-I completed the technical development of \Surface and plan to submit my
-dissertation in May 2025.
+I plan to submit my dissertation in May 2025.
 
 \clearpage
 \bibliographystyle{ACM-Reference-Format}
