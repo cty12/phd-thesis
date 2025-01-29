@@ -79,7 +79,7 @@
 \colorlet{red}{RedOrange}
 
 \title{PhD Dissertation Proposal: \\
-  The Holy Grail of Gradual Security}
+  \textbf{The Holy Grail of Gradual Security}}
 
 \author{Tianyu Chen \\ Computer Science, Indiana University}
 \date{\today}
@@ -98,14 +98,14 @@
 }
 \vspace{30pt}
 
-In my PhD dissertation, I propose to harmoniously combine the static and the
-dynamic enforcement of information-flow security in one programming language,
-named \Surface. The distinguishing feature of \Surface is that it satisfies both
-the main security guarantee (noninterference) and the gradual guarantee. The
-proposal is organized as follows. In Section~\ref{sec:pl-enforce-sec}, I
-motivate my dissertation research by demonstrating that programming languages
-are useful in protecting software systems against real-world security threats
-through information-flow control (IFC). In Section~{sec:prior-ifc}, I review the
+In my PhD dissertation, I propose to harmoniously combine static and dynamic
+enforcement of information-flow security in one programming language, \Surface.
+The distinguishing feature of \Surface is that it satisfies both the main
+security guarantee (noninterference) and the gradual guarantee. The proposal is
+organized as follows. In Section~\ref{sec:pl-enforce-sec}, I motivate my
+dissertation research by demonstrating that programming languages are useful in
+protecting software systems against real-world security threats through
+information-flow control (IFC). In Section~\ref{sec:prior-ifc}, I review the
 traditional approaches to IFC, including static, dynamic, and hybrid enforcement
 mechanisms. In Section~\ref{sec:intro-gradual-ifc}, I review prior work on
 gradual IFC and describe the challenges of designing a language that satisfies
@@ -578,7 +578,7 @@ A ideal gradual IFC language (1) should enforce security by
 satisfying noninterference (2) should satisfy the gradual guarantee (3) should
 provide type-based reasoning through vigilance and type-guided classification
 (4) should not require addition static analyses prior to program execution.
-Contrary to the prior work, I am going to show in this dissertation that one
+Contrary to the prior work, I am going to show in my dissertation that one
 does not have to give up on any of the four requirements to resolve the tension
 between noninterference and the gradual guarantee. Instead, the real source of
 the tension is that \GSLRef allows \unk as a \emph{runtime} security label. By
@@ -628,9 +628,8 @@ The choice of \low as the default label is because most literals (if not all) in
 real programs are low security. In fact, it is bad practice to embed
 high-security literals, such as passwords, in program text.
 
-The thesis of this dissertation is that a gradual IFC programming
-language is able to satisfy the gradual guarantee, as long as there is no \unk
-among runtime security labels:
+My thesis is that a gradual IFC programming language is able to satisfy the
+gradual guarantee, as long as there is no \unk among runtime security labels:
 
 \vspace{20pt}
 \fbox{
@@ -685,7 +684,7 @@ enforced when security coercions are reduced to their normal forms.
 particular, security coercions are designed such that \Surface satisfies the
 gradual guarantee.
 
-I plan to submit my dissertation in May 2025.
+I plan to finish the writing and submit my dissertation by May 2025.
 
 \clearpage
 \bibliographystyle{ACM-Reference-Format}
