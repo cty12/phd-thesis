@@ -99,23 +99,24 @@
 \vspace{30pt}
 
 In my PhD dissertation, I propose to harmoniously combine static and dynamic
-enforcement of information-flow security in one programming language, \Surface.
-The distinguishing feature of \Surface is that it satisfies both the main
-security guarantee (noninterference) and the gradual guarantee. The proposal is
-organized as follows. In Section~\ref{sec:pl-enforce-sec}, I motivate my
-dissertation research by demonstrating that programming languages are useful in
-protecting software systems against real-world security threats through
-information-flow control (IFC). In Section~\ref{sec:prior-ifc}, I review the
-traditional approaches to IFC, including static, dynamic, and hybrid enforcement
-mechanisms. In Section~\ref{sec:intro-gradual-ifc}, I review prior work on
-gradual IFC and describe the challenges of designing a language that satisfies
-both noninterference and the gradual guarantee. In
+enforcement of information-flow security in one programming language (PL),
+\Surface. The distinguishing feature of \Surface is that it satisfies both the
+main security guarantee (noninterference) and the gradual guarantee. The
+proposal is organized as follows. In Section~\ref{sec:pl-enforce-sec}, I
+motivate my dissertation research by demonstrating that programming languages
+are useful in protecting software systems against real-world security threats
+through information-flow control (IFC). In Section~\ref{sec:prior-ifc}, I review
+the traditional approaches to IFC, including static, dynamic, and hybrid
+enforcement mechanisms. In Section~\ref{sec:intro-gradual-ifc}, I review prior
+work on gradual IFC and describe the challenges of designing a language that
+satisfies both noninterference and the gradual guarantee. In
 Section~\ref{sec:insight-and-statement}, I present the main enabling insight of
-\Surface and reiterate my thesis statement. In
+\Surface and reiterate my thesis statement. In Section~\ref{sec:contributions},
+I list the main technical contributions of my dissertation research. Finally in
 Section~\ref{sec:progress-and-plan}, I summarize my progress and describe the
 plan.
 
-\section{Programming Languages Can Enforce Security}
+\section{Security Is Important, and PL Can Help!}
 \label{sec:pl-enforce-sec}
 
 With the development of digital society, people are increasingly concerned about
@@ -277,10 +278,8 @@ public output of the program must stay the same.
 
 We are going to review the literature about static and dynamic enforcement of
 IFC in Section~\ref{sec:intro-static-ifc} and Section~\ref{sec:intro-dyn-ifc}
-respectively. We then review dynamic IFC enforcement with static pre-processing
-in Section~\ref{sec:intro-dyn-static}. Finally in
-Section~\ref{sec:intro-hybrid}, we briefly review the hybrid technique
-by~\citet{Buiras:2015aa}, which offers the programmer control over the
+respectively. In Section~\ref{sec:intro-hybrid}, we briefly review the hybrid
+technique by~\citet{Buiras:2015aa}, which offers the programmer control over the
 regions where IFC is enforced statically versus dynamically in a single program.
 
 \subsection{Static IFC in Programming Languages}
@@ -434,62 +433,21 @@ on heap write operations and disallows writing to memory locations whose
 security is below the current label. Under the hood, LIO keeps track of the
 current label as a monad.
 
-\subsection{Dynamic IFC Augmented With Static Pre-processing}
-\label{sec:intro-dyn-static}
-
-Researchers have also explored facilitating runtime IFC monitors with static
-analyses prior to program execution, to achieves goals that are hard to
-accomplish by using dynamic IFC alone. It is worth noting that different from
-user-controlled hybrid IFC and gradual IFC (which we are going to discuss in
-Section~\ref{sec:intro-hybrid} and Section~\ref{sec:intro-gradual-ifc}
-respectively), papers in this category do not aim at offering programmer the
-\emph{control} over statically versus dynamically enforced regions in a single
-program.
-
-\citet{le2005monitoring} explore a
-hybrid IFC monitor for sequential programs that combines runtime IFC with a
-static analysis that gathers information about the non-executed branches. This
-hybrid IFC accepts programs that are conservatively rejected by fully static
-IFC. They further show that it is possible to alter the behavior of executions
-that may be unsafe by resetting output values using the information from their
-hybrid analysis to reclaim confidentiality. \citet{le2007automaton} extends
-this hybrid IFC approach to concurrent programs and prove noninterference for
-any execution. \citet{Shroff:2007tg} build a runtime monitor augmented with a
-pre-computed fixed point of dependencies. Similar to
-\citet{le2005monitoring}, they observe that this hybrid technique is less
-conservatively than a fully static system. They also show that their hybrid
-monitor is able to support user-defined policy, so that different policies can
-be applied to the same program.
-
-\citet{Chandra:2007we} implement a hybrid monitor for the Java virtual
-machine. Their implementation add IFC annotations to a executable file using a
-static analysis. The runtime monitor then uses those annotations to update the
-labels of variables in alternative execution paths to enforce IFC, while
-maintaining backward-compatibility with existing Java class files.
-
-\citet{russo2010dynamic} study dynamic IFC in a flow-sensitive setting. They
-utilize a static analysis that detects variables in untaken branches whose
-security must be upgraded at runtime in order to prevent illegal implicit flows
-through the heap. \citet{moore2011static} improve the efficiency of the
-hybrid monitoring of \citet{russo2010dynamic} by selectively tracking
-variables and incorporating memory abstractions.
-
 \subsection{Programmer-Controlled Hybrid IFC}
 \label{sec:intro-hybrid}
 
-Similar to gradual IFC and different from dynamic IFC with static
-pre-processing, Hybrid LIO (HLIO)~\cite{Buiras:2015aa} supports programmer's
-choice of static or dynamic IFC in different regions of a single program. By
-default, the checking is static, but a programmer can insert a \texttt{defer}
-clause to say that the security constraints should be checked at runtime. There
-are two major differences between HLIO and gradual IFC programming languages (we
-are going to discuss gradual IFC in the next section). In HLIO, the developer
-has to embed explicit \texttt{defer} into the program, while in a gradual
-language, the switch between static and dynamic is directed by types, with no
-\texttt{defer} or explicit casts needed. Moreover, there is no theorem about
-adding and removing \texttt{defer} in HLIO, while in a gradual language, the
-gradual guarantee theorem relates the runtime behavior of programs that differ
-only in the precision of their type annotations.
+Similar to gradual IFC, Hybrid LIO (HLIO)~\cite{Buiras:2015aa} supports
+programmer's choice of static or dynamic IFC in different regions of a single
+program. By default, the checking is static, but a programmer can insert a
+\texttt{defer} clause to say that the security constraints should be checked at
+runtime. There are two major differences between HLIO and gradual IFC
+programming languages (we are going to discuss gradual IFC in the next section).
+In HLIO, the developer has to embed explicit \texttt{defer} into the program,
+while in a gradual language, the switch between static and dynamic is directed
+by types, with no \texttt{defer} or explicit casts needed. Moreover, there is no
+theorem about adding and removing \texttt{defer} in HLIO, while in a gradual
+language, the gradual guarantee theorem relates the runtime behavior of programs
+that differ only in the precision of their type annotations.
 
 \section{The Tension Between Gradual Typing and Information-Flow Control}
 \label{sec:intro-gradual-ifc}
@@ -644,27 +602,29 @@ gradual guarantee, as long as there is no \unk among runtime security labels:
   }
 }
 
-\section{Progress and Plan}
-\label{sec:progress-and-plan}
+\section{Technical Contributions}
+\label{sec:contributions}
 
-In general, I plan to make the following technical contributions in my
-dissertation:
+In general, I make the following technical contributions in my dissertation:
 
 \begin{enumerate}
-\item I will identify the real cause of the tension between information flow
+\item I identify the real cause of the tension between information flow
   security and the gradual guarantee.
-\item I will present \Surface, the first gradual IFC language with type-guided
+\item I present \Surface, the first gradual IFC language with type-guided
   classification that satisfies the gradual guarantee.
-\item I will design two coercion calculi that serve as the runtime IFC monitor:
+\item I design two coercion calculi that serve as the runtime IFC monitor:
   a coercion calculus for security labels and a coercion calculus for secure
   values.
-\item I will design an IFC cast calculus, named \CC. \CC defines the dynamic
+\item I design an IFC cast calculus, named \CC. \CC defines the dynamic
   semantics of \Surface.
-\item I will mechanize in Agda the proofs for (1) the gradual guarantee of
+\item I mechanize in Agda the proofs for (1) the gradual guarantee of
   \Surface, (2) compilation from \Surface to \CC preserves types, and (3) type
   safety of \CC by progress and preservation.
-\item I will prove noninterference for \Surface.
+\item I prove noninterference for \Surface.
 \end{enumerate}
+
+\section{Progress and Plan}
+\label{sec:progress-and-plan}
 
 I have completed the technical development of \Surface. I defined the syntax,
 the type system, and the semantics of \Surface. In particular, I defined the
@@ -682,9 +642,53 @@ enforced when security coercions are reduced to their normal forms.
 \textit{Composing} coercions models \textit{explicit flows}, while the action of
 \textit{stamping} a coercion in normal form models \textit{implicit flows}. In
 particular, security coercions are designed such that \Surface satisfies the
-gradual guarantee.
+gradual guarantee. I mechanized the proofs of (1) the gradual guarantee of
+\Surface, (2) compilation from \Surface to \CC preserves types, and (3) type
+safety of \CC. I proved noninterference for \Surface on paper.
 
-I plan to finish the writing and submit my dissertation by May 2025.
+I plan to finish the writing and submit my dissertation by May 2025. The
+tentative outline (as well as the schedule) of the dissertation is listed below.
+
+\begin{enumerate}
+\item[\textbf{DONE}] In Chapter 1, I motivate my research and describe the background. I show
+  that security is important, and programming languages are useful for enforcing
+  security through IFC. I review the literature on existing IFC enforcement
+  mechanisms. I also review the tension between noninterference and the gradual
+  guarantee. I then introduce the main technical achievement of my dissertation:
+  a programming language called \Surface that satisfies both noninterference and
+  the gradual guarantee. I have finished a draft of Chapter 1.
+\item[\textbf{DONE}] In Chapter 2, I define the gradual IFC language \Surface. I
+  then demonstrate how \Surface works using examples. Finally, I define the
+  static and the dynamic extremes of \Surface. I have finished a draft of
+  Chapter 2.
+\item[\textbf{TODO}] In Chapter 3, I formalize the operational semantics of
+  \Surface by defining its cast calculus \CC. I take a three-step approach.
+  First, I define a coercion calculus on security labels. Using this coercion
+  calculus, I define security label expressions. Label expressions serve as my
+  model of the program counter (PC) that restricts the security of memory
+  locations where write operations are allowed to happen. Next, I define a
+  second coercion calculus, whose purpose is to cast a program value from one
+  type to another type. This coercion calculus serves as the representation of
+  casts in the intermediate language \CC. Finally, I present the design of my
+  intermediate language, the cast calculus \CC. I define the syntax, the type
+  system, and the operational semantics for \CC. I then define a type-preserving
+  compilation from \Surface to \CC, so that the semantics of \Surface is given
+  by \CC. I am working on Chapter 3, and I plan to finish a draft by
+  mid-February.
+\item[\textbf{TODO}] In Chapter 4, I present the Agda mechanization of three
+  major meta-theoretical results, including the gradual guarantee, compilation
+  preserves types, and type safety. I plan to finish a draft of Chapter 4 by
+  mid-March.
+\item[\textbf{TODO}] In Chapter 5, I prove the noninterference theorem for
+  \Surface, by simulating its cast calculus \CC with the dynamic extreme of
+  \Surface, namely \DynIFC. The noninterference of \DynIFC can be proved using
+  the standard erasure technique. I plan to finish a draft of Chapter 5 by late
+  March.
+\item[\textbf{TODO}] In Chapter 6, I summarize this dissertation and discuss
+  future research directions in gradual IFC. I plan to finish a draft of Chapter
+  6 by early April. I will keep revising my dissertation until the end of the
+  Spring 2025 semester.
+\end{enumerate}
 
 \clearpage
 \bibliographystyle{ACM-Reference-Format}
