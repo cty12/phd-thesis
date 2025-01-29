@@ -918,6 +918,43 @@ similar to fully dynamic IFC. It is just that the security labels on
 \textit{type annotations} will not trigger errors at runtime, even if they are
 inconsistent.
 
+\subsubsection{\Surface Performs Typed-Guided Classification}
+
+A gradual IFC language employs \textit{typed-guided classification} if the
+security-level of a value can be changed when the value flows through a cast.
+
+The following example from Section 2 of \textcite{Toro:2018aa} demonstrates how
+type-guided classification interacts with implicit flow and type-based
+reasoning:
+\begin{lstlisting}[style=tt]
+  let mix : |$\Int_{\low}$| -> |$\Int_{\unk}$| -> |$\Int_{\low}$| =
+    |$\lambda$| pub priv. if pub < priv then 1 else 2 in
+  let smix : |$\Int_{\low}$| -> |$\Int_{\high}$| -> |$\Int_{\low}$| =
+    |$\lambda$| pub priv. mix pub priv in
+  smix 1|$_{\low}$| 5|$_{\low}$|
+\end{lstlisting}
+
+\noindent Type-based reasoning tells us that the \texttt{smix} function should
+either fail or return a value that does not depend on its high-security
+parameter \texttt{priv}. However, \texttt{smix} calls \texttt{mix} and there is
+an implicit flow from \texttt{priv} to the result value, so this program should
+fail.
+
+In \Surface the program produces an error as type-based reasoning suggests.
+Security coercions in \CC classify values, so when $\key{5}_{\low}$ is passed
+into \texttt{smix} and then \texttt{mix}, it is wrapped in a coercion:
+$\cccast{\key{5}_{\low}}{\up\seq\inj{\high}}$ and is classified as
+high-security.
+%
+Consequently, the \texttt{if} reduces to its then-branch protected with \high.
+This implicit flow affects the result value of the then-branch, by (1) inserting
+a subtype coercion before the injection and (2) promoting the source of the
+injection to \high to preserve types. So the result of the \texttt{if} is
+$\cccast{\key{1}_{\low}}{\up\seq\inj{\high}}$. The injection, whose source is
+\high, collides with a projection to \low (to match the $\Int_{\low}$ return
+type of \texttt{mix}), causing the program to error as expected, blaming the
+projection.
+
 \section{The Static and Dynamic Extremes of \Surface}
 \label{sec:embedding}
 
