@@ -2,20 +2,40 @@
 \label{ch:examples}
 
 %%\todo[inline]{Add a scientific story about our experiments of different design choices}
-As discussed in Chapter~\ref{ch:intro}, there are two major differences between
-\GSLRef~\parencite{Toro:2018aa} and GLIO~\parencite{Amorim:2020aa}: (1) \GSLRef
-supports type-guided classification while GLIO does not; (2) \GSLRef includes
-the unknown security label \unk in runtime security labels while GLIO does not.
-In particular,~\textcite{Amorim:2020aa} identify the exclusion of type-guided
-classification as the reason that GLIO is able to reconcile noninterference and
-the gradual guarantee, while \GSLRef only satisfies noninterference but not the
-gradual guarantee. I started the journey of \Surface by retrofitting GLIO with
-vigilance and blame tracking, while leaving out type-guided classification and
-excluding \unk from runtime security labels.
+I started the journey by retrofitting GLIO with vigilance. As discussed in
+Chapter~\ref{ch:intro}, there are two major differences between
+\GSLRef~\parencite{Toro:2018aa}, which satisfies noninterference but not the
+gradual guarantee, and GLIO~\parencite{Amorim:2020aa}, which satisfies both.
+First, \GSLRef supports type-guided classification, but GLIO does not. Second,
+\GSLRef includes the unknown security label \unk in runtime security labels, but
+GLIO does not. \textcite{Amorim:2020aa} identify the exclusion of type-guided
+classification (the first difference) as the reason that GLIO is able to
+reconcile noninterference and the gradual guarantee. Following
+\textcite{Amorim:2020aa}, I created a language called \SurfaceOld. Like GLIO,
+\SurfaceOld leaves out type-guided classification and excludes \unk from runtime
+security labels. The only difference between \SurfaceOld and GLIO is that
+\SurfaceOld is vigilant, that is, \Surface errors when the casts applied to a
+value are inconsistent, while GLIO does not.
 
-In this chapter, I first define the gradual IFC surface language \Surface, by
-presenting its syntax, type system, and semantics in
-Section~\ref{sec:surface-def}. After that, I put \Surface into action in
+During the development of \SurfaceOld, I realized that NSU checking can be
+expressed as casts; however long the chain of casts is, the source of the first
+cast and the target of the last cast must be specific, that is, \low or \high.
+The key of designing a gradual security-typed language is to identify the source
+of an injection and the target of a projection. Injection happens when a value
+is cast from some specific security label to \unk. A constant must be associated
+a specific security label, so that when the constant is injected, its label
+becomes the source of the injection. Implicit flow causes the program counter
+(PC) to be injected when branching on an injected condition. Projection, on the
+other hand, happens when an injected value is cast to a specific security label.
+NSU checking is a projection: the program counter (PC) is cast to the security
+level of the memory location to write. If successful, the projection justifies
+the heap policy that the memory location to write is at least as secure as PC.
+As a result, each memory location must also be associated with a specific
+security label, so that the target of a cast for NSU is always specific.
+
+The rest of this chapter is organized as follows. I first define the gradual IFC
+surface language \Surface, by presenting its syntax, type system, and semantics
+in Section~\ref{sec:surface-def}. After that, I put \Surface into action in
 Section~\ref{sec:examples}. I present example programs to demonstrate how
 \Surface enables a gradual and smooth transition between static and dynamic IFC,
 while supporting type-based reasoning and satisfying the gradual guarantee at
