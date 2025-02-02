@@ -999,34 +999,25 @@ static IFC languages in the literature (such as $\lambda_{\text{SEC}}$ of
 \SSLRef all security labels in types are statically known, and the type system
 alone enforces IFC.
 
-\todo[inline]{Compare with LambdaINFO and LIO. Discuss the reason}
-In the dynamic extreme of \GSLRef, all security labels in types are unknown
-(\unk). The dynamic extreme of \GSLRef is a new dynamic IFC programming language
-named \DynIFC, where every memory location has a fixed security level. I present
-the syntax and semantics of \DynIFC in Figure~\ref{fig:dyn-ifc}. \DynIFC is
-different from a typical dynamic IFC language in the literature (such as
-$\lambda^{\textit{info}}$ of~\textcite{austin2009efficient}), in that each
-memory location of \DynIFC is labeled with a fixed security level. This security
-level is given by the programmer and remains unchanged during program execution.
-I will show in Chapter~\ref{ch:mech-metatheory} that this choice of the dynamic
-extreme makes it possible that \Surface satisfies the gradual guarantee.
+\todo[inline]{Compare with LambdaINFO and LIO. Discuss the reason} In the
+dynamic extreme of \GSLRef, all security labels in types are unknown (\unk). The
+dynamic extreme of \GSLRef is a new dynamic IFC programming language named
+\DynIFC, where every memory location is associated with a fixed security level.
+We compare \DynIFC with dynamic IFC languages in the literature, in particular,
+$\lambda^{\textit{info}}$~\parencite{austin2009efficient} and
+LIO~\parencite{STEFAN:2017ta}.
+
+\DynIFC is different from $\lambda^{\textit{info}}$ in that each memory location
+of \DynIFC is labeled with a fixed security level. This security level is given
+by the programmer and remains unchanged during program execution. I will show in
+Chapter~\ref{ch:mech-metatheory} that this choice of the dynamic extreme makes
+it possible that \Surface satisfies the gradual guarantee.
+
+I present the syntax and semantics of \DynIFC in Figure~\ref{fig:dyn-ifc}.
 
 \todo[inline]{Discuss GG. Also discuss how to work around}
 \todo[inline]{Foreshadow that the dynamic extreme is used by the noninterference proof}
-\todo[inline]{Relate the heap design to the reduction rules}
-\todo[inline]{Talk about prot}
-
-%% \begin{align*}
-%%     \small
-%%     \compile{x}=\;&x \\
-%%     \compile{\const{k}{\ell}}=\;&\dynconst{k}{\ell} \\
-%%     \compile{\lam{\unk}{x}{A}{N}{\ell}}=\;&\dynlam{x}{\compile{N}}{\ell} \\
-%%     \compile{\app{L}{M}{p}}=\;&(\compile{L})\;(\compile{M}) \\
-%%     \compile{\ifexp{L}{M}{N}{p}}=\;&\dynif{(\compile{L})}{(\compile{M})}{(\compile{N})} \\
-%%     \compile{\assign{L}{M}{p}}=\;&\dynassign{(\compile{L})}{?}{(\compile{M})} \\
-%%     \compile{(\letexp{x}{M}{N})}=\;&(\dynlet{x}{\compile{M}}{\compile{N}}) \\
-%%     \compile{\refexp{\ell}{M}{p}}=\;&\dynref{?}{\ell}{(\compile{M})}
-%% \end{align*}
+\todo[inline]{Relate the heap design to the reduction rules. Talk about prot}
 
 \begin{figure}[tbp]
   \raggedright
