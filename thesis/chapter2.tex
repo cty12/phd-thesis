@@ -999,24 +999,89 @@ static IFC languages in the literature (such as $\lambda_{\text{SEC}}$ of
 \SSLRef all security labels in types are statically known, and the type system
 alone enforces IFC.
 
-\todo[inline]{Compare with LambdaINFO and LIO. Discuss the reason} In the
-dynamic extreme of \GSLRef, all security labels in types are unknown (\unk). The
-dynamic extreme of \GSLRef is a new dynamic IFC programming language named
-\DynIFC, where every memory location is associated with a fixed security level.
-We compare \DynIFC with dynamic IFC languages in the literature, in particular,
-$\lambda^{\textit{info}}$~\parencite{austin2009efficient} and
+%\todo[inline]{Compare with LambdaINFO and LIO. Discuss the reason}
+%\todo[inline]{Discuss GG. Also discuss how to work around}
+%\todo[inline]{Foreshadow that the dynamic extreme is used by the noninterference proof}
+In the dynamic extreme of \GSLRef, all security labels in types are unknown
+(\unk). The dynamic extreme of \GSLRef is a dynamic IFC programming language
+named \DynIFC, where every memory location is associated with a fixed security
+level. \DynIFC is particularly useful for the noninterference result in
+Chapter~\ref{ch:noninterference}, whose proof is by simulation between \CC and
+\DynIFC. We are going to compare \DynIFC with other dynamic IFC languages in the
+literature, such as \laminfo~\parencite{austin2009efficient} and
 LIO~\parencite{STEFAN:2017ta}.
 
-\DynIFC is different from $\lambda^{\textit{info}}$ in that each memory location
-of \DynIFC is labeled with a fixed security level. This security level is given
-by the programmer and remains unchanged during program execution. I will show in
-Chapter~\ref{ch:mech-metatheory} that this choice of the dynamic extreme makes
-it possible that \Surface satisfies the gradual guarantee.
+\DynIFC is different from \laminfo in that in \DynIFC, each memory location is
+labeled with a fixed security level, but in \laminfo, the security of a memory
+location can change during program execution. In \DynIFC, the security level of
+a memory location is decided by the programmer during reference creation and
+remains unchanged during program execution. On the other hand, in \laminfo, the
+security level of a memory location is decided by the current program counter
+(PC) during reference creation and can then increase monotonically during
+program execution.
 
-I present the syntax and semantics of \DynIFC in Figure~\ref{fig:dyn-ifc}.
+Unfortunately, as we are about to demonstrate, choosing current PC as the
+default security for the newly created memory location would violate the gradual
+guarantee. Imagine a language that is the same as \Surface, except that besides
+\low and \high, the language also supports \unk as an annotation on reference
+creation; similar to the semantics of \laminfo,
+\refexp{\colorbox{highlight}{\unk}}{\true}{} would create a new memory location
+whose security is decided at run time by the current PC and store the value
+\true~in it. Consider the following program:
 
-\todo[inline]{Discuss GG. Also discuss how to work around}
-\todo[inline]{Foreshadow that the dynamic extreme is used by the noninterference proof}
+\noindent
+\bluetext{\small\textbf{(More precise, more static)}}
+\begin{lstlisting}[style=tt,basicstyle=\ttfamily\footnotesize]
+  let i = user-input () in
+  let a = ref |\colorbox{highlight}{$\high$}| true in
+  if (i : |$\Bool_{\unk}$|) then
+      a := false
+  else ()
+  ! a
+\end{lstlisting}
+
+\noindent The \bluetext{more precise} program runs successfully. On line 3, the
+branch condition is injected to \unk, so an NSU check will happen during the
+assignment. On line 4, PC is promoted to high by the branch condition, and the
+program assigns to a high memory location, $\high \preccurlyeq \high$, so the
+NSU check is successful. On line 6, the program dereferences address \texttt{a},
+resulting in a high boolean that is the negation of the input.
+
+If we change the annotation on reference creation, making the security of the
+memory location dynamically decided by PC:
+
+\noindent
+\redtext{\small\textbf{(Less precise, more dynamic)}}
+\begin{lstlisting}[style=tt,basicstyle=\ttfamily\footnotesize]
+  let i = user-input () in
+  let a = ref |\colorbox{highlight}{$\unk$}| true in
+  if (i : |$\Bool_{\unk}$|) then
+      a := false
+  else ()
+  ! a
+\end{lstlisting}
+
+\noindent The \redtext{less precise} program errors due to failed NSU. PC
+initially starts at low, so on line 2, a memory location of low security is
+created, storing \true. Similar to the more precise program, the branch
+condition is injected, so an NSU checking happens on line 4 to ensure that the
+security of the memory location assigning to is at least as high as that of PC.
+However, the program attempts to write to low memory under high PC, so the NSU
+check fails and signals a runtime error. The more precise program runs to
+completion but the less precise one errors, violating the gradual guarantee.
+
+\DynIFC is similar to LIO in that the security of a memory location stays the
+same during assignment. However, LIO supports an additional feature: first-class
+labels, which \DynIFC (or \Surface in general) does not currently support. When
+creating a reference in LIO, the security of the new memory location may come
+from a security label value produced at runtime. In comparison, in \Surface the
+programmer has to specify this security level during development. In future, I
+plan to support first-class labels, similar to that of LIO, in \Surface. I will
+discuss future work in Chapter~\ref{ch:conclusion}.
+
+I formally define the syntax and semantics of \DynIFC in
+Figure~\ref{fig:dyn-ifc}.
+
 \todo[inline]{Relate the heap design to the reduction rules. Talk about prot}
 
 \begin{figure}[tbp]
