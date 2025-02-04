@@ -1079,10 +1079,18 @@ programmer has to specify this security level during development. In future, I
 plan to support first-class labels, similar to that of LIO, in \Surface. I will
 discuss future work in Chapter~\ref{ch:conclusion}.
 
+%\todo[inline]{Relate the heap design to the reduction rules. Talk about prot}
 I formally define the syntax and semantics of \DynIFC in
-Figure~\ref{fig:dyn-ifc}.
-
-\todo[inline]{Relate the heap design to the reduction rules. Talk about prot}
+Figure~\ref{fig:dyn-ifc}. When creating a reference, we need to perform a
+runtime NSU check $\pc \preccurlyeq \ell$, so that the security of the memory
+location to write to is at least as high as the current PC (rule
+\textit{ref?-ok}, highlighted). If the check fails, the program errors (rule
+\textit{ref?-fail}). In this way, programs such as
+\[
+\texttt{publish (! (if (input ()) (ref low false) (ref low true)))}
+\]
+will error at runtime due to NSU, guarding against illegal implicit information
+flows through the heap.
 
 \begin{figure}[tbp]
   \raggedright
@@ -1092,8 +1100,8 @@ Figure~\ref{fig:dyn-ifc}.
                            &  & \MID & L \; M \MID \dynif{L}{M}{N} \\
                            &  & \MID & \dynref{?}{\ell}{M} \MID \dynderef{M} \MID \dynassign{L}{?}{M} \MID \dynprot{\ell}{M} \MID \key{error} \\
     \text{values}     & V, W     & ::=  & \dynconst{k}{\ell} \MID \dynaddr{n_{\hat{\ell}}}{\ell} \MID \dynlam{x}{N}{\ell} \\
-    \text{frames} & F & ::= & \Box\;M \MID V\;\Box \MID \dynif{\Box}{M}{N} \MID \dynref{?}{\ell}{\Box}
-                              \MID \dynderef{\Box} \MID \dynassign{\Box}{?}{M} \MID \dynassign{V}{?}{\Box}
+    \text{frames} & F & ::= & \Box\;M \MID V\;\Box \MID \dynif{\Box}{M}{N} \MID \dynref{?}{\ell}{\Box} \\
+                          & & \MID & \dynderef{\Box} \MID \dynassign{\Box}{?}{M} \MID \dynassign{V}{?}{\Box}
   \end{array}
   \]}
   \fbox{$\reduce{M}{\mu}{\pc}{N}{\mu'}$}
@@ -1109,7 +1117,7 @@ Figure~\ref{fig:dyn-ifc}.
   \\[1ex]
   \textit{prot-val}~
   \inference{}{\reduce{\dynprot{\ell}{V}}{\mu}{\pc}{V \curlyvee \ell}{\mu}}
-  \quad
+  \;\;
   \textit{prot-ctx}~
   \inference
   {\reduce{M}{\mu}{\pc \curlyvee \ell}{M'}{\mu'}}
