@@ -48,16 +48,14 @@ embeds.
 \section{The Gradual IFC Language \Surface}
 \label{sec:surface-def}
 
-This section is organized as follows. I first present the syntax of \Surface in
+This section is organized as follows. I first define security labels and types
+in Section~\ref{sec:labels-and-types}. I present the syntax of \Surface in
 Section~\ref{sec:surface-syntax}. I then present the type system for \Surface in
 Section~\ref{sec:surface-typing}. Finally, I discuss the semantics of \Surface
 by defining the \texttt{eval} function in Section~\ref{sec:surface-semantics}.
 
-\subsection{The Syntax of \Surface}
-\label{sec:surface-syntax}
-
-\todo[inline]{Describe the syntax in the order of importance. Relate the order
-  to the experiments}
+\subsection{Security Labels and Types}
+\label{sec:labels-and-types}
 
 \begin{figure}[tbp]
 \raggedright
@@ -68,8 +66,40 @@ by defining the \texttt{eval} function in Section~\ref{sec:surface-semantics}.
     \text{security labels}  & g    & ::= & \unk \MID \ell \\
     \text{base types}               & \iota     & ::= & \Unit \MID \Bool \\
     \text{raw types}                & T, S      & ::= & \iota \MID \Fun{A}{\gc}{B} \mid \Refer{(T_g)} \\
-    \text{blame labels}         & \bl{p}, \bl{q}     &      & \\
     \text{types}                    & A, B      & ::= & T_g \\
+  \end{array}
+  \]}
+  \caption{Security Labels and Types}
+  \label{fig:labels-and-types}
+\end{figure}
+
+I define security labels in Figure~\ref{fig:labels-and-types}. For simplicity, I
+will use a two-point security lattice $\langle \{\high, \low\} , \preccurlyeq,
+\curlyvee , \curlywedge \rangle$, where $\high$ is for private, sensitive data
+and $\low$ is for public, disclosable data. Of course, any lattice of security
+labels could be used in place of low and high. The ordering is standard: $\low
+\preccurlyeq \high$ and $\high \npreccurlyeq \low$. So information is allowed to
+flow from public sources to private sinks but not the other way around. I refer
+to $\{\high,\low\}$ as \emph{specific security labels}.
+
+I also define security types in Figure~\ref{fig:labels-and-types}. Types in
+\Surface have security labels associated with them, for example, $\Bool_{\high}$
+is the type for booleans with high security, $\Unit_{\low}$ is the type for the
+unit value with low security, and $\Bool_{\unk}$ is the type of a boolean whose
+security level is unknown at compile time. I refer to $\{\high,\low,\unk\}$ as
+\emph{security labels}. A function type $(\Fun{A}{\gc}{B})_g$ carries an
+additional security label \gc, which is the type of the program counter (PC) to
+evaluate the body of the function.
+
+\subsection{The Syntax of \Surface}
+\label{sec:surface-syntax}
+
+\begin{figure}[tbp]
+\raggedright
+  {\small
+  \[
+  \begin{array}{rcll}
+    \text{blame labels}         & \bl{p}, \bl{q}     &      & \\
     \text{terms}                & L , M , N & ::=  & x \MID \const{k}{\text{\hl{$\ell$}}} \MID \lam{g}{x}{A}{N}{\text{\hl{$\ell$}}} \MID \app{L}{M}{p} \\
     &                                       & \MID & \ifexp{L}{M}{N}{p} \MID \letexp{x}{M}{N} \\
     &                                       & \MID & \refexp{\text{\hl{$\ell$}}}{M}{p} \MID \deref{M}{p} \MID \assign{L}{M}{p} \MID \ann{M}{A}{p}
@@ -79,33 +109,11 @@ by defining the \texttt{eval} function in Section~\ref{sec:surface-semantics}.
   \label{fig:surface-syntax}
 \end{figure}
 
+%% \todo[inline]{Describe the syntax in the order of importance. Relate the order
+%%   to the experiments}
+%
 The syntax of the gradual language \Surface is shown in
-Figure~\ref{fig:surface-syntax}. The figure also includes the definitions for
-security labels, security types, and blame labels.
-
-For simplicity, I will use a two-point security lattice $\langle \{\high, \low\}
-, \preccurlyeq, \curlyvee , \curlywedge \rangle$, where $\high$ is for private,
-sensitive data and $\low$ is for public, disclosable data. Of course, any
-lattice of security labels could be used in place of low and high. The ordering
-is standard: $\low \preccurlyeq \high$ and $\high \npreccurlyeq \low$. So
-information is allowed to flow from public sources to private sinks but not the
-other way around. I refer to $\{\high,\low\}$ as \emph{specific security
-labels}.
-
-Types in \Surface have security labels associated with them, for example,
-$\Bool_{\high}$ is the type for booleans with high security, $\Unit_{\low}$ is
-the type for the unit value with low security, and $\Bool_{\unk}$ is the type of
-a boolean whose security level is unknown at compile time. I refer to
-$\{\high,\low,\unk\}$ as \emph{security labels}. A function type
-$(\Fun{A}{\gc}{B})_g$ carries an additional security label \gc, which is the
-type of the program counter (PC) to evaluate the body of the function.
-
-Some terms in \Surface are annotated with an identifier called a blame label
-(\bl{p}). When compiled to the intermediate representation, those terms generate
-runtime checking (casts) that may fail. In case a check fails, it raises a cast
-error, called \textit{blame}, that contains its blame label. In this way, the
-programmer knows which cast is causing the problem and which part of the program
-generates that cast.
+Figure~\ref{fig:surface-syntax}.
 
 To enable information-flow control, \Surface allows the programmer to annotate
 constants, mutable references, and $\lambda$-abstractions with a specific
@@ -125,6 +133,13 @@ of literals and newly created memory cells default to a specific label such as
 am going to show in Section~\ref{sec:example2} that defaulting to a specific
 security label helps us resolve the tension between noninterference and the
 gradual guarantee.
+
+Some terms in \Surface are annotated with an identifier called a blame label
+(\bl{p}). When compiled to the intermediate representation, those terms generate
+runtime checking (casts) that may fail. In case a check fails, it raises a cast
+error, called \textit{blame}, that contains its blame label. In this way, the
+programmer knows which cast is causing the problem and which part of the program
+generates that cast.
 
 \subsection{The Type System of \Surface}
 \label{sec:surface-typing}
@@ -993,11 +1008,19 @@ projection.
 \section{The Static and Dynamic Extremes of \Surface}
 \label{sec:embedding}
 
-Same as \GSLRef, the static extreme of \Surface is \SSLRef. Similar to other
-static IFC languages in the literature (such as $\lambda_{\text{SEC}}$ of
-~\textcite{zdancewic2002programming} and SLam of~\textcite{heintze1998slam}), in
-\SSLRef all security labels in types are statically known, and the type system
-alone enforces IFC.
+Gradual IFC embeds both static and dynamic IFC. In this section, we discuss the
+static and dynamic extremes of \Surface. We compare them to existing static and
+dynamic IFC languages in the literature.
+
+\subsection{The Static Extreme of \Surface: \SSLRef}
+
+Same as \GSLRef, the static extreme of \Surface is \SSLRef. In \SSLRef all
+security labels in types are statically known, and the type system alone
+enforces IFC. The type system of \SSLRef is standard and similar to other static
+IFC languages in the literature, such as $\lambda_{\text{SEC}}$ of
+~\textcite{zdancewic2002programming} and SLam of~\textcite{heintze1998slam}.
+
+\subsection{The Dynamic Extreme of \Surface: \DynIFC}
 
 %\todo[inline]{Compare with LambdaINFO and LIO. Discuss the reason}
 %\todo[inline]{Discuss GG. Also discuss how to work around}
@@ -1005,92 +1028,29 @@ alone enforces IFC.
 In the dynamic extreme of \GSLRef, all security labels in types are unknown
 (\unk). The dynamic extreme of \GSLRef is a dynamic IFC programming language
 named \DynIFC, where every memory location is associated with a fixed security
-level. \DynIFC is particularly useful for the noninterference result in
-Chapter~\ref{ch:noninterference}, whose proof is by simulation between \CC and
-\DynIFC. We are going to compare \DynIFC with other dynamic IFC languages in the
-literature, such as \laminfo~\parencite{austin2009efficient} and
-LIO~\parencite{STEFAN:2017ta}.
+level. \DynIFC is particularly useful for the noninterference proof in
+Chapter~\ref{ch:noninterference}. The proof is by simulation between \CC and
+\DynIFC. I present the formal definition of \DynIFC in
+Section~\ref{sec:def-dynifc} and compare \DynIFC to dynamic IFC languages in the
+literature in Section~\ref{sec:compare-dynifc}.
 
-\DynIFC is different from \laminfo in that in \DynIFC, each memory location is
-labeled with a fixed security level, but in \laminfo, the security of a memory
-location can change during program execution. In \DynIFC, the security level of
-a memory location is decided by the programmer during reference creation and
-remains unchanged during program execution. On the other hand, in \laminfo, the
-security level of a memory location is decided by the current program counter
-(PC) during reference creation and can then increase monotonically during
-program execution.
-
-Unfortunately, as we are about to demonstrate, choosing current PC as the
-default security for the newly created memory location would violate the gradual
-guarantee. Imagine a language that is the same as \Surface, except that besides
-\low and \high, the language also supports \unk as an annotation on reference
-creation; similar to the semantics of \laminfo,
-\refexp{\colorbox{highlight}{\unk}}{\true}{} would create a new memory location
-whose security is decided at run time by the current PC and store the value
-\true~in it. Consider the following program:
-
-\noindent
-\bluetext{\small\textbf{(More precise, more static)}}
-\begin{lstlisting}[style=tt,basicstyle=\ttfamily\footnotesize]
-  let i = user-input () in
-  let a = ref |\colorbox{highlight}{$\high$}| true in
-  if (i : |$\Bool_{\unk}$|) then
-      a := false
-  else ()
-  ! a
-\end{lstlisting}
-
-\noindent The \bluetext{more precise} program runs successfully. On line 3, the
-branch condition is injected to \unk, so an NSU check will happen during the
-assignment. On line 4, PC is promoted to high by the branch condition, and the
-program assigns to a high memory location, $\high \preccurlyeq \high$, so the
-NSU check is successful. On line 6, the program dereferences address \texttt{a},
-resulting in a high boolean that is the negation of the input.
-
-If we change the annotation on reference creation, making the security of the
-memory location dynamically decided by PC:
-
-\noindent
-\redtext{\small\textbf{(Less precise, more dynamic)}}
-\begin{lstlisting}[style=tt,basicstyle=\ttfamily\footnotesize]
-  let i = user-input () in
-  let a = ref |\colorbox{highlight}{$\unk$}| true in
-  if (i : |$\Bool_{\unk}$|) then
-      a := false
-  else ()
-  ! a
-\end{lstlisting}
-
-\noindent The \redtext{less precise} program errors due to failed NSU. PC
-initially starts at low, so on line 2, a memory location of low security is
-created, storing \true. Similar to the more precise program, the branch
-condition is injected, so an NSU checking happens on line 4 to ensure that the
-security of the memory location assigning to is at least as high as that of PC.
-However, the program attempts to write to low memory under high PC, so the NSU
-check fails and signals a runtime error. The more precise program runs to
-completion but the less precise one errors, violating the gradual guarantee.
-
-\DynIFC is similar to LIO in that the security of a memory location stays the
-same during assignment. However, LIO supports an additional feature: first-class
-labels, which \DynIFC (or \Surface in general) does not currently support. When
-creating a reference in LIO, the security of the new memory location may come
-from a security label value produced at runtime. In comparison, in \Surface the
-programmer has to specify this security level during development. In future, I
-plan to support first-class labels, similar to that of LIO, in \Surface. I will
-discuss future work in Chapter~\ref{ch:conclusion}.
+\subsection{Formal Definition of \DynIFC}
+\label{sec:def-dynifc}
 
 %\todo[inline]{Relate the heap design to the reduction rules. Talk about prot}
 I formally define the syntax and semantics of \DynIFC in
-Figure~\ref{fig:dyn-ifc}. When creating a reference, we need to perform a
-runtime NSU check $\pc \preccurlyeq \ell$, so that the security of the memory
-location to write to is at least as high as the current PC (rule
-\textit{ref?-ok}, highlighted). If the check fails, the program errors (rule
-\textit{ref?-fail}). In this way, programs such as
-\[
-\texttt{publish (! (if (input ()) (ref low false) (ref low true)))}
-\]
-will error at runtime due to NSU, guarding against illegal implicit information
-flows through the heap.
+Figure~\ref{fig:dyn-ifc}. As is standard for security-typed languages
+\parencite{heintze1998slam, Fennell:2013ab, Toro:2018aa}, the protection term
+(\texttt{prot}) ensures that the computed value and the side effects of its
+sub-term must be at least as secure as the security level of the protection
+term. In rule \textit{prot-ctx}, the sub-term of \texttt{prot} is reduced under
+the join of the current PC and the security of \texttt{prot} ($\pc \curlyvee
+\ell$). In rule \texttt{prot-val}, the sub-term has been reduced to a value $V$,
+so \texttt{prot} stamps the label $\ell$ onto the value, producing a new value
+whose security is at least as high as $\ell$. The if-conditional reduces to
+\texttt{prot} (rule $\beta\textit{-if-true}$ and rule
+$\beta\textit{-if-false}$), capturing the implicit flows from the branch
+condition to the resulting value as well as through the heap.
 
 \begin{figure}[tbp]
   \raggedright
@@ -1164,3 +1124,111 @@ flows through the heap.
     enforce heap policy in reference creation and assignment are highlighted}
   \label{fig:dyn-ifc}
 \end{figure}
+
+When creating a reference, we need to perform a runtime NSU check $\pc
+\preccurlyeq \ell$, so that the memory location to write to is at least as
+secure as the current PC (rule \textit{ref?-ok}, highlighted). If the NSU check
+fails, the program errors (rule \textit{ref?-fail}). In this way, programs such
+as
+\begin{lstlisting}[style=tt,numbers=none]
+publish (! (if (input ()) (ref low false) (ref low true)))
+\end{lstlisting}
+will error at runtime due to NSU, guarding against illegal implicit information
+flows through the heap. When assigning to a reference, we perform the NSU check
+$\pc \curlyvee \ell \preccurlyeq \hat{\ell}$ (rule \textit{assign?-ok},
+highlighted), which is equivalent to $\pc \preccurlyeq \hat{\ell}$ and $\ell
+\preccurlyeq \hat{\ell}$; if the NSU check fails, the program errors (rule
+\textit{assign?-fail}). The first part of the check is similar to the check on
+reference creation: it ensures that the security level ($\hat{\ell}$) of the
+memory location to write to is at least as high as the current PC ($\pc$). The
+second part ensures that the memory location is at least as secure as the
+address itself. This is because it may leak information when choosing which
+address to assign to:
+\begin{lstlisting}[style=tt]
+let a1 = ref low true  in
+let a2 = ref low false in
+  (if (input ()) a1 a2) := false
+  publish (! a1)
+\end{lstlisting}
+\noindent On line 3, PC is low, and we assign to low memory, so the first part of the
+check succeeds. If there were no second part of the check, the program would
+leak information by publishing the negation of sensitive input. As a result, we
+must check the security of the address against the security of the memory
+location. In this case, the address is high security because the branch
+condition is of high security; we assign to low memory, so the check fails and
+signals an error.
+
+\subsection{Comparing \DynIFC to \laminfo and LIO}
+\label{sec:compare-dynifc}
+
+We are going to compare \DynIFC with other dynamic IFC languages in the
+literature, such as \laminfo~\parencite{austin2009efficient} and
+LIO~\parencite{STEFAN:2017ta}.
+
+\DynIFC is different from \laminfo in that in \DynIFC, each memory location is
+labeled with a fixed security level, but in \laminfo, the security of a memory
+location can change during program execution. In \DynIFC, the security level of
+a memory location is decided by the programmer during reference creation and
+remains unchanged during program execution. On the other hand, in \laminfo, the
+security level of a memory location is decided by the current program counter
+(PC) during reference creation and can then increase monotonically during
+program execution.
+
+Unfortunately, as we are about to demonstrate, choosing current PC as the
+default security for the newly created memory location would violate the gradual
+guarantee. Imagine a language that is the same as \Surface, except that besides
+\low and \high, the language also supports \unk as an annotation on reference
+creation; similar to the semantics of \laminfo,
+\refexp{\colorbox{highlight}{\unk}}{\true}{} would create a new memory location
+whose security is decided at run time by the current PC and store the value
+\true~in it. Consider the following program:
+
+\noindent
+\bluetext{\small\textbf{(More precise, more static)}}
+\begin{lstlisting}[style=tt,basicstyle=\ttfamily\footnotesize]
+  let i = user-input () in
+  let a = ref |\colorbox{highlight}{$\high$}| true in
+  if (i : |$\Bool_{\unk}$|) then
+      a := false
+  else ()
+  ! a
+\end{lstlisting}
+
+\noindent The \bluetext{more precise} program runs successfully. On line 3, the
+branch condition is injected to \unk, so an NSU check will happen during the
+assignment. On line 4, PC is promoted to high by the branch condition, and the
+program assigns to a high memory location, $\high \preccurlyeq \high$, so the
+NSU check is successful. On line 6, the program dereferences address \texttt{a},
+resulting in a high boolean that is the negation of the input.
+
+If we change the annotation on reference creation, making the security of the
+memory location dynamically decided by PC:
+
+\noindent
+\redtext{\small\textbf{(Less precise, more dynamic)}}
+\begin{lstlisting}[style=tt,basicstyle=\ttfamily\footnotesize]
+  let i = user-input () in
+  let a = ref |\colorbox{highlight}{$\unk$}| true in
+  if (i : |$\Bool_{\unk}$|) then
+      a := false
+  else ()
+  ! a
+\end{lstlisting}
+
+\noindent The \redtext{less precise} program errors due to failed NSU. PC
+initially starts at low, so on line 2, a memory location of low security is
+created, storing \true. Similar to the more precise program, the branch
+condition is injected, so an NSU checking happens on line 4 to ensure that the
+security of the memory location assigning to is at least as high as that of PC.
+However, the program attempts to write to low memory under high PC, so the NSU
+check fails and signals a runtime error. The more precise program runs to
+completion but the less precise one errors, violating the gradual guarantee.
+
+\DynIFC is similar to LIO in that the security of a memory location stays the
+same during assignment. However, LIO supports an additional feature: first-class
+labels, which \DynIFC (or \Surface in general) does not currently support. When
+creating a reference in LIO, the security of the new memory location may come
+from a security label value produced at runtime. In comparison, in \Surface the
+programmer has to specify this security level during development. In future, I
+plan to support first-class labels, similar to that of LIO, in \Surface. I will
+discuss future work in Chapter~\ref{ch:conclusion}.
