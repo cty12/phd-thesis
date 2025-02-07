@@ -135,22 +135,21 @@
 \newcommand{\letexp}[3]{\ensuremath{\syntax{let}\;{#1}={#2}\;\syntax{in}\;{#3}}}
 \newcommand{\ccconst}[1]{\ensuremath{\ccsyntax{\$}\;{#1}}}
 \newcommand{\ccaddr}[1]{\ensuremath{\ccsyntax{addr}\;{#1}}}
-\newcommand{\cclam}[2]{\ensuremath{\ccsyntax{λ}{#1}\ccsyntax{.}\,{#2}}}
+\newcommand{\cclam}[2]{\ensuremath{\ccsyntax{${\lambda}$}{#1}\ccsyntax{.}\,{#2}}}
 \newcommand{\ccif}[5]{\ensuremath{\ccsyntax{if}\;{#1}\;{#2}\;{#3}\;{#4}\;{#5}}}
-\newcommand{\ccifinj}[4]{\ensuremath{\ccsyntax{if!}\;{#1}\;{#2}\;{#3}\;{#4}}}
+\newcommand{\ccifstar}[4]{\ensuremath{\ccsyntax{if}{\star}\,{#1}\,{#2}\,{#3}\,{#4}}}
 \newcommand{\ccref}[2]{\ensuremath{\ccsyntax{ref}\;{#1}\;{#2}}}
 \newcommand{\ccrefproj}[3]{\ensuremath{\ccsyntax{ref?}^{\bl{#3}}\;{#1}\;{#2}}}
 \newcommand{\ccderef}[3]{\ensuremath{\ccsyntax{!}\;{#1}\;{#2}\;{#3}}}
-\newcommand{\ccderefinj}[2]{\ensuremath{\ccsyntax{!!}\;{#1}\;{#2}}}
+\newcommand{\ccderefstar}[2]{\ensuremath{\ccsyntax{!}{\star}\,{#1}\,{#2}}}
 \newcommand{\ccassign}[5]{\ensuremath{\ccsyntax{assign}\;{#1}\;{#2}\;{#3}\;{#4}\;{#5}}}
 \newcommand{\ccassignproj}[5]{\ensuremath{\ccsyntax{assign?}^{\bl{#5}}\;{#1}\;{#2}\;{#3}\;{#4}}}
 \newcommand{\cccast}[2]{\ensuremath{{#1}\,\ccsyntax{\textlangle}\,{#2}\,\ccsyntax{\textrangle}}}
 \newcommand{\ccprot}[4]{\ensuremath{\ccsyntax{prot}\;{#1}\;{#2}\;{#3}\;{#4}}}
-\newcommand{\ccprotinj}[4]{\ensuremath{\ccsyntax{prot!}\;{#1}\;{#2}\;{#3}\;{#4}}}
 \newcommand{\cccastpc}[2]{\ensuremath{\ccsyntax{cast}_{\ccsyntax{pc}}\;{#1}\;{#2}}}
 \newcommand{\cclet}[4]{\ensuremath{\ccsyntax{let}\;{#1}\ccsyntax{=}{#2}\ccsyntax{:}{#3}\;\ccsyntax{in}\;{#4}}}
 \newcommand{\ccapp}[5]{\ensuremath{\ccsyntax{app}\;{#1}\;{#2}\;{#3}\;{#4}\;{#5}}}
-\newcommand{\ccappinj}[4]{\ensuremath{\ccsyntax{app!}\;{#1}\;{#2}\;{#3}\;{#4}}}
+\newcommand{\ccappstar}[4]{\ensuremath{\ccsyntax{app}{\star}\,{#1}\,{#2}\,{#3}\,{#4}}}
 \newcommand{\ccopaque}{\ensuremath{\ccsyntax{●}}}
 \newcommand{\lconsisjoin}{\ensuremath{\,\widetilde{\curlyvee}\,}}  % label consistent join
 \newcommand{\consisjoin}{\ensuremath{\,\widetilde{\vee}\,}}        % type consistent join

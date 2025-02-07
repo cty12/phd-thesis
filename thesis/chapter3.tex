@@ -1,7 +1,16 @@
 \chapter{The Definition of the Cast Calculus \CC}
 \label{ch:sem}
 
-\todo[inline]{Add sentences about why using coercions as the cast representation}
+%\todo[inline]{Add sentences about why using coercions as the cast representation}
+
+As we have seen in Section~\ref{sec:examples}, gradual information flows can be
+modeled as casts. For example, the cast sequence $\high \Rightarrow \unk
+\Rightarrow \low$ should be statically accepted but dynamically rejected, while
+the sequence $\low \Rightarrow \unk \Rightarrow \high$ should be statically and
+dynamically accepted, promoting the security of data to high. Such sequences of
+casts can be arbitrarily long (for example, $\low \Rightarrow \high \Rightarrow
+\unk \Rightarrow \unk \Rightarrow \low$), which motivates us to represent the
+casts on security labels as \textit{coercions}.
 
 In this chapter, I first present a coercion calculus for security labels in
 Section~\ref{sec:coercion-calc-labels}. I show that coercion on labels can model
@@ -17,19 +26,20 @@ the semantics of \CC.
 \section{A Coercion Calculus for Security Labels}
 \label{sec:coercion-calc-labels}
 
-In this section, I describe a coercion calculus on security labels. This
+In this section, I describe a coercion calculus for security labels. This
 coercion calculus is an important stepping stone to our representation of casts
-between security types. I first explain the motivation of using coercions to
-represent information flows (Section~\ref{sec:motiv}). I then demonstrate that
-we can use coercion composition to model explicit flows and use coercion
-stamping to model implicit flows (Section~\ref{sec:cexpr-comp-stamp}). Finally,
-I define how these coercions act on security labels by defining a language of
-label expressions whose meaning is defined by a reduction relation
-(Section~\ref{sec:lexpr}). Label expressions are used to model security checks
-for the heap policy in \CC.
+between security types. I first define the syntax, the type system, and the
+semantics of the coercion calculus for security labels
+(Section~\ref{sec:coercion-calc-def}). I then demonstrate that we can use
+coercion composition to model explicit flows and use coercion stamping to model
+implicit flows (Section~\ref{sec:cexpr-comp-stamp}). Finally, I define how these
+coercions act on security labels by defining a language of label expressions
+whose meaning is defined by a reduction relation (Section~\ref{sec:lexpr}).
+Label expressions are used to model security checks that enforce the heap policy
+in \CC.
 
-\subsection{Why Coercions?}
-\label{sec:motiv}
+\subsection{Syntax, Typing, and Semantics of the Coercion Calculus for Security Labels}
+\label{sec:coercion-calc-def}
 
 \begin{figure}[tbp]
 \raggedright
@@ -122,32 +132,22 @@ for the heap policy in \CC.
   \label{fig:cexpr}
 \end{figure}
 
-As we have seen in Section~\ref{sec:examples}, gradual information flows can be
-modeled as casts. For example, the cast sequence $\high \Rightarrow \unk
-\Rightarrow \low$ should be statically accepted but dynamically rejected, while
-the sequence $\low \Rightarrow \unk \Rightarrow \high$ should be statically and
-dynamically accepted, promoting the security of data to high. Such sequences of
-casts can be arbitrarily long (for example, $\low \Rightarrow \high \Rightarrow
-\unk \Rightarrow \unk \Rightarrow \low$), which motivates us to model the casts
-on security labels as coercions.
-
 In \Surface, the source security label of a coercion sequence comes from
 literals, while the sink is whatever security level that the observer has: for
 example, the \texttt{publish} function of Section~\ref{sec:examples} is of \low.
 Coercions can be easily sequenced and composed. Checking information flow at
 runtime is accomplished by reducing coercion sequences to their normal forms.
 
-There are two noteworthy benefits of the coercion representation for IFC. First,
+There are two noteworthy benefits of using coercions to represent IFC. First,
 coercions can be used to represent NSU checking while satisfying the gradual
 guarantee. In brief, whenever a memory location is written to, the current PC is
 coerced to the security level of that location. We are going to formally
 introduce label expressions as our representation for PC in
-Section~\ref{sec:lexpr} and discuss NSU in detail in
-Section~\ref{sec:cc}. Second, the coercion representation benefits
-mechanization because it enables modular reasoning. The main simulation lemma
-(Lemma~\ref{lem:sim}) depends on the simulation results of coercion sequences
-and label expressions, which are stated as separate lemmas and reasoned
-independently in our Agda code.
+Section~\ref{sec:lexpr} and discuss NSU in detail in Section~\ref{sec:cc}.
+Second, the coercion representation benefits mechanization because it enables
+modular reasoning. The main simulation lemma (Lemma~\ref{lem:sim}) depends on
+the simulation results of coercion sequences and label expressions, which are
+stated as separate lemmas and reasoned independently in our Agda code.
 
 The syntax and typing for security coercions and coercion sequences is defined
 in Figure~\ref{fig:cexpr}. A security label is either $\low$, $\high$, or
@@ -344,13 +344,42 @@ identity, then the coercion application goes away ($\beta$\textit{-id}), whereas
 if the coercion reduces to a failure, then the label expression reduces to blame
 (\textit{lblame}).
 
+\begin{figure}[tbp]
+  \raggedright
+  \fbox{$\mathit{stamp}\,e\,\ell = e$}
+       {\small
+         \begin{align*}
+           \mathit{stamp} \; \ell \; \low &= \ell \\
+           \mathit{stamp} \; \low \; \high &= \cccast{\low}{\id{\low}\seq\up} \\
+           \mathit{stamp} \; \high \; \high &= \high \\
+           \mathit{stamp} \; (\cccast{\ell}{\bar{c}}) \; \ell' &= \cccast{\ell}{\mathit{stamp} \; \bar{c} \; \ell'}
+         \end{align*}
+       }
+  \fbox{$\mathit{stamp!}\,e\,\ell = e$}
+       {\small
+         \begin{align*}
+           \mathit{stamp!} \; \ell \; \ell' &= \cccast{\ell}{\mathit{stamp!}\;\id{\ell}\;\ell'} \\
+           \mathit{stamp!} \; (\cccast{\ell}{\bar{c}}) \; \ell' &= \cccast{\ell}{\mathit{stamp!} \; \bar{c} \; \ell'}
+         \end{align*}
+       }
+  \fbox{$|e| = \ell$}
+       {\small
+         \begin{align*}
+           | \ell | &= \ell \\
+           | \cccast{\ell}{\bar{c}} | &= | \bar{c} |
+         \end{align*}
+       }
+  \caption{Stamping and security level operators for security label expressions}
+  \label{fig:stamp-lval}
+\end{figure}
+
 The stamping and security level operators for label expressions are defined in
-Figure~\ref{fig:stamp-lval} of the Appendix. They both require their input to be
-in normal form, which can be either (1) a specific security label $\ell$, or (2)
-a label wrapped with an irreducible coercion sequence $\cccast{\ell}{\bar{c}}$.
-For (1), stamping \low with \high results in \cccast{\low}{\up}, otherwise the
-label expression remains unchanged; for (2), we directly stamp the coercion
-sequence using \textit{stamp} for coercion sequences defined in
+Figure~\ref{fig:stamp-lval}. They both require their input to be in normal form,
+which can be either (1) a specific security label $\ell$, or (2) a label wrapped
+with an irreducible coercion sequence $\cccast{\ell}{\bar{c}}$. For (1),
+stamping \low with \high results in \cccast{\low}{\up}, otherwise the label
+expression remains unchanged; for (2), we directly stamp the coercion sequence
+using \textit{stamp} for coercion sequences defined in
 Figure~\ref{fig:comp-stampc}. The definition of \textit{stamp!} is analogous,
 except that it turns to the \textit{stamp!} operator of coercion sequences. The
 security level operator $|{-}|$ is defined such that (1) a specific security
@@ -364,13 +393,424 @@ to implement NSU checks, which enforce the heap policy for write operations.
 \section{A Coercion Calculus on Values}
 \label{sec:coercion-calc-values}
 
-TBA
+\begin{figure}[tbp]
+\raggedright
+  \[
+  \begin{array}{rcll}
+    \text{base types}               & \iota     & ::= & \Unit \MID \Bool \\
+    \text{raw types}                & T, S      & ::= & \iota \MID \Fun{A}{\gc}{B} \mid \Refer{(T_g)} \\
+    \text{types}                    & A, B      & ::= & T_g \\
+    \text{raw coercions}            & c_r, d_r  & ::=  & \id{\iota} \MID \refco{\bm{c}}{\bm{d}} \MID \left( \funco{\bar{d}}{\bm{c}}{\bm{d}} \right) \\
+    \text{coercions}                & \bm{c}, \bm{d} & ::= & \coerc{c_r}{\bar{c}}
+  \end{array}
+  \]
+  \fbox{$\cccast{V}{\bm{c}} \longrightarrow M$}
+  { \small
+  \begin{gather*}
+  \textit{cast}~
+  \inference{\bar{c} \longrightarrow^{+} \bar{d} & \mathbf{NF} \; \bar{d}}
+  {\cccast{V_r}{\coerc{c_r}{\bar{c}}} \longrightarrow \cccast{V_r}{\coerc{c_r}{\bar{d}}}}
+  \qquad
+  \textit{cast-blame}~
+  \inference{\bar{c} \longrightarrow^{*} \err{g_1}{g_2}{p}}
+  {\cccast{V_r}{\coerc{c_r}{\bar{c}}} \longrightarrow \blame{p}}
+  \\
+  \textit{cast-id}~
+  \inference{}{\cccast{V_r}{\coerc{\id{\iota}}{\id{g}}} \longrightarrow V_r}
+  \qquad
+  \textit{cast-comp}~
+  \inference{\mathbf{Irreducible} \; \bm{c}}
+  {\cccast{\cccast{V_r}{\bm{c}}}{\bm{d}} \longrightarrow \cccast{V_r}{\bm{c} \mdoubleplus \bm{d}}}
+  \end{gather*}}
+  \caption{Syntax and semantics of coercions on values.}
+  \label{fig:coercions}
+\end{figure}
+
+In this section, we define a second coercion calculus whose purpose is to cast a
+program value from one type to another type. We use this coercion calculus as
+the representation of casts in the intermediate language \CC. These coercions on
+values make use of the coercions on security labels that we defined in
+Section~\ref{sec:coercion-calc-labels}, because the types in \CC are annotated
+with security labels, as is usual for a static and gradually-typed IFC
+languages.
+
+We begin with the definition of types in Figure~\ref{fig:coercions}, which is
+standard for gradual security type systems: each type has a security label
+ascription on it, which is either a specific label $\ell$ or $\unk$. Function
+types have one extra label \gc, which is a static approximation of the security
+level of the PC while executing the function body. In a reference type
+$(\Refer{T_{\hat{g}}})_g$, the label $\hat{g}$ of the referenced type also
+doubles as the security level of the memory cell.
+
+\begin{figure}[tbp]
+\raggedright
+  \fbox{$\bm{c}\mdoubleplus \bm{c} = \bm{c}$}
+  {\small
+\begin{align*}
+\left( \coerc{\id{\iota}}{\bar{c}} \right) \mdoubleplus \left( \coerc{\id{\iota}}{\bar{d}} \right) &= \left( \coerc{\id{\iota}}{\bar{c} \mdoubleplus \bar{d}} \right) \\
+\left( \coerc{\refco{\bm{c_1}}{\bm{c_2}}}{\bar{c}} \right) \mdoubleplus \left( \coerc{\refco{\bm{d_1}}{\bm{d_2}}}{\bar{d}} \right) &= \left( \coerc{\refco{(\bm{d_1} \mdoubleplus \bm{c_1})}{(\bm{c_2} \mdoubleplus \bm{d_2})}}{\bar{c} \mdoubleplus \bar{d}} \right) \\
+\left( \coerc{\funco{\bar{c}_1}{\bm{c_1}}{\bm{c_2}}}{\bar{c}_2} \right) \mdoubleplus \left( \coerc{\funco{\bar{d}_1}{\bm{d_1}}{\bm{d_2}}}{\bar{d}_2} \right) &= \left( \coerc{\funco{\bar{d}_1 \mdoubleplus \bar{c}_1}{(\bm{d_1} \mdoubleplus \bm{c_1})}{(\bm{c_2} \mdoubleplus \bm{d_2})}}{\bar{c}_2 \mdoubleplus \bar{d}_2} \right)
+\end{align*}
+  }
+  \fbox{$\mathbf{Irreducible} \; \bm{c}$}
+  {\small
+  \begin{gather*}
+    \inference{\mathbf{NF} \; \bar{c} & \ell \neq g}
+    {\mathbf{Irreducible} \; \left( \coerc{\id{\iota}}{\bar{c}} \right)}
+    ~{\vdash \bar{c} : \ell \Rightarrow g}
+    \\[1ex]
+    \inference{\mathbf{NF} \; \bar{c}}
+    {\mathbf{Irreducible} \; \left( \coerc{\refco{\bm{c}}{\bm{d}}}{\bar{c}} \right)}
+    \quad
+    \inference{\mathbf{NF} \; \bar{c}}
+    {\mathbf{Irreducible} \; \left( \coerc{\funco{\bar{d}}{\bm{c}}{\bm{d}}}{\bar{c}} \right)}
+  \end{gather*}}
+  \caption{Composition of coercions on values.}
+  \label{fig:coercion-composition}
+\end{figure}
+
+The syntax and semantics for coercions on values is defined in
+Figure~\ref{fig:coercions}. Each coercion $\bm{c}$ consists of a raw coercion
+$c_r$ that casts the type of the value and the label coercion $\bar{c}$ that
+casts the security label of the value. There are three kinds of raw coercions:
+identity coercions $\id{g}$, coercions between reference types
+$(\refco{\bm{c}}{\bm{d}})$, and coercions between function types $\left(
+\funco{\bar{d}}{\bm{c}}{\bm{d}} \right)$. In the coercion on functions, the
+$\bar{d}$ casts the PC of the function.
+%
+The syntax for values is not defined until the next section, so here we remark
+that $V$ ranges over values, which can either be a raw value $V_r$ (constant,
+address, or $\lambda$) or an irreducible coercion applied to a raw value:
+\cccast{V_r}{\bm{c}}, where there is no $M$ such that $\cccast{V_r}{\bm{c}}
+\longrightarrow M$. The definition of irreducible coercion is in
+Figure~\ref{fig:coercion-composition}.
+
+The reduction rules in Figure~\ref{fig:coercions} apply a coercion to a value,
+yielding a value or triggering blame. The \textit{cast} rule normalizes the
+coercion $\bar{c}$ on the security label. If it normalizes to a failure
+coercion, the rule \textit{cast-blame} triggers blame. We reduce identity
+coercions using rule \textit{cast-id}. Finally, if the value is wrapped with an
+irreducible coercion, we compose the coercion with the coercion being applied
+(rule \textit{cast-comp}). The composition operator ${-}\mdoubleplus{-}$ is also
+defined in Figure~\ref{fig:coercion-composition}; the intuition of the
+composition operator is that $\cccast{\cccast{V_r}{\bm{c}}}{\bm{d}}$ must be
+contextual equivalent to $\cccast{V_r}{\bm{c} \mdoubleplus \bm{d}}$. There are
+no reduction rules specific to reference coercions $\refco{\bm{c}}{\bm{d}}$ or
+function coercions $\left( \funco{\bar{d}}{\bm{c}}{\bm{d}} \right)$ because they
+are irreducible coercions that wrap a value. Their action occurs when the value
+is used in an elimination form such as in a function call or a read or write to
+the reference, which we explain in the next section.
 
 \section{The Cast Calculus \CC: An Intermediate Language For Gradual IFC}
 \label{sec:cc}
 
-\todo[inline]{Define a down arrow and an up arrow (diverge)}
+\todo[inline]{Define a down arrow and an up arrow (diverge)} In this section, we
+define the cast calculus \CC by presenting its syntax and type system in
+Section~\ref{sec:cc-typing} and its operational semantics in
+Section~\ref{sec:cc-semantics}.
 
-\todo[inline]{Put compilation into another chapter}
+\subsection{Syntax and Typing of \CC}
+\label{sec:cc-typing}
+
+\begin{figure}[tbp]
+\raggedright
+  {\small \[
+  \begin{array}{rcll}
+    \text{variables}            & x, y, z   &      & \\
+    \text{constants}            & k         & \in  & \{ \unit , \true , \false \} \\
+    \text{terms}  & L , M , N & ::=  & x \MID \ccconst{k} \MID \ccaddr{n} \MID \cclam{x}{N} \MID
+                                       \ccapp{L}{M}{A}{B}{\ell} \MID \ccappstar{L}{M}{A}{T} \\
+                           &  & \MID & \ccif{L}{A}{\ell}{M}{N} \MID \ccifstar{L}{T}{M}{N} \MID
+                                       \cclet{x}{M}{A}{N} \\
+                           &  & \MID & \ccref{\ell}{M} \MID \ccrefproj{\ell}{M}{p} \MID \ccderef{M}{A}{\ell} \MID \ccderefstar{M}{T} \\
+                           &  & \MID & \ccassign{L}{M}{T}{\hat{\ell}}{\ell} \MID \ccassignproj{L}{M}{T}{\hat{g}}{p} \\
+                           &   & \MID & \ccprot{\PC}{\ell}{M}{A} \MID \cccast{M}{\bm{c}} \MID \blame{p} \\
+    \text{raw values} & V_r, W_r & ::=  &  \ccconst{k} \MID \ccaddr{n} \MID \cclam{x}{N} \\
+    \text{values}     & V, W     & ::=  & V_r \MID \cccast{V_r}{\bm{c}} \text{, where } \mathbf{Irreducible}\;\bm{c}
+  \end{array}
+  \]}
+  \fbox{$\Gamma ; \Sigma ; g ; \ell \vdash M \Leftarrow A$}
+  {\small
+  \begin{gather*}
+    {\vdash}\mathit{app} ~
+    \inference{\Gamma; \Sigma; \ell'; \ell'' \vdash L \Leftarrow (\Fun{A}{\ell' \curlyvee \ell}{B})_{\ell} \\
+               \Gamma; \Sigma; \ell'; \ell'' \vdash M \Leftarrow A &
+               C = \mathit{stamp} \; B \; \ell}
+              {\Gamma; \Sigma; \ell'; \ell'' \vdash \ccapp{L}{M}{A}{B}{\ell} \Leftarrow C}
+    \quad
+    {\vdash}\mathit{app}{\star}~
+    \inference{\Gamma; \Sigma; g; \ell \vdash L \Leftarrow (\Fun{A}{\unk}{(T_{\unk})})_{\unk} \\
+               \Gamma; \Sigma; g; \ell \vdash M \Leftarrow A &
+               %C = \mathit{stamp} \; B \; \unk
+               }
+              {\Gamma; \Sigma; g; \ell \vdash \ccappstar{L}{M}{A}{T} \Leftarrow T_{\unk}}
+    \\[1ex]
+    {\vdash}\mathit{assign} ~
+    \inference{\Gamma; \Sigma; \ell'; \ell'' \vdash L \Leftarrow (\Refer{T_{\hat{\ell}}})_\ell \\
+               \Gamma; \Sigma; \ell'; \ell'' \vdash M \Leftarrow T_{\hat{\ell}} &
+               \highlightblue{\ell' \curlyvee \ell \preccurlyeq \hat{\ell}} }
+              {\Gamma; \Sigma; \ell'; \ell'' \vdash \ccassign{L}{M}{T}{\hat{\ell}}{\ell} \Leftarrow \Unit_{\low}}
+    \;
+    {\vdash}\mathit{assign?} ~
+    \inference{\Gamma; \Sigma; g; \ell \vdash L \Leftarrow (\Refer{T_{\hat{g}}})_{\unk} \\
+               \Gamma; \Sigma; g; \ell \vdash M \Leftarrow T_{\hat{g}}}
+              {\Gamma; \Sigma; g; \ell \vdash \ccassignproj{L}{M}{T}{\hat{g}}{p} \Leftarrow \Unit_{\low}}
+    \\[1ex]
+    {\vdash}\mathit{prot} ~
+    \inference{\Gamma; \Sigma; g'; | \PC | \vdash M \Leftarrow A &
+               \vdash \PC \Leftarrow g' &
+               \ell' \curlyvee \ell \preccurlyeq | \PC | &
+               B = \mathit{stamp} \; A \; \ell}
+              {\Gamma; \Sigma; g; \ell' \vdash \ccprot{\PC}{\ell}{M}{A} \Leftarrow B}
+  \end{gather*}}
+  \caption{Syntax and selected typing rules of the cast calculus \CC.
+    The side condition that enforces the heap policy statically during assignment is
+    \highlightblue{\text{highlighted}}}
+  \label{fig:cc-syntax-typing}
+\end{figure}
+
+As usual, the cast calculus \CC is a statically-typed language that
+includes an explicit term for casts, written \cccast{M}{\bm{c}}, where
+$M$ is a term and $\bm{c}$ is a coercion to be applied to the value of
+$M$. Furthermore, many of the operators in \CC have two variants, a
+``static'' one for when the pertinent security label is statically
+known and the ``dynamic'' one for when the security label is
+statically unknown. The operational semantics of the ``dynamic''
+variants involve runtime checking.  The syntax and typing rules
+for \CC are shown in Figure~\ref{fig:cc-syntax-typing} (excerpt
+of typing rules, full version in Figure~\ref{fig:cc-typing-full}
+in the Appendix) and described in the following paragraphs.
+
+A value is a raw value (constant, address or $\lambda$) or an
+irreducible coercion applied to a raw value.
+
+The typing rules are syntax-directed.  The typing judgment is of the
+form $\Gamma ; \Sigma ; g ; \ell \vdash M \Leftarrow A$, which says
+that we are type-checking \CC term $M$ against the expected type $A$,
+where $\Gamma$ is the typing context, $\Sigma$ is the heap typing
+context, $g$ is the security label that PC is typed at, and $\ell$ is
+the security level of PC.  Both $\Sigma$ and the security level $\ell$
+play a role during runtime.  The security level of the PC is constrained in
+rule ${\vdash}\textit{prot}$, which is for the protection term that
+arises during reduction (we are going to discuss this rule momentarily).
+In the premises for sub-terms that do not immediately
+reduce, such as the body of a $\lambda$ and the branches of an
+\texttt{if}, we universally quantify the security level (as in
+$\forall \ell$), which helps us prove that
+compilation preserves types (Theorem~\ref{thm:compile-pres}).  The heap
+context $\Sigma$ is mostly standard: looking up
+$\Sigma(\hat{\ell}, n)$, where $n$ is the index in part of the heap
+with security $\hat{\ell}$, gives us a raw type. Each memory cell is
+associated with a specific security label $\hat{\ell}$, which is
+specified by the programmer when that cell is
+created.
+
+As the typing rules always stay in checking mode, constants,
+addresses, and $\lambda$s do not carry any label. The security of
+these raw values is in their types: for example,
+$\ccaddr{n} \Leftarrow (\Refer{T_{\hat{\ell}}})_\ell$ says that the
+security of the address $n$ itself is $\ell$ and it points to a memory
+cell labeled $\hat{\ell}$.
+
+The typing rules for the static variants are similar to the typing
+rules in a static security type system.  For example, in the static
+function application rule ${\vdash}\textit{app}$, both top-level
+labels on the function type as well as the security label that the
+current PC is typed at are static and the rule mirrors one in a static
+system.  On the other hand, in the dynamic version of application rule
+${\vdash}\textit{app}\star$, both top-level labels as well as the label
+of the co-domain type are \unk and PC is allowed to be typed at \unk,
+indicating the presence of injections.
+As another example, in the static version of memory assignment rule
+${\vdash}\textit{assign}$, all labels to perform the heap policy
+check, including the security of the memory address itself ($\ell$),
+the security of the memory cell that the address references
+($\hat{\ell}$), and the security of PC ($\ell'$) are known statically
+and satisfy $\highlightblue{\ell' \curlyvee \ell \preccurlyeq \hat{\ell}}$.
+At runtime, this static assignment
+can happen directly without any runtime overhead (as is shown in the
+example of Section~\ref{sec:example2}). Its dynamic counterpart rule
+${\vdash}\textit{assign?}$ does not maintain these static security
+invariants and thus requires runtime NSU checking, which is
+implemented as a projection on PC.
+
+As we shall see in the reduction rules, the semantics of the
+protection term \texttt{prot} performs two things: (1) \texttt{prot} promotes
+the security of the value reduced from its body by level $\ell$
+(2) it uses a new PC to reduce its body.
+However, the new PC cannot be any label expression. It has to be one with
+higher security than both the current PC and the security level $\ell$.
+We capture this invariant in side condition $\ell' \curlyvee \ell \preccurlyeq |\PC|$
+in rule ${\vdash}\textit{prot}$, where $\ell'$ is the security of the current PC
+and $|\PC|$ is the security for the new PC.
+The invariant is used in the proof of noninterference.
+
+\subsection{Operational Semantics for \CC}
+\label{sec:cc-semantics}
+
+\begin{figure}[tbp]
+\raggedright
+  \fbox{\reduce{M}{\mu}{\PC}{N}{\mu'}}
+  {\footnotesize
+  \begin{gather*}
+  \textit{prot-ctx}
+  \inference
+  {\reduce{M}{\mu}{\PC'}{M'}{\mu'}}
+  {\reduce{\ccprot{\PC'}{\ell}{M}{A}}{\mu}{\PC}{\ccprot{\PC'}{\ell}{M'}{A}}{\mu'}}
+  \;
+  \textit{prot-val}
+  \inference{}{\reduce{\ccprot{\PC'}{\ell}{V}{A}}{\mu}{\PC}{\textit{stamp-val}\,V A\, \ell}{\mu}}
+  \\[1ex]
+  \textit{cast}~
+  \inference{\cccast{V}{\bm{c}} \longrightarrow M}{\reduce{\cccast{V}{\bm{c}}}{\mu}{\PC}{M}{\mu}}
+  \quad
+  \beta~
+  \inference{}{\reduce{\ccapp{(\cclam{x}{N})}{V}{A}{B}{\ell}}{\mu}{\PC}{\ccprot{(\mathit{stamp}\;\PC\;\ell)}{\ell}{(N [x := V])}{B}}{\mu}}
+  \\[1ex]
+  \textit{app-cast}~
+  \inference{\mathbf{NF}\;\bar{c} & \cccast{(\textit{stamp}\;\PC\;\ell)}{\bar{d}} \longrightarrow^{*} \PC' & \cccast{V}{\bm{c}} \longrightarrow^{*} W }
+  {\reduce{\ccapp{\left(\cccast{\cclam{x}{N}}{\coerc{\funco{\bar{d}}{\bm{c}}{\bm{d}}}{\bar{c}}}\right)}{V}{C}{D}{\ell}}{\mu}{\PC}{\ccprot{\PC'}{\ell}{(\cccast{(N [x := W])}{\bm{d}})}{D}}{\mu}}
+  \\[1ex]
+  \textit{app}{\star}\textit{-cast}~
+  \inference{\mathbf{NF}\;\bar{c} & \cccast{(\textit{stamp!}\;\PC\;|\bar{c}|)}{\bar{d}} \longrightarrow^{*} \PC' & \cccast{V}{\bm{c}} \longrightarrow^{*} W }
+  {\reduce{\ccappstar{\left(\cccast{\cclam{x}{N}}{\coerc{\funco{\bar{d}}{\bm{c}}{\bm{d}}}{\bar{c}}}\right)}{V}{C}{T}}{\mu}{\PC}{\ccprot{\PC'}{|\bar{c}|}{(\cccast{(N [x := W])}{\bm{d}})}{(T_{\unk})}}{\mu}}
+  \\[1ex]
+  \textit{if-true}~
+  \inference{}{\reduce{\ccif{\ccconst{\true}}{A}{\ell}{M}{N}}{\mu}{\PC}{\ccprot{(\mathit{stamp}\;\PC\;\ell)}{\ell}{M}{A}}{\mu}}
+  \\[1ex]
+  \textit{if}{\star}\textit{-true-cast}~
+  \inference{\mathbf{NF}\;\bar{c}}{\reduce{\ccifstar{\left(\cccast{\ccconst{\true}}{\coerc{\id{\Bool}}{\bar{c}}}\right)}{T}{M}{N}}{\mu}{\PC}{\ccprot{(\mathit{stamp!}\;\PC\;|\bar{c}|)}{|\bar{c}|}{M}{(T_{\unk})}}{\mu}}
+  \\[1ex]
+  \textit{ref}~
+  \inference{n \; \mathbf{FreshIn} \; \mu(\ell)}
+  {\reduce{\ccref{\ell}{V}}{\mu}{\PC}{\ccaddr{n}}{(\mu , \ell \mapsto n \mapsto V)}}
+  \quad
+  \textit{ref?}~
+  \inference{n \; \mathbf{FreshIn} \; \mu(\ell) & \highlightred{\cccast{\PC}{\unk \Rightarrow^{\bl{p}} \ell} \longrightarrow^{*} \PC'} }
+  {\reduce{\ccrefproj{\ell}{V}{p}}{\mu}{\PC}{\ccaddr{n}}{(\mu , \ell \mapsto n \mapsto V)}}
+  \\[1ex]
+  \textit{ref?-blame}
+  \inference{\cccast{\PC}{\unk \Rightarrow^{\bl{p}} \ell} \longrightarrow^{*} \blame{q}}
+  {\reduce{\ccrefproj{\ell}{V}{p}}{\mu}{\PC}{\blame{q}}{\mu}}
+  \;
+  \textit{assign}
+  \inference{}{\reduce{\ccassign{(\ccaddr{n})}{V}{T}{\hat{\ell}}{\ell}}{\mu}{\PC}{\ccconst{\unit}}{[\hat{\ell} {\mapsto} n {\mapsto} V] \, \mu}}
+  \\[1ex]
+  \textit{assign?-cast}~
+  \inference{\mathbf{NF}\;\bar{c} & \vdash \bm{c} : T_g \Rightarrow S_{\hat{\ell}} & \vdash \bm{d} : S_{\hat{\ell}} \Rightarrow T_g & \highlightred{\cccast{(\mathit{stamp!}\;\PC\;|\bar{c}|)}{\unk \Rightarrow^{\bl{p}} \hat{\ell}} \longrightarrow^{*} \PC'} & \cccast{V}{\bm{c}} \longrightarrow^{*} W}
+  {\reduce{\ccassignproj{\left(\cccast{\ccaddr{n}}{\coerc{\refco{\bm{c}}{\bm{d}}}{\bar{c}}}\right)}{V}{T}{g}{p}}{\mu}{\PC}{\ccconst{\unit}}{[\hat{\ell} \mapsto n \mapsto W] \; \mu}}
+  \\[1ex]
+  \textit{deref}~
+  \inference{\mu(\hat{\ell}, n) = V}
+  {\reduce{\ccderef{(\ccaddr{n})}{T_{\hat{\ell}}}{\ell}}{\mu}{\PC}{\ccprot{\_}{\ell}{V}{T_{\hat{\ell}}}}{\mu}}
+  \\[1ex]
+  \textit{deref}{\star}\textit{-cast}~
+  \inference{\mathbf{NF}\;\bar{c} & \vdash \bm{c} : S_{\unk} \Rightarrow T_\ell & \vdash \bm{d} : T_\ell \Rightarrow S_{\unk} & \mu(\ell, n) = V}
+  {\reduce{\ccderefstar{\left(\cccast{\ccaddr{n}}{\coerc{\refco{\bm{c}}{\bm{d}}}{\bar{c}}}\right)}{S}}{\mu}{\PC}{\ccprot{\_}{|\bar{c}|}{(\cccast{V}{\bm{d}})}{(S_{\unk})}}{\mu}}
+  \end{gather*}}
+  \caption{Selected semantics rules for \CC. NSU checks are represented using label expressions (\highlightred{\text{highlighted}})}
+  \label{fig:reduction}
+\end{figure}
+
+We show the interesting rules of the operational semantics of \CC in
+Figure~\ref{fig:reduction} (full version in Figure~\ref{fig:reduction-full-1}
+and~\ref{fig:reduction-full-2} of the Appendix).
+The reduction relation takes the form $\reduce{M}{\mu}{\PC}{N}{\mu'}$,
+which reduces the configuration of term $M$ and heap $\mu$ under the
+label expression \PC to another configuration $N$ and $\mu'$. The heap is
+a map $(\ell, n) \mapsto V$, where a cell is indexed by its security
+level $\ell$ and by index $n$ among the cells of $\ell$.
+The predicate $(n\;\mathbf{FreshIn}\;\mu(\ell))$ means that the index $n$ is fresh
+(not already in use) among all cells with security $\ell$; when
+performing a lookup, $\mu(\ell, n) = V$ retrieves the value $V$ at
+index $n$ whose security level is $\ell$.
+
+\textbf{\textit{Protection terms. }}
+Following standard approaches to IFC, a protection
+term \ccprot{\PC'}{\ell}{M}{A} has two functionalities: (1) it ensures
+that the reduction inside $M$ does not leak information through heap
+write operations (2) it promotes the security level of the computation
+result of $M$ to at least level $\ell$. The first functionality is
+achieved by switching to \PC' from the current $\PC$ when reducing the
+body $M$ (rule \textit{prot-ctx}). Recall Section~\ref{sec:cc-typing},
+the typing of \texttt{prot} makes sure that \PC' has the correct
+security that is at least as secure as both $\PC$ and $\ell$.
+The second functionality is achieved by stamping the value produced by
+the body of \texttt{prot} (rule \textit{prot-val}).  The stamping of
+values in \CC (Figure~\ref{fig:stamp-val} in the Appendix) is analogous to
+stamping of label expressions and turns to the stamping operation for
+coercions on labels (Figure~\ref{fig:comp-stampc}) in a similar
+way. Again there are two cases, because the value is either (1) a raw value or
+(2) a coercion-wrapped value. Suppose the value is a raw value, if its type has \low security
+and is stamped with \high, the value becomes wrapped with a subtype coercion;
+otherwise the value stays unchanged. Otherwise, if the value is wrapped
+with an irreducible coercion, we stamp the top-level coercion sequence.
+
+\textbf{\textit{Function Application. }} The $\beta$ rule is standard for IFC languages.
+It generates a \texttt{prot} term with the specific security label $\ell$ that
+comes from the label on the $\lambda$, preventing implicit
+flow from the function being applied through both the computation
+result and the heap. The \textit{app-cast} rule applies a function
+wrapped in a function coercion to a value $V$. The application is
+``static'', so the security level of \texttt{prot} comes from the
+function type just like $\beta$. The function coercion is distributed
+into its domain coercion $\bm{c}$, its co-domain coercion $\bm{d}$,
+and the coercion on PC $\bar{d}$. The coercion $\bar{c}$ is not used
+because the function type is fully static, so its security is already
+indicated by its type.  The domain coercion $\bm{c}$ casts the input
+of the function $V$ to $W$ and $W$ is substituted into the body of the
+$\lambda$. The substituted body goes through the co-domain cast
+$\bm{d}$, and is then protected by $\ell$ using \texttt{prot}.  The
+stamped PC casts to $\PC'$ by $\bar{d}$ and $\PC'$ is used as the PC
+for \texttt{prot}.  The rule $\textit{app}{\star}\textit{-cast}$ is similar
+to \textit{app-cast} except for two things: (1) the PC is stamped
+and then injected using \textit{stamp!} to preserve types
+(2) the security level of the function proxy used in protection is indicated
+by $|\bar{c}|$ instead, because the top-level security label of the
+function is statically unknown (\unk).
+
+\textbf{\textit{If-conditional. }} The static rule \textit{if-true} is standard;
+the \texttt{if} term reduces a \texttt{prot} whose security $\ell$
+comes from the type of the branch condition, guarding against implicit
+flow. The rationale of $\textit{if}{\star}\textit{-true-cast}$ follows that
+of $\textit{app}{\star}\textit{-cast}$: (1) a \textit{stamp!} is generated to
+stamp and then inject the PC and (2) the security of \texttt{prot} is retrieved
+from the coercion in the branch condition.
+
+\textbf{\textit{NSU and heap operations. }}
+Let us consider reference creation first.
+A ``static'' reference creation is secure because its typing (rule
+${\vdash}\textit{-ref}$, Figure~\ref{fig:cc-typing-full} of the Appendix)
+already enforces the heap policy. Consequently, the allocation can happen directly
+(rule \textit{ref}) without any runtime checking. Rule \textit{ref?}
+does the same reference creation but with NSU checking, by casting the
+current PC to the security $\ell$ of the newly created memory
+cell.
+The coerce function (${-}\Rightarrow^{-}{-}$) takes two
+security labels and a blame label to generate a coercion on labels.
+In this case, $\unk \Rightarrow^{\bl{p}} \ell$ generates
+$\id{\unk}\seq\proj{\ell}{p}$, which performs a projection whose
+target is $\ell$. If the projected PC reduces to a blame, it means
+that NSU checking fails so we lift the blame to \CC. Assignment
+follows the same pattern: a static assignment can happen directly,
+while \texttt{assign?} requires NSU checking, by stamping the current
+PC with the security indicated in the coercion and then projecting to
+$\hat{\ell}$, where $\hat{\ell}$ is the security of the heap cell.
+The input coercion $\bm{c}$ is applied before the value is stored into
+the cell.
+
+The rule for static dereferencing \textit{deref} looks up index $n$ in
+all memory cells with security level $\hat{\ell}$. The value from the
+lookup is protected with $\ell$, the top-level security label of the
+reference type. The PC of the \texttt{prot} does not matter, because
+$V$ is already a value and will not reduce.
+The rule $\textit{deref}{\star}\textit{-cast}$ dereferences a reference proxy.
+It looks up the value $V$ in the heap, applies the output coercion $\bm{d}$,
+and generates a \texttt{prot} with the security of the coercion $|\bar{c}|$.
+The PC of \texttt{prot} does not matter in this case either, because
+applying a coercion is pure and does not produce side effects.
+
 \section{Compiling from \Surface to \CC}
 \label{sec:compile}
+
+\todo[inline]{Put compilation into another chapter}
