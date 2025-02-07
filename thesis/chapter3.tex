@@ -719,17 +719,28 @@ The invariant is used in the proof of noninterference.
   \fbox{\reduce{M}{\mu}{\PC}{N}{\mu'}}
   {\footnotesize
   \begin{gather*}
-  \textit{prot-ctx}
+  \xi~
+  \inference
+  {\reduce{M}{\mu}{\PC}{M'}{\mu'}}
+  {\reduce{\mathit{plug}\;M\;F}{\mu}{\PC}{\mathit{plug}\;M'\;F}{\mu'}}
+  \quad
+  \xi\textit{-blame}~
+  \inference{}{\reduce{\mathit{plug}\;(\blame{p})\;F}{\mu}{\PC}{\blame{p}}{\mu}}
+  \\[1ex]
+  \textit{prot-ctx}~
   \inference
   {\reduce{M}{\mu}{\PC'}{M'}{\mu'}}
   {\reduce{\ccprot{\PC'}{\ell}{M}{A}}{\mu}{\PC}{\ccprot{\PC'}{\ell}{M'}{A}}{\mu'}}
-  \;
-  \textit{prot-val}
-  \inference{}{\reduce{\ccprot{\PC'}{\ell}{V}{A}}{\mu}{\PC}{\textit{stamp-val}\,V A\, \ell}{\mu}}
   \\[1ex]
+  \textit{prot-val}~
+  \inference{}{\reduce{\ccprot{\PC'}{\ell}{V}{A}}{\mu}{\PC}{\textit{stamp-val}\;V\;A\;\ell}{\mu}}
+  \\[1ex]
+  \textit{prot-blame}~
+  \inference{}{\reduce{\ccprot{\PC'}{\ell}{(\blame{p})}{A}}{\mu}{\PC}{\blame{p}}{\mu}}
+  \quad
   \textit{cast}~
   \inference{\cccast{V}{\bm{c}} \longrightarrow M}{\reduce{\cccast{V}{\bm{c}}}{\mu}{\PC}{M}{\mu}}
-  \quad
+  \\[1ex]
   \beta~
   \inference{}{\reduce{\ccapp{(\cclam{x}{N})}{V}{A}{B}{\ell}}{\mu}{\PC}{\ccprot{(\mathit{stamp}\;\PC\;\ell)}{\ell}{(N [x := V])}{B}}{\mu}}
   \\[1ex]
@@ -737,59 +748,119 @@ The invariant is used in the proof of noninterference.
   \inference{\mathbf{NF}\;\bar{c} & \cccast{(\textit{stamp}\;\PC\;\ell)}{\bar{d}} \longrightarrow^{*} \PC' & \cccast{V}{\bm{c}} \longrightarrow^{*} W }
   {\reduce{\ccapp{\left(\cccast{\cclam{x}{N}}{\coerc{\funco{\bar{d}}{\bm{c}}{\bm{d}}}{\bar{c}}}\right)}{V}{C}{D}{\ell}}{\mu}{\PC}{\ccprot{\PC'}{\ell}{(\cccast{(N [x := W])}{\bm{d}})}{D}}{\mu}}
   \\[1ex]
+  \textit{app-blame-pc}~
+  \inference{\mathbf{NF}\;\bar{c} & \cccast{(\textit{stamp}\;\PC\;\ell)}{\bar{d}} \longrightarrow^{*} \blame{p}}
+  {\reduce{\ccapp{\left(\cccast{\cclam{x}{N}}{\coerc{\funco{\bar{d}}{\bm{c}}{\bm{d}}}{\bar{c}}}\right)}{V}{C}{D}{\ell}}{\mu}{\PC}{\blame{p}}{\mu}}
+  \\[1ex]
+  \textit{app-blame}~
+  \inference{\mathbf{NF}\;\bar{c} & \cccast{(\textit{stamp}\;\PC\;\ell)}{\bar{d}} \longrightarrow^{*} \PC' & \cccast{V}{\bm{c}} \longrightarrow^{*} \blame{p} }
+  {\reduce{\ccapp{\left(\cccast{\cclam{x}{N}}{\coerc{\funco{\bar{d}}{\bm{c}}{\bm{d}}}{\bar{c}}}\right)}{V}{C}{D}{\ell}}{\mu}{\PC}{\blame{p}}{\mu}}
+  \\[1ex]
   \textit{app}{\star}\textit{-cast}~
   \inference{\mathbf{NF}\;\bar{c} & \cccast{(\textit{stamp!}\;\PC\;|\bar{c}|)}{\bar{d}} \longrightarrow^{*} \PC' & \cccast{V}{\bm{c}} \longrightarrow^{*} W }
   {\reduce{\ccappstar{\left(\cccast{\cclam{x}{N}}{\coerc{\funco{\bar{d}}{\bm{c}}{\bm{d}}}{\bar{c}}}\right)}{V}{C}{T}}{\mu}{\PC}{\ccprot{\PC'}{|\bar{c}|}{(\cccast{(N [x := W])}{\bm{d}})}{(T_{\unk})}}{\mu}}
   \\[1ex]
+  \textit{app}{\star}\textit{-blame-pc}~
+  \inference{\mathbf{NF}\;\bar{c} & \cccast{(\textit{stamp!}\;\PC\;|\bar{c}|)}{\bar{d}} \longrightarrow^{*} \blame{p}}
+  {\reduce{\ccappstar{\left(\cccast{\cclam{x}{N}}{\coerc{\funco{\bar{d}}{\bm{c}}{\bm{d}}}{\bar{c}}}\right)}{V}{C}{T}}{\mu}{\PC}{\blame{p}}{\mu}}
+  \\[1ex]
+  \textit{app}{\star}\textit{-blame}~
+  \inference{\mathbf{NF}\;\bar{c} & \cccast{(\textit{stamp!}\;\PC\;|\bar{c}|)}{\bar{d}} \longrightarrow^{*} \PC' & \cccast{V}{\bm{c}} \longrightarrow^{*} \blame{p}}
+  {\reduce{\ccappstar{\left(\cccast{\cclam{x}{N}}{\coerc{\funco{\bar{d}}{\bm{c}}{\bm{d}}}{\bar{c}}}\right)}{V}{C}{T}}{\mu}{\PC}{\blame{p}}{\mu}}
+  \\[1ex]
   \textit{if-true}~
-  \inference{}{\reduce{\ccif{\ccconst{\true}}{A}{\ell}{M}{N}}{\mu}{\PC}{\ccprot{(\mathit{stamp}\;\PC\;\ell)}{\ell}{M}{A}}{\mu}}
+  \inference{}{\reduce{\ccif{(\ccconst{\true})}{A}{\ell}{M}{N}}{\mu}{\PC}{\ccprot{(\mathit{stamp}\;\PC\;\ell)}{\ell}{M}{A}}{\mu}}
+  \\[1ex]
+  \textit{if-true-cast}~
+  \inference{}{\reduce{\ccif{\left(\cccast{\ccconst{\true}}{\coerc{\id{\Bool}}{\id{\low}\seq\up}}\right)}{A}{\high}{M}{N}}{\mu}{\PC}{\ccprot{(\mathit{stamp}\;\PC\;\high)}{\high}{M}{A}}{\mu}}
   \\[1ex]
   \textit{if}{\star}\textit{-true-cast}~
   \inference{\mathbf{NF}\;\bar{c}}{\reduce{\ccifstar{\left(\cccast{\ccconst{\true}}{\coerc{\id{\Bool}}{\bar{c}}}\right)}{T}{M}{N}}{\mu}{\PC}{\ccprot{(\mathit{stamp!}\;\PC\;|\bar{c}|)}{|\bar{c}|}{M}{(T_{\unk})}}{\mu}}
   \\[1ex]
+  \textit{if-false}~
+  \inference{}{\reduce{\ccif{(\ccconst{\false})}{A}{\ell}{M}{N}}{\mu}{\PC}{\ccprot{(\mathit{stamp}\;\PC\;\ell)}{\ell}{N}{A}}{\mu}}
+  \\[1ex]
+  \textit{if-false-cast}~
+  \inference{}{\reduce{\ccif{\left(\cccast{\ccconst{\false}}{\coerc{\id{\Bool}}{\id{\low}\seq\up}}\right)}{A}{\high}{M}{N}}{\mu}{\PC}{\ccprot{(\mathit{stamp}\;\PC\;\high)}{\high}{N}{A}}{\mu}}
+  \\[1ex]
+  \textit{if}{\star}\textit{-false-cast}~
+  \inference{\mathbf{NF}\;\bar{c}}{\reduce{\ccifstar{\left(\cccast{\ccconst{\false}}{\coerc{\id{\Bool}}{\bar{c}}}\right)}{T}{M}{N}}{\mu}{\PC}{\ccprot{(\mathit{stamp!}\;\PC\;|\bar{c}|)}{|\bar{c}|}{N}{(T_{\unk})}}{\mu}}
+  \\[1ex]
+  \textit{let}~
+  \inference{}{\reduce{\cclet{x}{V}{A}{N}}{\mu}{\PC}{N[x:=V]}{\mu}}
+  \end{gather*}}
+  \caption{Operational semantics of \CC (Part I).}
+  \label{fig:reduction-full-1}
+\end{figure}
+
+
+\begin{figure}[tbp]
+\raggedright
+  \fbox{\reduce{M}{\mu}{\PC}{N}{\mu'}}
+  {\small
+  \begin{gather*}
   \textit{ref}~
   \inference{n \; \mathbf{FreshIn} \; \mu(\ell)}
   {\reduce{\ccref{\ell}{V}}{\mu}{\PC}{\ccaddr{n}}{(\mu , \ell \mapsto n \mapsto V)}}
-  \quad
+  \\[1ex]
   \textit{ref?}~
   \inference{n \; \mathbf{FreshIn} \; \mu(\ell) & \highlightred{\cccast{\PC}{\unk \Rightarrow^{\bl{p}} \ell} \longrightarrow^{*} \PC'} }
   {\reduce{\ccrefproj{\ell}{V}{p}}{\mu}{\PC}{\ccaddr{n}}{(\mu , \ell \mapsto n \mapsto V)}}
   \\[1ex]
-  \textit{ref?-blame}
+  \textit{ref?-blame}~
   \inference{\cccast{\PC}{\unk \Rightarrow^{\bl{p}} \ell} \longrightarrow^{*} \blame{q}}
   {\reduce{\ccrefproj{\ell}{V}{p}}{\mu}{\PC}{\blame{q}}{\mu}}
-  \;
-  \textit{assign}
-  \inference{}{\reduce{\ccassign{(\ccaddr{n})}{V}{T}{\hat{\ell}}{\ell}}{\mu}{\PC}{\ccconst{\unit}}{[\hat{\ell} {\mapsto} n {\mapsto} V] \, \mu}}
+  \\[1ex]
+  \textit{assign}~
+  \inference{}{\reduce{\ccassign{(\ccaddr{n})}{V}{T}{\hat{\ell}}{\ell}}{\mu}{\PC}{\ccconst{\unit}}{[\hat{\ell} \mapsto n \mapsto V] \; \mu}}
+  \\[1ex]
+  \textit{assign-cast}~
+  \inference{\mathbf{NF}\;\bar{c} & \vdash \bm{c} : T_{\hat{\ell}_2} \Rightarrow S_{\hat{\ell}_1} & \vdash \bm{d} : S_{\hat{\ell}_1} \Rightarrow T_{\hat{\ell}_2} & \cccast{V}{\bm{c}} \longrightarrow^{*} W}
+  {\reduce{\ccassign{\left(\cccast{\ccaddr{n}}{\coerc{\refco{\bm{c}}{\bm{d}}}{\bar{c}}}\right)}{V}{T}{\hat{\ell}_2}{\ell}}{\mu}{\PC}{\ccconst{\unit}}{[\hat{\ell}_1 \mapsto n \mapsto W] \; \mu}}
+  \\[1ex]
+  \textit{assign-blame}~
+  \inference{\mathbf{NF}\;\bar{c} & \vdash \bm{c} : T_{\hat{\ell}_2} \Rightarrow S_{\hat{\ell}_1} & \vdash \bm{d} : S_{\hat{\ell}_1} \Rightarrow T_{\hat{\ell}_2} & \cccast{V}{\bm{c}} \longrightarrow^{*} \blame{p}}
+  {\reduce{\ccassign{\left(\cccast{\ccaddr{n}}{\coerc{\refco{\bm{c}}{\bm{d}}}{\bar{c}}}\right)}{V}{T}{\hat{\ell}_2}{\ell}}{\mu}{\PC}{\blame{p}}{\mu}}
   \\[1ex]
   \textit{assign?-cast}~
-  \inference{\mathbf{NF}\;\bar{c} & \vdash \bm{c} : T_g \Rightarrow S_{\hat{\ell}} & \vdash \bm{d} : S_{\hat{\ell}} \Rightarrow T_g & \highlightred{\cccast{(\mathit{stamp!}\;\PC\;|\bar{c}|)}{\unk \Rightarrow^{\bl{p}} \hat{\ell}} \longrightarrow^{*} \PC'} & \cccast{V}{\bm{c}} \longrightarrow^{*} W}
+  \inference{\mathbf{NF}\;\bar{c} & \vdash \bm{c} : T_g \Rightarrow S_{\hat{\ell}} & \vdash \bm{d} : S_{\hat{\ell}} \Rightarrow T_g \\ \highlightred{\cccast{(\mathit{stamp!}\;\PC\;|\bar{c}|)}{\unk \Rightarrow^{\bl{p}} \hat{\ell}} \longrightarrow^{*} \PC'} & \cccast{V}{\bm{c}} \longrightarrow^{*} W}
   {\reduce{\ccassignproj{\left(\cccast{\ccaddr{n}}{\coerc{\refco{\bm{c}}{\bm{d}}}{\bar{c}}}\right)}{V}{T}{g}{p}}{\mu}{\PC}{\ccconst{\unit}}{[\hat{\ell} \mapsto n \mapsto W] \; \mu}}
+  \\[1ex]
+  \textit{assign?-cast-blame-pc}~
+  \inference{\mathbf{NF}\;\bar{c} & \vdash \bm{c} : T_g \Rightarrow S_{\hat{\ell}} & \vdash \bm{d} : S_{\hat{\ell}} \Rightarrow T_g \\ \cccast{(\mathit{stamp!}\;\PC\;|\bar{c}|)}{\unk \Rightarrow^{\bl{p}} \hat{\ell}} \longrightarrow^{*} \blame{q}}
+  {\reduce{\ccassignproj{\left(\cccast{\ccaddr{n}}{\coerc{\refco{\bm{c}}{\bm{d}}}{\bar{c}}}\right)}{V}{T}{g}{p}}{\mu}{\PC}{\blame{q}}{\mu}}
+  \\[1ex]
+  \textit{assign?-cast-blame}~
+  \inference{\mathbf{NF}\;\bar{c} & \vdash \bm{c} : T_g \Rightarrow S_{\hat{\ell}} & \vdash \bm{d} : S_{\hat{\ell}} \Rightarrow T_g \\ \cccast{(\mathit{stamp!}\;\PC\;|\bar{c}|)}{\unk \Rightarrow^{\bl{p}} \hat{\ell}} \longrightarrow^{*} \PC' & \cccast{V}{\bm{c}} \longrightarrow^{*} \blame{q}}
+  {\reduce{\ccassignproj{\left(\cccast{\ccaddr{n}}{\coerc{\refco{\bm{c}}{\bm{d}}}{\bar{c}}}\right)}{V}{T}{g}{p}}{\mu}{\PC}{\blame{q}}{\mu}}
   \\[1ex]
   \textit{deref}~
   \inference{\mu(\hat{\ell}, n) = V}
   {\reduce{\ccderef{(\ccaddr{n})}{T_{\hat{\ell}}}{\ell}}{\mu}{\PC}{\ccprot{\_}{\ell}{V}{T_{\hat{\ell}}}}{\mu}}
   \\[1ex]
+  \textit{deref-cast}~
+  \inference{\mathbf{NF}\;\bar{c} & \vdash \bm{c} : A \Rightarrow T_{\hat{\ell}} & \vdash \bm{d} : T_{\hat{\ell}} \Rightarrow A & \mu(\hat{\ell}, n) = V}
+  {\reduce{\ccderef{\left(\cccast{\ccaddr{n}}{\coerc{\refco{\bm{c}}{\bm{d}}}{\bar{c}}}\right)}{A}{\ell}}{\mu}{\PC}{\ccprot{\_}{\ell}{(\cccast{V}{\bm{d}})}{A}}{\mu}}
+  \\[1ex]
   \textit{deref}{\star}\textit{-cast}~
-  \inference{\mathbf{NF}\;\bar{c} & \vdash \bm{c} : S_{\unk} \Rightarrow T_\ell & \vdash \bm{d} : T_\ell \Rightarrow S_{\unk} & \mu(\ell, n) = V}
+  \inference{\mathbf{NF}\;\bar{c} & \vdash \bm{c} : S_{\unk} \Rightarrow T_{\hat{\ell}} & \vdash \bm{d} : T_{\hat{\ell}} \Rightarrow S_{\unk} & \mu(\hat{\ell}, n) = V}
   {\reduce{\ccderefstar{\left(\cccast{\ccaddr{n}}{\coerc{\refco{\bm{c}}{\bm{d}}}{\bar{c}}}\right)}{S}}{\mu}{\PC}{\ccprot{\_}{|\bar{c}|}{(\cccast{V}{\bm{d}})}{(S_{\unk})}}{\mu}}
   \end{gather*}}
-  \caption{Selected semantics rules for \CC. NSU checks are represented using label expressions (\highlightred{\text{highlighted}})}
-  \label{fig:reduction}
+  \caption{Operational semantics of \CC (Part II).
+  NSU checks are represented using label expressions (\highlightred{\text{highlighted}})}
+  \label{fig:reduction-full-2}
 \end{figure}
 
-We show the interesting rules of the operational semantics of \CC in
-Figure~\ref{fig:reduction} (full version in Figure~\ref{fig:reduction-full-1}
-and~\ref{fig:reduction-full-2} of the Appendix).
-The reduction relation takes the form $\reduce{M}{\mu}{\PC}{N}{\mu'}$,
-which reduces the configuration of term $M$ and heap $\mu$ under the
-label expression \PC to another configuration $N$ and $\mu'$. The heap is
-a map $(\ell, n) \mapsto V$, where a cell is indexed by its security
-level $\ell$ and by index $n$ among the cells of $\ell$.
-The predicate $(n\;\mathbf{FreshIn}\;\mu(\ell))$ means that the index $n$ is fresh
-(not already in use) among all cells with security $\ell$; when
-performing a lookup, $\mu(\ell, n) = V$ retrieves the value $V$ at
-index $n$ whose security level is $\ell$.
+We show the the operational semantics of \CC in
+Figure~\ref{fig:reduction-full-1} and~\ref{fig:reduction-full-2}. The reduction
+relation takes the form $\reduce{M}{\mu}{\PC}{N}{\mu'}$, which reduces the
+configuration of term $M$ and heap $\mu$ under the label expression \PC to
+another configuration $N$ and $\mu'$. The heap is a map $(\ell, n) \mapsto V$,
+where a cell is indexed by its security level $\ell$ and by index $n$ among the
+cells of $\ell$. The predicate $(n\;\mathbf{FreshIn}\;\mu(\ell))$ means that the
+index $n$ is fresh (not already in use) among all cells with security $\ell$;
+when performing a lookup, $\mu(\ell, n) = V$ retrieves the value $V$ at index
+$n$ whose security level is $\ell$.
 
 \textbf{\textit{Protection terms. }}
 Following standard approaches to IFC, a protection
