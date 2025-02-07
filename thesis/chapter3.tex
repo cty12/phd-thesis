@@ -772,8 +772,12 @@ The invariant is used in the proof of noninterference.
   \inference{}{\reduce{\ccif{(\ccconst{\true})}{A}{\ell}{M}{N}}{\mu}{\PC}{\ccprot{(\mathit{stamp}\;\PC\;\ell)}{\ell}{M}{A}}{\mu}}
   \\[1ex]
   \textit{if-true-cast}~
-  \inference{}{\reduce{\ccif{\left(\cccast{\ccconst{\true}}{\coerc{\id{\Bool}}{\id{\low}\seq\up}}\right)}{A}{\high}{M}{N}}{\mu}{\PC}{\ccprot{(\mathit{stamp}\;\PC\;\high)}{\high}{M}{A}}{\mu}}
-  \\[1ex]
+  \inference{}{
+    \begin{split}
+      \ccif{\left(\cccast{\ccconst{\true}}{\coerc{\id{\Bool}}{\id{\low}\seq\up}}\right)}{A}{\high}{M}{N} &\mid \mu \mid \PC \longrightarrow \\
+           {\ccprot{(\mathit{stamp}\;\PC\;\high)}{\high}{M}{A}} &\mid \mu
+    \end{split}}
+  \\[1.5ex]
   \textit{if}{\star}\textit{-true-cast}~
   \inference{\mathbf{NF}\;\bar{c}}{\reduce{\ccifstar{\left(\cccast{\ccconst{\true}}{\coerc{\id{\Bool}}{\bar{c}}}\right)}{T}{M}{N}}{\mu}{\PC}{\ccprot{(\mathit{stamp!}\;\PC\;|\bar{c}|)}{|\bar{c}|}{M}{(T_{\unk})}}{\mu}}
   \\[1ex]
@@ -781,8 +785,12 @@ The invariant is used in the proof of noninterference.
   \inference{}{\reduce{\ccif{(\ccconst{\false})}{A}{\ell}{M}{N}}{\mu}{\PC}{\ccprot{(\mathit{stamp}\;\PC\;\ell)}{\ell}{N}{A}}{\mu}}
   \\[1ex]
   \textit{if-false-cast}~
-  \inference{}{\reduce{\ccif{\left(\cccast{\ccconst{\false}}{\coerc{\id{\Bool}}{\id{\low}\seq\up}}\right)}{A}{\high}{M}{N}}{\mu}{\PC}{\ccprot{(\mathit{stamp}\;\PC\;\high)}{\high}{N}{A}}{\mu}}
-  \\[1ex]
+  \inference{}{
+    \begin{split}
+      \ccif{\left(\cccast{\ccconst{\false}}{\coerc{\id{\Bool}}{\id{\low}\seq\up}}\right)}{A}{\high}{M}{N} &\mid \mu \mid \PC \longrightarrow \\
+      \ccprot{(\mathit{stamp}\;\PC\;\high)}{\high}{N}{A} &\mid \mu
+    \end{split}}
+  \\[1.5ex]
   \textit{if}{\star}\textit{-false-cast}~
   \inference{\mathbf{NF}\;\bar{c}}{\reduce{\ccifstar{\left(\cccast{\ccconst{\false}}{\coerc{\id{\Bool}}{\bar{c}}}\right)}{T}{M}{N}}{\mu}{\PC}{\ccprot{(\mathit{stamp!}\;\PC\;|\bar{c}|)}{|\bar{c}|}{N}{(T_{\unk})}}{\mu}}
   \\[1ex]
