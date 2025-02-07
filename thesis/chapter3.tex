@@ -504,9 +504,8 @@ the reference, which we explain in the next section.
 \section{The Cast Calculus \CC: An Intermediate Language For Gradual IFC}
 \label{sec:cc}
 
-\todo[inline]{Define a down arrow and an up arrow (diverge)} In this section, we
-define the cast calculus \CC by presenting its syntax and type system in
-Section~\ref{sec:cc-typing} and its operational semantics in
+In this section, we define the cast calculus \CC by presenting its syntax and
+type system in Section~\ref{sec:cc-typing} and its operational semantics in
 Section~\ref{sec:cc-semantics}.
 
 \subsection{Syntax and Typing of \CC}
@@ -529,60 +528,126 @@ Section~\ref{sec:cc-semantics}.
     \text{values}     & V, W     & ::=  & V_r \MID \cccast{V_r}{\bm{c}} \text{, where } \mathbf{Irreducible}\;\bm{c}
   \end{array}
   \]}
+  \caption{Syntax of the cast calculus \CC}
+  \label{fig:cc-syntax}
+\end{figure}
+
+As usual, the cast calculus \CC is a statically-typed language that includes an
+explicit term for casts, written \cccast{M}{\bm{c}}, where $M$ is a term and
+$\bm{c}$ is a coercion to be applied to the value of $M$. Furthermore, many of
+the operators in \CC have two variants, a ``static'' one for when the pertinent
+security label is statically known and the ``dynamic'' one for when the security
+label is statically unknown. The operational semantics of the ``dynamic''
+variants involve runtime checking. The syntax and typing rules for \CC are shown
+in Figure~\ref{fig:cc-typing-full} and described in the following paragraphs.
+
+A value is a raw value (constant, address or $\lambda$) or an
+irreducible coercion applied to a raw value.
+
+\begin{figure}[tbp]
+\raggedright
   \fbox{$\Gamma ; \Sigma ; g ; \ell \vdash M \Leftarrow A$}
   {\small
   \begin{gather*}
+    {\vdash}\mathit{var} ~
+    \inference{\Gamma \ni x : A}
+              {\Gamma; \Sigma; g; \ell \vdash x \Leftarrow A}
+    \qquad
+    {\vdash}\mathit{const} ~
+    \inference{k : \iota}
+              {\Gamma; \Sigma; g; \ell \vdash \ccconst{k} \Leftarrow \iota_\ell}
+    \\[1ex]
+    {\vdash}\mathit{addr} ~
+    \inference{\Sigma(\hat{\ell}, n) = T}
+              {\Gamma; \Sigma; g; \ell' \vdash \ccaddr{n} \Leftarrow (\Refer{T_{\hat{\ell}}})_\ell}
+    \\[1ex]
+    {\vdash}\mathit{lam} ~
+    \inference{\forall \ell'' . (\Gamma , x{:}A); \Sigma; g; \ell'' \vdash N \Leftarrow B}
+              {\Gamma; \Sigma; g'; \ell' \vdash \cclam{x}{N} \Leftarrow (\Fun{A}{g}{B})_\ell}
+    \quad
+    {\vdash}\mathit{let} ~
+    \inference{\Gamma; \Sigma; g; \ell \vdash M \Leftarrow A \\
+               \forall \ell' . (\Gamma, x{:}A); \Sigma; g; \ell' \vdash N \Leftarrow B}
+              {\Gamma; \Sigma; g; \ell \vdash \cclet{x}{M}{A}{N} \Leftarrow B}
+    \\[1ex]
     {\vdash}\mathit{app} ~
     \inference{\Gamma; \Sigma; \ell'; \ell'' \vdash L \Leftarrow (\Fun{A}{\ell' \curlyvee \ell}{B})_{\ell} \\
-               \Gamma; \Sigma; \ell'; \ell'' \vdash M \Leftarrow A &
+               \Gamma; \Sigma; \ell'; \ell'' \vdash M \Leftarrow A \\
                C = \mathit{stamp} \; B \; \ell}
               {\Gamma; \Sigma; \ell'; \ell'' \vdash \ccapp{L}{M}{A}{B}{\ell} \Leftarrow C}
     \quad
     {\vdash}\mathit{app}{\star}~
     \inference{\Gamma; \Sigma; g; \ell \vdash L \Leftarrow (\Fun{A}{\unk}{(T_{\unk})})_{\unk} \\
-               \Gamma; \Sigma; g; \ell \vdash M \Leftarrow A &
+               \Gamma; \Sigma; g; \ell \vdash M \Leftarrow A \\
                %C = \mathit{stamp} \; B \; \unk
                }
               {\Gamma; \Sigma; g; \ell \vdash \ccappstar{L}{M}{A}{T} \Leftarrow T_{\unk}}
     \\[1ex]
+    {\vdash}\mathit{if} ~
+    \inference{\Gamma; \Sigma; \ell'; \ell'' \vdash L \Leftarrow \Bool_{\ell} \\
+               \forall \ell_1 . \Gamma; \Sigma; \ell' \curlyvee \ell; \ell_1 \vdash M \Leftarrow A \\
+               \forall \ell_2 . \Gamma; \Sigma; \ell' \curlyvee \ell; \ell_2 \vdash N \Leftarrow A \\
+               B = \mathit{stamp} \; A \; \ell}
+              {\Gamma; \Sigma; \ell'; \ell'' \vdash \ccif{L}{A}{\ell}{M}{N} \Leftarrow B}
+    \qquad
+    {\vdash}\mathit{if}{\star}~
+    \inference{\Gamma; \Sigma; g; \ell \vdash L \Leftarrow \Bool_{\unk} \\
+               \forall \ell_1 . \Gamma; \Sigma; \unk; \ell_1 \vdash M \Leftarrow T_{\unk} \\
+               \forall \ell_2 . \Gamma; \Sigma; \unk; \ell_2 \vdash N \Leftarrow T_{\unk} \\
+               %B = \mathit{stamp} \; A \; \unk
+               }
+              {\Gamma; \Sigma; g; \ell \vdash \ccifstar{L}{T}{M}{N} \Leftarrow T_{\unk}}
+    \\[1ex]
+    {\vdash}\mathit{ref} ~
+    \inference{\Gamma; \Sigma; \ell'; \ell'' \vdash M \Leftarrow T_\ell \\
+               \highlightblue{\ell' \preccurlyeq \ell}}
+              {\Gamma; \Sigma; \ell'; \ell'' \vdash \ccref{\ell}{M} \Leftarrow (\Refer{T_\ell})_{\low}}
+    \qquad
+    {\vdash}\mathit{ref?} ~
+    \inference{\Gamma; \Sigma; \unk; \ell' \vdash M \Leftarrow T_\ell}
+              {\Gamma; \Sigma; \unk; \ell' \vdash \ccrefproj{\ell}{M}{p} \Leftarrow (\Refer{T_\ell})_{\low}}
+    \\[1ex]
+    {\vdash}\mathit{deref} ~
+    \inference{\Gamma; \Sigma; g; \ell' \vdash M \Leftarrow (\Refer{A})_\ell \\
+               B = \mathit{stamp} \; A \; \ell}
+              {\Gamma; \Sigma; g; \ell' \vdash \ccderef{M}{A}{\ell} \Leftarrow B}
+    \qquad
+    {\vdash}\mathit{deref}{\star}~
+    \inference{\Gamma; \Sigma; g; \ell \vdash M \Leftarrow (\Refer{(T_{\unk})})_{\unk} \\
+               %B = \mathit{stamp} \; A \; \unk
+               }
+              {\Gamma; \Sigma; g; \ell \vdash \ccderefstar{M}{T} \Leftarrow T_{\unk}}
+    \\[1ex]
     {\vdash}\mathit{assign} ~
-    \inference{\Gamma; \Sigma; \ell'; \ell'' \vdash L \Leftarrow (\Refer{T_{\hat{\ell}}})_\ell \\
+    \inference{\Gamma; \Sigma; \ell'; \ell'' \vdash L \Leftarrow (\Refer{T_{\hat{\ell}}})_\ell &
                \Gamma; \Sigma; \ell'; \ell'' \vdash M \Leftarrow T_{\hat{\ell}} &
                \highlightblue{\ell' \curlyvee \ell \preccurlyeq \hat{\ell}} }
               {\Gamma; \Sigma; \ell'; \ell'' \vdash \ccassign{L}{M}{T}{\hat{\ell}}{\ell} \Leftarrow \Unit_{\low}}
-    \;
+    \\[1ex]
     {\vdash}\mathit{assign?} ~
-    \inference{\Gamma; \Sigma; g; \ell \vdash L \Leftarrow (\Refer{T_{\hat{g}}})_{\unk} \\
+    \inference{\Gamma; \Sigma; g; \ell \vdash L \Leftarrow (\Refer{T_{\hat{g}}})_{\unk} &
                \Gamma; \Sigma; g; \ell \vdash M \Leftarrow T_{\hat{g}}}
               {\Gamma; \Sigma; g; \ell \vdash \ccassignproj{L}{M}{T}{\hat{g}}{p} \Leftarrow \Unit_{\low}}
-    \\[1ex]
+    \\[2ex]
     {\vdash}\mathit{prot} ~
     \inference{\Gamma; \Sigma; g'; | \PC | \vdash M \Leftarrow A &
                \vdash \PC \Leftarrow g' &
                \ell' \curlyvee \ell \preccurlyeq | \PC | &
                B = \mathit{stamp} \; A \; \ell}
               {\Gamma; \Sigma; g; \ell' \vdash \ccprot{\PC}{\ell}{M}{A} \Leftarrow B}
+    \\[2ex]
+    {\vdash}\mathit{cast} ~
+    \inference{\Gamma; \Sigma; g; \ell \vdash M \Leftarrow A & \vdash \bm{c} : A \Rightarrow B}
+              {\Gamma; \Sigma; g; \ell \vdash \cccast{M}{\bm{c}} \Leftarrow B}
+    \qquad
+    {\vdash}\mathit{blame} ~
+    \inference{}
+              {\Gamma; \Sigma; g; \ell \vdash \blame{p} \Leftarrow A}
   \end{gather*}}
-  \caption{Syntax and selected typing rules of the cast calculus \CC.
-    The side condition that enforces the heap policy statically during assignment is
-    \highlightblue{\text{highlighted}}}
-  \label{fig:cc-syntax-typing}
+  \caption{Typing rules of the cast calculus \CC. The side conditions that enforce the
+  heap policy statically during memory write operations are \highlightblue{\text{highlighted}}}
+  \label{fig:cc-typing-full}
 \end{figure}
-
-As usual, the cast calculus \CC is a statically-typed language that
-includes an explicit term for casts, written \cccast{M}{\bm{c}}, where
-$M$ is a term and $\bm{c}$ is a coercion to be applied to the value of
-$M$. Furthermore, many of the operators in \CC have two variants, a
-``static'' one for when the pertinent security label is statically
-known and the ``dynamic'' one for when the security label is
-statically unknown. The operational semantics of the ``dynamic''
-variants involve runtime checking.  The syntax and typing rules
-for \CC are shown in Figure~\ref{fig:cc-syntax-typing} (excerpt
-of typing rules, full version in Figure~\ref{fig:cc-typing-full}
-in the Appendix) and described in the following paragraphs.
-
-A value is a raw value (constant, address or $\lambda$) or an
-irreducible coercion applied to a raw value.
 
 The typing rules are syntax-directed.  The typing judgment is of the
 form $\Gamma ; \Sigma ; g ; \ell \vdash M \Leftarrow A$, which says
@@ -809,6 +874,8 @@ It looks up the value $V$ in the heap, applies the output coercion $\bm{d}$,
 and generates a \texttt{prot} with the security of the coercion $|\bar{c}|$.
 The PC of \texttt{prot} does not matter in this case either, because
 applying a coercion is pure and does not produce side effects.
+
+\todo[inline]{Define a down arrow and an up arrow (diverge)}
 
 \section{Compiling from \Surface to \CC}
 \label{sec:compile}
