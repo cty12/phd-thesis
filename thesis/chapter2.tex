@@ -96,7 +96,7 @@ security level is unknown at compile time. I refer to $\{\high,\low,\unk\}$ as
 additional security label \gc, which is the type of the program counter (PC) to
 evaluate the body of the function.
 
-\subsection{The Syntax of \Surface}
+\subsection{Syntax of \Surface}
 \label{sec:surface-syntax}
 
 \begin{figure}[tbp]
@@ -147,7 +147,7 @@ error, called \textit{blame}, that contains its blame label. In this way, the
 programmer knows which cast is causing the problem and which part of the program
 generates that cast.
 
-\subsection{The Type System of \Surface}
+\subsection{Type System of \Surface}
 \label{sec:surface-typing}
 
 I first define operators and relations on security labels and security types. I
@@ -398,7 +398,7 @@ cell (rule ${\vdash}\mathit{ref}$) has a concrete top-level label:
 $(\Refer{T_{\text{\hl{$\ell$}}}})_{\low}$. The reference itself has a \low label
 because it is newly created and cannot leak information.
 
-\subsection{The Semantics of \Surface}
+\subsection{Semantics of \Surface}
 \label{sec:surface-semantics}
 
 %% foreshadow the semantics by defining the eval function

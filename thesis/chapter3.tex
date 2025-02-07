@@ -504,12 +504,12 @@ the reference, which we explain in the next section.
 \section{The Cast Calculus \CC: An Intermediate Language For Gradual IFC}
 \label{sec:cc}
 
-In this section, we define the cast calculus \CC by presenting its syntax and
-type system in Section~\ref{sec:cc-typing} and its operational semantics in
-Section~\ref{sec:cc-semantics}.
+In this section, we define the cast calculus \CC by presenting its syntax in
+Section~\ref{sec:cc-syntax}, its type system in Section~\ref{sec:cc-typing}, and
+its operational semantics in Section~\ref{sec:cc-semantics}.
 
-\subsection{Syntax and Typing of \CC}
-\label{sec:cc-typing}
+\subsection{Syntax of \CC}
+\label{sec:cc-syntax}
 
 \begin{figure}[tbp]
 \raggedright
@@ -543,6 +543,9 @@ in Figure~\ref{fig:cc-typing-full} and described in the following paragraphs.
 
 A value is a raw value (constant, address or $\lambda$) or an
 irreducible coercion applied to a raw value.
+
+\subsection{Type System of \CC}
+\label{sec:cc-typing}
 
 \begin{figure}[tbp]
 \raggedright
