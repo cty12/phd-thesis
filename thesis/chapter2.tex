@@ -13,17 +13,19 @@ classification (the first difference) as the reason that GLIO is able to
 reconcile noninterference and the gradual guarantee. Following
 \textcite{Amorim:2020aa}, I created a language called \SurfaceOld. Like GLIO,
 \SurfaceOld leaves out type-guided classification and excludes \unk from runtime
-security labels. However, unlike GLIO, \SurfaceOld is vigilant, that is,
-\Surface errors when the casts applied to a value are inconsistent, while GLIO
-does not.
+security labels. However, unlike GLIO, \SurfaceOld is vigilant: \SurfaceOld
+errors when the casts applied to a value are inconsistent while GLIO does not. I
+will present the design of \SurfaceOld in Chapter~\ref{ch:alt-design}.
 
-During the development of \SurfaceOld, I realized that NSU checking can be
-expressed as casts; however long the chain of casts is, the source of the first
-cast and the target of the last cast must be specific, that is, \low or \high.
-The key of designing a gradual security-typed language is to identify the source
-of an injection and the target of a projection. Injection happens when a value
-is cast from some specific security label to \unk. A constant must be associated
-a specific security label, so that when the constant is injected, its label
+During the development of \SurfaceOld, I realized that including \unk in runtime
+labels (the second difference) should instead be root cause of the tension
+between noninterference and the gradual guarantee. NSU checking can be expressed
+as casts. However long the chain of casts is, the source of the first cast and
+the target of the last cast must be specific, that is, \low or \high. The key of
+designing a gradual security-typed language is to identify the source of an
+injection and the target of a projection. Injection happens when a value is cast
+from some specific security label to \unk. A constant must be associated a
+specific security label, so that when the constant is injected, its label
 becomes the source of the injection. Implicit flow causes the program counter
 (PC) to be injected when branching on an injected branch condition. Projection,
 on the other hand, happens when an injected value is cast to a specific security
@@ -32,7 +34,9 @@ security level of the memory location to write. If successful, the projection
 justifies the heap policy that the memory location to write is at least as
 secure as PC. As a result, each memory location must also be associated with a
 specific security label, so that the target of a cast for NSU is always
-specific.
+specific. I came up with a new IFC language \Surface. Like GLIO and unlike
+\GSLRef, \Surface satisfies the gradual guarantee. Like \GSLRef and unlike GLIO,
+\Surface supports type-guided classification.
 
 The rest of this chapter is organized as follows. I first define the gradual IFC
 surface language \Surface, by presenting its syntax, type system, and semantics
@@ -41,18 +45,19 @@ Section~\ref{sec:examples}. I present example programs to demonstrate how
 \Surface enables a gradual and smooth transition between static and dynamic IFC,
 while supporting type-based reasoning and satisfying the gradual guarantee at
 the same time. Finally, in Section~\ref{sec:embedding}, I conclude the chapter
-by discussing the static and the dynamic extremes of \Surface. \Surface enables
-a continuum of IFC enforcement between the static and dynamic extremes that it
-embeds.
+by discussing the static and the dynamic extremes of \Surface. The static
+extreme, \SSLRef, is a static IFC language. The dynamic extreme, \DynIFC is a
+dynamic IFC language. \Surface enables a continuum of IFC enforcement between
+the static and dynamic extremes that it embeds.
 
 \section{The Gradual IFC Language \Surface}
 \label{sec:surface-def}
 
 This section is organized as follows. I first define security labels and types
-in Section~\ref{sec:labels-and-types}. I present the syntax of \Surface in
-Section~\ref{sec:surface-syntax}. I then present the type system for \Surface in
+in Section~\ref{sec:labels-and-types}. I then present the syntax of \Surface in
+Section~\ref{sec:surface-syntax} and the type system for \Surface in
 Section~\ref{sec:surface-typing}. Finally, I discuss the semantics of \Surface
-by defining the \texttt{eval} function in Section~\ref{sec:surface-semantics}.
+by defining \texttt{eval} in Section~\ref{sec:surface-semantics}.
 
 \subsection{Security Labels and Types}
 \label{sec:labels-and-types}
@@ -113,26 +118,27 @@ evaluate the body of the function.
 %%   to the experiments}
 %
 The syntax of the gradual language \Surface is shown in
-Figure~\ref{fig:surface-syntax}.
+Figure~\ref{fig:surface-syntax}. For readers familiar with \GSLRef, the syntax
+of \Surface is similar to that of \GSLRef. The main syntactic difference is that
+in \Surface, the security labels of literals and newly created memory cells
+(highlighted in Figure~\ref{fig:surface-syntax}) default to a specific label
+such as \low, while in \GSLRef they default to a runtime unknown security level
+\unk. I am going to show in Section~\ref{sec:example2} that the design choice of
+defaulting to a specific security label helps us resolve the tension between
+noninterference and the gradual guarantee in \Surface.
 
 To enable information-flow control, \Surface allows the programmer to annotate
 constants, mutable references, and $\lambda$-abstractions with a specific
 security label. \Surface ensures that if a value is annotated with $\high$, it
-will not flow into a sink that is $\low$ security. If the programmer does not
-annotate a value with a label, \Surface defaults the value's label to \low. So
-\texttt{true} is shorthand for $\mathtt{true}_{\low}$. \Surface supports
-higher-order functions, mutable references, and explicit type annotations. One
-thing to note is that compared with literals, $\lambda$-abstractions in \Surface
-carry an addition security label annotation $g$, which is the type of the PC
-label expression used to evaluate the body of the $\lambda$. Same as the
-security labels in type annotations, $g$ defaults to \unk if omitted. For
-readers familiar with \GSLRef, the syntax of \Surface is similar to that of
-\GSLRef. The main syntactic difference is that in \Surface, the security labels
-of literals and newly created memory cells default to a specific label such as
-\low, while in \GSLRef they default to a runtime unknown security level \unk. I
-am going to show in Section~\ref{sec:example2} that defaulting to a specific
-security label helps us resolve the tension between noninterference and the
-gradual guarantee.
+will not flow into a sink that is $\low$ security. As I mentioned, if the
+programmer does not annotate a value with a label, \Surface defaults the value's
+label to \low, so \texttt{true} is shorthand for $\mathtt{true}_{\low}$.
+\Surface supports higher-order functions, mutable references, and explicit type
+annotations. One thing to note is that compared with literals,
+$\lambda$-abstractions in \Surface carry an addition security label annotation
+$g$, which is the type of the PC label expression used to evaluate the body of
+the $\lambda$. Same as the security labels in type annotations, $g$ defaults to
+\unk if omitted.
 
 Some terms in \Surface are annotated with an identifier called a blame label
 (\bl{p}). When compiled to the intermediate representation, those terms generate
@@ -144,12 +150,10 @@ generates that cast.
 \subsection{The Type System of \Surface}
 \label{sec:surface-typing}
 
-I first define operators and relations on security labels and types that are
-used by the typing rules in Section~\ref{sec:ops-and-rels}. I then introduce
-the typing rules of \Surface in Section~\ref{sec:surface-typing-rules}.
+I first define operators and relations on security labels and security types. I
+then define the type system of \Surface using those operators and relations.
 
 \subsubsection{Operators and Relations on Security Labels and Types}
-\label{sec:ops-and-rels}
 
 \begin{figure}[tbp]
 \begin{align*}
@@ -211,7 +215,7 @@ stamping operator is a shorthand that computes the consistent join of the
 top-level label of the type with another label, while keeping the rest of the
 type unchanged.
 
-\begin{figure}[ht]
+\begin{figure}[tbp]
   \raggedright
   \fbox{$g_1 \precsim g_2$}
   \begin{gather*}
@@ -299,7 +303,6 @@ Figure~\ref{fig:type-prec} of the Appendix gives the definition of precision on
 types.
 
 \subsubsection{Typing Rules for \Surface}
-\label{sec:surface-typing-rules}
 
 \begin{figure}[tbp]
 \raggedright
@@ -363,7 +366,7 @@ types.
 The typing rules for \Surface are shown in Figure~\ref{fig:surface-typing-full}.
 They are directly adapted from those of \GSLRef, by changing the security labels
 on values to disallow the \unk label. The type system of \GSLRef is derived from
-its static counterpart \SSLRef by replacing labels and types as well as their
+its static extreme \SSLRef by replacing labels and types as well as their
 operators and predicates with the gradual variants, while \SSLRef is in turn an
 adaptation of prior security-typed languages such as \textcite{Fennell:2013ab,
   heintze1998slam, zdancewic2002programming}.
@@ -921,11 +924,7 @@ an error if they are not.
 
 \textcite{Toro:2018aa} present the following example to demonstrate how vigilance
 is needed for type-based reasoning and free theorems in the sense of
-\textcite{Wadler:1989fk}. The example involves casts from $\low$ (line 3, the label
-annotation on $\key{5}_{\low}$) to $\high$ (line 1, the type annotation
-$\Int_{\high}$ in the signature of \texttt{mix}) and then back to $\low$ via the
-unknown security level $\unk$ (line 2, the nested type annotations $\Int_{\unk}$
-and $\Int_{\low}$):
+\textcite{Wadler:1989fk}:
 
 \begin{lstlisting}[style=tt]
   let mix : |$\Int_{\low}$| -> |\colorbox{White!80!Maroon}{$\Int_{\high}$}| -> |$\Int_{\low}$| =
@@ -933,10 +932,14 @@ and $\Int_{\low}$):
   mix 1|$_{\low}$| |\colorbox{White!70!YellowGreen}{$\key{5}_{\low}$}|
 \end{lstlisting}
 
-\noindent The type signature of \texttt{mix} should guarantee the free theorem
-that either (1) the result of \texttt{mix}, which is low security, never depends
-on the high-security \texttt{priv} argument or (2) \texttt{mix} produces a
-runtime error. In this case, the output of \texttt{mix} does depend on
+\noindent The example involves casts from $\low$ (line 3, the label annotation
+on $\key{5}_{\low}$) to $\high$ (line 1, the type annotation $\Int_{\high}$ in
+the signature of \texttt{mix}) and then back to $\low$ via the unknown security
+level $\unk$ (line 2, the nested type annotations $\Int_{\unk}$ and
+$\Int_{\low}$). The type signature of \texttt{mix} should guarantee the free
+theorem that either (1) the result of \texttt{mix}, which is low security, never
+depends on the high-security \texttt{priv} argument or (2) \texttt{mix} produces
+a runtime error. In this case, the output of \texttt{mix} does depend on
 \texttt{priv} via an implicit flow, so the free theorem says that an error
 should be triggered at runtime. Let us focus on the three casts applied to
 $\key{5}_{\low}$, where the first cast sends the security level from \low to
@@ -1038,19 +1041,19 @@ literature in Section~\ref{sec:compare-dynifc}.
 \label{sec:def-dynifc}
 
 %\todo[inline]{Relate the heap design to the reduction rules. Talk about prot}
-I formally define the syntax and semantics of \DynIFC in
-Figure~\ref{fig:dyn-ifc}. As is standard for security-typed languages
-\parencite{heintze1998slam, Fennell:2013ab, Toro:2018aa}, the protection term
-(\texttt{prot}) ensures that the computed value and the side effects of its
-sub-term must be at least as secure as the security level of the protection
-term. In rule \textit{prot-ctx}, the sub-term of \texttt{prot} is reduced under
-the join of the current PC and the security of \texttt{prot} ($\pc \curlyvee
-\ell$). In rule \texttt{prot-val}, the sub-term has been reduced to a value $V$,
-so \texttt{prot} stamps the label $\ell$ onto the value, producing a new value
-whose security is at least as high as $\ell$. The if-conditional reduces to
-\texttt{prot} (rule $\beta\textit{-if-true}$ and rule
-$\beta\textit{-if-false}$), capturing the implicit flows from the branch
-condition to the resulting value as well as through the heap.
+I define the syntax and semantics of \DynIFC in Figure~\ref{fig:dyn-ifc}. As is
+standard for security-typed languages \parencite{heintze1998slam,
+  Fennell:2013ab, Toro:2018aa}, the protection term (\texttt{prot}) ensures that
+the computed value and the side effects of its sub-term must be at least as
+secure as the security level of the protection term. In rule \textit{prot-ctx},
+the sub-term of \texttt{prot} is reduced under the join of the current PC and
+the security of \texttt{prot} ($\pc \curlyvee \ell$). In rule \texttt{prot-val},
+the sub-term has been reduced to a value $V$, so \texttt{prot} stamps the label
+$\ell$ onto the value, producing a new value whose security is at least as high
+as $\ell$. The if-conditional reduces to \texttt{prot} (rule
+$\beta\textit{-if-true}$ and rule $\beta\textit{-if-false}$), capturing the
+implicit flows from the branch condition to the resulting value as well as
+through the heap.
 
 \begin{figure}[tbp]
   \raggedright
@@ -1137,7 +1140,7 @@ will error at runtime due to NSU, guarding against illegal implicit information
 flows through the heap. When assigning to a reference, we perform the NSU check
 $\pc \curlyvee \ell \preccurlyeq \hat{\ell}$ (rule \textit{assign?-ok},
 highlighted), which is equivalent to $\pc \preccurlyeq \hat{\ell}$ and $\ell
-\preccurlyeq \hat{\ell}$; if the NSU check fails, the program errors (rule
+\preccurlyeq \hat{\ell}$. If the NSU check fails, the program errors (rule
 \textit{assign?-fail}). The first part of the check is similar to the check on
 reference creation: it ensures that the security level ($\hat{\ell}$) of the
 memory location to write to is at least as high as the current PC ($\pc$). The
@@ -1178,7 +1181,7 @@ Unfortunately, as we are about to demonstrate, choosing current PC as the
 default security for the newly created memory location would violate the gradual
 guarantee. Imagine a language that is the same as \Surface, except that besides
 \low and \high, the language also supports \unk as an annotation on reference
-creation; similar to the semantics of \laminfo,
+creation. Similar to the semantics of \laminfo,
 \refexp{\colorbox{highlight}{\unk}}{\true}{} would create a new memory location
 whose security is decided at run time by the current PC and store the value
 \true~in it. Consider the following program:
