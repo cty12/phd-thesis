@@ -19,9 +19,7 @@ calculus whose purpose is to cast a program value from one type to another type
 in Section~\ref{sec:coercion-calc-values}. I use this second coercion calculus
 as the representation of casts in the intermediate language \CC. With this cast
 representation in hand, I am going to present the full definition of \CC in
-Section~\ref{sec:cc}. Finally, I show that \Surface can be compiled into \CC in
-Section~\ref{sec:compile}. As a result, the semantics of \Surface is given by
-the semantics of \CC.
+Section~\ref{sec:cc}.
 
 \section{A Coercion Calculus for Security Labels}
 \label{sec:coercion-calc-labels}
@@ -879,8 +877,3 @@ The PC of \texttt{prot} does not matter in this case either, because
 applying a coercion is pure and does not produce side effects.
 
 \todo[inline]{Define a down arrow and an up arrow (diverge)}
-
-\section{Compiling from \Surface to \CC}
-\label{sec:compile}
-
-\todo[inline]{Put compilation into another chapter}
