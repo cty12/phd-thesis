@@ -955,4 +955,12 @@ and generates a \texttt{prot} with the security of the coercion $|\bar{c}|$.
 The PC of \texttt{prot} does not matter in this case either, because
 applying a coercion is pure and does not produce side effects.
 
-\todo[inline]{Define a down arrow and an up arrow (diverge)}
+%\todo[inline]{Define a down arrow and an up arrow (diverge)}
+With the reduction relation in hand, we define the evaluation of \CC:
+\begin{align*}
+  M \Downarrow V &\triangleq \exists \mu.\,\reducemult{M}{\emptyset}{\low}{V}{\mu} \\
+  M \Uparrow &\triangleq \forall L\,\mu.\reducemult{M}{\emptyset}{\low}{L}{\mu} \text{~and~} \exists N\,\mu'.\,\reduce{L}{\mu}{\low}{N}{\mu'}
+\end{align*}
+\noindent $M$ is a term in \CC. $M$ evaluates to a value $V$ if it reduces to
+$V$ in zero or more steps from the initial empty heap and \low PC. $M$ diverges
+if for all $L$ that $M$ reduces to, $L$ can always take one more step.
