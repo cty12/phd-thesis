@@ -3,6 +3,19 @@
 
 %\todo[inline]{Add sentences about why using coercions as the cast representation}
 
+In this chapter, I first motivate using coercion as the cast representation in
+Section~\ref{sec:why-coercions}. I present a coercion calculus for security
+labels in Section~\ref{sec:coercion-calc-labels}. I show that coercion on
+security labels can model both explicit and implicit information flows. I then
+define a second coercion calculus whose purpose is to cast a program value from
+one type to another type in Section~\ref{sec:coercion-calc-values}. I use this
+second coercion calculus to represent casts between security types in the
+intermediate language \CC. Finally, with both coercion calculi in hand, I am
+going to present the full definition of \CC in Section~\ref{sec:cc}.
+
+\section{Why Coercions?}
+\label{sec:why-coercions}
+
 As we have seen in Section~\ref{sec:examples}, gradual information flows can be
 modeled as casts. For example, the cast sequence $\high \Rightarrow \unk
 \Rightarrow \low$ should be statically accepted but dynamically rejected, while
@@ -10,16 +23,23 @@ the sequence $\low \Rightarrow \unk \Rightarrow \high$ should be statically and
 dynamically accepted, promoting the security of data to high. Such sequences of
 casts can be arbitrarily long (for example, $\low \Rightarrow \high \Rightarrow
 \unk \Rightarrow \unk \Rightarrow \low$), which motivates us to represent the
-casts on security labels as \textit{coercions}.
+casts on security labels as \textit{coercions}. In \Surface, the source security
+label of a coercion sequence comes from literals, while the sink is whatever
+security level that the observer has: for example, the \texttt{publish} function
+of Section~\ref{sec:examples} is of \low. Coercions can be easily sequenced and
+composed. Checking information flow at runtime is accomplished by reducing
+coercion sequences to their normal forms.
 
-In this chapter, I first present a coercion calculus for security labels in
-Section~\ref{sec:coercion-calc-labels}. I show that coercion on labels can model
-both explicit and implicit information flows. I then define a second coercion
-calculus whose purpose is to cast a program value from one type to another type
-in Section~\ref{sec:coercion-calc-values}. I use this second coercion calculus
-as the representation of casts in the intermediate language \CC. With this cast
-representation in hand, I am going to present the full definition of \CC in
-Section~\ref{sec:cc}.
+There are two noteworthy benefits of using coercions to represent IFC. First,
+coercions can be used to represent NSU checking while satisfying the gradual
+guarantee. In brief, whenever a memory location is written to, the current PC is
+coerced to the security level of that location. We are going to formally
+introduce label expressions as our representation for PC in
+Section~\ref{sec:lexpr} and discuss NSU in detail in Section~\ref{sec:cc}.
+Second, the coercion representation benefits mechanization because it enables
+modular reasoning. The main simulation lemma (Lemma~\ref{lem:sim}) depends on
+the simulation results of coercion sequences and label expressions, which are
+stated as separate lemmas and reasoned independently in our Agda code.
 
 \section{A Coercion Calculus for Security Labels}
 \label{sec:coercion-calc-labels}
@@ -130,23 +150,6 @@ in \CC.
   \label{fig:cexpr}
 \end{figure}
 
-In \Surface, the source security label of a coercion sequence comes from
-literals, while the sink is whatever security level that the observer has: for
-example, the \texttt{publish} function of Section~\ref{sec:examples} is of \low.
-Coercions can be easily sequenced and composed. Checking information flow at
-runtime is accomplished by reducing coercion sequences to their normal forms.
-
-There are two noteworthy benefits of using coercions to represent IFC. First,
-coercions can be used to represent NSU checking while satisfying the gradual
-guarantee. In brief, whenever a memory location is written to, the current PC is
-coerced to the security level of that location. We are going to formally
-introduce label expressions as our representation for PC in
-Section~\ref{sec:lexpr} and discuss NSU in detail in Section~\ref{sec:cc}.
-Second, the coercion representation benefits mechanization because it enables
-modular reasoning. The main simulation lemma (Lemma~\ref{lem:sim}) depends on
-the simulation results of coercion sequences and label expressions, which are
-stated as separate lemmas and reasoned independently in our Agda code.
-
 The syntax and typing for security coercions and coercion sequences is defined
 in Figure~\ref{fig:cexpr}. A security label is either $\low$, $\high$, or
 statically unknown (\unk). There are five security coercions: identity (\id{g}),
@@ -227,26 +230,26 @@ before we check the flow from \high through \unk to \low.
   \label{fig:comp-stampc}
 \end{figure}
 
-We model explicit flow using security coercions. We can compose two coercion
+We can model explicit flow using security coercions. We define coercion
+composition in Figure~\ref{fig:comp-stampc}. We can compose two coercion
 sequences ($\bar{c} \mdoubleplus \bar{d}$), where $\bar{c} : g_1 \Rightarrow
-g_2$ and $\bar{d} : g_2 \Rightarrow g_3$, to form a flow from $g_1$ to $g_3$,
-which is defined in Figure~\ref{fig:comp-stampc}.
+g_2$ and $\bar{d} : g_2 \Rightarrow g_3$, to form a flow from $g_1$ to $g_3$.
 
-The stamping operation captures the intuition of an implicit flow from the
-security level $\ell'$ to a coercion sequence $\bar{c}$. We define the stamping
-operation in Figure~\ref{fig:comp-stampc} as two functions,
-$\mathit{stamp}(\bar{c},\ell)$ and $\mathit{stamp!}(\bar{c},\ell)$. Both
-function require $\bar{c}$ to be in normal form and that its source label is not
-\unk. The $\mathit{stamp!}$ operator promotes the security of the coercion
-$\bar{c}$ to be at least $\ell$ and then injects the coercion if necessary,
-while $\mathit{stamp}$ only promotes the security but does not inject. These
-stamping operations satisfy the gradual guarantee, because when stamping on a
-more precise coercion sequence and a less precise coercion sequence, stamping
-preserves the precision relation (Section~\ref{sec:sim-cexpr}) between them
-(Lemma~\ref{lem:cexpr-stamp-sim}). The stamping operations of coercion sequences
-are used in the stamping operations of (1) label expressions, which are our
-representation of PC and (2) values in the cast calculus. Those three types of
-stamping together formalize the notion of implicit flow in \Surface.
+We can also model implicit flows using security coercions. The stamping
+operation captures the intuition of an implicit flow from the security level
+$\ell'$ to a coercion sequence $\bar{c}$. We define the stamping operation in
+Figure~\ref{fig:comp-stampc} as two functions, $\mathit{stamp}(\bar{c},\ell)$
+and $\mathit{stamp!}(\bar{c},\ell)$. Both function require $\bar{c}$ to be in
+normal form and that its source label is not \unk. The $\mathit{stamp!}$
+operator promotes the security of the coercion $\bar{c}$ to be at least $\ell$
+and then injects the coercion if necessary, while $\mathit{stamp}$ only promotes
+the security but does not inject. These stamping operations satisfy the gradual
+guarantee, because when stamping on a more precise coercion sequence and a less
+precise coercion sequence, stamping preserves the precision relation between
+them (Lemma~\ref{lem:cexpr-stamp-sim}). The stamping operations of coercion
+sequences are used in the stamping operations of (1) label expressions, which
+are our representation of PC and (2) values in the cast calculus. Those three
+types of stamping together formalize the notion of implicit flow in \Surface.
 
 \subsection{Security Label Expressions}
 \label{sec:lexpr}
@@ -420,7 +423,7 @@ to implement NSU checks, which enforce the heap policy for write operations.
   \inference{\mathbf{Irreducible} \; \bm{c}}
   {\cccast{\cccast{V_r}{\bm{c}}}{\bm{d}} \longrightarrow \cccast{V_r}{\bm{c} \mdoubleplus \bm{d}}}
   \end{gather*}}
-  \caption{Syntax and semantics of coercions on values.}
+  \caption{Syntax and semantics of coercions on values}
   \label{fig:coercions}
 \end{figure}
 
@@ -463,7 +466,7 @@ doubles as the security level of the memory cell.
     \inference{\mathbf{NF} \; \bar{c}}
     {\mathbf{Irreducible} \; \left( \coerc{\funco{\bar{d}}{\bm{c}}{\bm{d}}}{\bar{c}} \right)}
   \end{gather*}}
-  \caption{Composition of coercions on values.}
+  \caption{Composition of coercions on values}
   \label{fig:coercion-composition}
 \end{figure}
 
@@ -870,26 +873,45 @@ index $n$ is fresh (not already in use) among all cells with security $\ell$;
 when performing a lookup, $\mu(\ell, n) = V$ retrieves the value $V$ at index
 $n$ whose security level is $\ell$.
 
-\textbf{\textit{Protection terms. }}
-Following standard approaches to IFC, a protection
-term \ccprot{\PC'}{\ell}{M}{A} has two functionalities: (1) it ensures
-that the reduction inside $M$ does not leak information through heap
-write operations (2) it promotes the security level of the computation
-result of $M$ to at least level $\ell$. The first functionality is
-achieved by switching to \PC' from the current $\PC$ when reducing the
-body $M$ (rule \textit{prot-ctx}). Recall Section~\ref{sec:cc-typing},
-the typing of \texttt{prot} makes sure that \PC' has the correct
-security that is at least as secure as both $\PC$ and $\ell$.
-The second functionality is achieved by stamping the value produced by
-the body of \texttt{prot} (rule \textit{prot-val}).  The stamping of
-values in \CC (Figure~\ref{fig:stamp-val} in the Appendix) is analogous to
-stamping of label expressions and turns to the stamping operation for
-coercions on labels (Figure~\ref{fig:comp-stampc}) in a similar
-way. Again there are two cases, because the value is either (1) a raw value or
-(2) a coercion-wrapped value. Suppose the value is a raw value, if its type has \low security
-and is stamped with \high, the value becomes wrapped with a subtype coercion;
-otherwise the value stays unchanged. Otherwise, if the value is wrapped
-with an irreducible coercion, we stamp the top-level coercion sequence.
+\begin{figure}
+  \fbox{$\textit{coerce-id}\;T = c_r$ and $\textit{coerce-id}\;A = \bm{c}$}
+  \begin{align*}
+    \textit{coerce-id}\;\iota &= \id{\iota} \\
+    \textit{coerce-id}\;(\Refer{A}) &= \refco{(\textit{coerce-id}\;A)}{(\textit{coerce-id}\;A)} \\
+    \textit{coerce-id}\;(\Fun{A}{g}{B}) &= (\funco{\id{g}}{\textit{coerce-id}\;A}{\textit{coerce-id}\;B}) \\
+    \textit{coerce-id}\;T_g &= (\coerc{\textit{coerce-id}\;T}{\id{g}})
+  \end{align*}
+  %
+  \fbox{$\mathit{stamp}\;V\;A\;\ell = W$}
+  \begin{align*}
+    \mathit{stamp}\;V\;{-}\;\low &= V \\
+    \mathit{stamp}\;V\;T_{\low}\;\high &= \cccast{V}{\coerc{(\textit{coerce-id}\;T)}{\id{\low} \seq \up}} \\
+    \mathit{stamp}\;V\;T_{\high}\;\high &= V \\
+    \mathit{stamp}\;(\cccast{V}{\coerc{c_r}{\bar{c}}})\;{-}\;\ell &= \cccast{V}{\coerc{c_r}{\mathit{stamp}\;\bar{c}\;\ell}}
+  \end{align*}
+  \caption{Stamping on values of \CC}
+  \label{fig:stamp-val}
+\end{figure}
+
+\textbf{\textit{Protection terms. }} A protection term is of form
+\ccprot{\PC'}{\ell}{M}{A}. Following standard approaches to IFC, a protection
+term has two functionalities: (1) it ensures that the reduction inside $M$ does
+not leak information through heap write operations (2) it promotes the security
+level of the computation result of $M$ to at least level $\ell$. The first
+functionality is achieved by switching to \PC' from the current $\PC$ when
+reducing the body $M$ (rule \textit{prot-ctx}). Recall
+Section~\ref{sec:cc-typing}, the typing of \texttt{prot} makes sure that \PC'
+has the correct security that is at least as secure as both $\PC$ and $\ell$.
+The second functionality is achieved by stamping the value produced by the body
+of \texttt{prot} (rule \textit{prot-val}). The stamping of values in \CC
+(Figure~\ref{fig:stamp-val}) is analogous to stamping of label expressions and
+turns to the stamping operation for coercions on labels
+(Figure~\ref{fig:comp-stampc}) in a similar way. Again there are two cases,
+because the value is either (1) a raw value or (2) a coercion-wrapped value.
+Suppose the value is a raw value, if its type has \low security and is stamped
+with \high, the value becomes wrapped with a subtype coercion; otherwise the
+value stays unchanged. Otherwise, if the value is wrapped with an irreducible
+coercion, we stamp the top-level coercion sequence.
 
 \textbf{\textit{Function Application. }} The $\beta$ rule is standard for IFC languages.
 It generates a \texttt{prot} term with the specific security label $\ell$ that
@@ -922,27 +944,23 @@ of $\textit{app}{\star}\textit{-cast}$: (1) a \textit{stamp!} is generated to
 stamp and then inject the PC and (2) the security of \texttt{prot} is retrieved
 from the coercion in the branch condition.
 
-\textbf{\textit{NSU and heap operations. }}
-Let us consider reference creation first.
-A ``static'' reference creation is secure because its typing (rule
-${\vdash}\textit{-ref}$, Figure~\ref{fig:cc-typing-full} of the Appendix)
-already enforces the heap policy. Consequently, the allocation can happen directly
-(rule \textit{ref}) without any runtime checking. Rule \textit{ref?}
-does the same reference creation but with NSU checking, by casting the
-current PC to the security $\ell$ of the newly created memory
-cell.
-The coerce function (${-}\Rightarrow^{-}{-}$) takes two
-security labels and a blame label to generate a coercion on labels.
-In this case, $\unk \Rightarrow^{\bl{p}} \ell$ generates
-$\id{\unk}\seq\proj{\ell}{p}$, which performs a projection whose
-target is $\ell$. If the projected PC reduces to a blame, it means
-that NSU checking fails so we lift the blame to \CC. Assignment
-follows the same pattern: a static assignment can happen directly,
-while \texttt{assign?} requires NSU checking, by stamping the current
-PC with the security indicated in the coercion and then projecting to
-$\hat{\ell}$, where $\hat{\ell}$ is the security of the heap cell.
-The input coercion $\bm{c}$ is applied before the value is stored into
-the cell.
+\textbf{\textit{NSU and heap operations. }} Let us consider reference creation
+first. A ``static'' reference creation is secure because its typing (rule
+${\vdash}\textit{ref}$, Figure~\ref{fig:cc-typing-full}) already enforces the
+heap policy. Consequently, the allocation can happen directly (rule
+\textit{ref}) without any runtime checking. Rule \textit{ref?} does the same
+reference creation but with NSU checking, by casting the current PC to the
+security $\ell$ of the newly created memory cell. The coerce function
+(${-}\Rightarrow^{-}{-}$) takes two security labels and a blame label to
+generate a coercion on labels. In this case, $\unk \Rightarrow^{\bl{p}} \ell$
+generates $\id{\unk}\seq\proj{\ell}{p}$, which performs a projection whose
+target is $\ell$. If the projected PC reduces to a blame, it means that NSU
+checking fails so we lift the blame to \CC. Assignment follows the same pattern:
+a static assignment can happen directly, while \texttt{assign?} requires NSU
+checking, by stamping the current PC with the security indicated in the coercion
+and then projecting to $\hat{\ell}$, where $\hat{\ell}$ is the security of the
+heap cell. The input coercion $\bm{c}$ is applied before the value is stored
+into the cell.
 
 The rule for static dereferencing \textit{deref} looks up index $n$ in
 all memory cells with security level $\hat{\ell}$. The value from the
@@ -956,7 +974,7 @@ The PC of \texttt{prot} does not matter in this case either, because
 applying a coercion is pure and does not produce side effects.
 
 %\todo[inline]{Define a down arrow and an up arrow (diverge)}
-With the reduction relation in hand, we define the evaluation of \CC:
+Finally, we define the evaluation of \CC using the reduction relation:
 \begin{align*}
   M \Downarrow V &\triangleq \exists \mu.\,\reducemult{M}{\emptyset}{\low}{V}{\mu} \\
   M \Uparrow &\triangleq \forall L\,\mu.\reducemult{M}{\emptyset}{\low}{L}{\mu} \text{~and~} \exists N\,\mu'.\,\reduce{L}{\mu}{\low}{N}{\mu'}
