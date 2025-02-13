@@ -1,9 +1,45 @@
 \chapter{Compiling From \Surface to \CC}
 \label{ch:compile}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-culpa qui officia deserunt mollit anim id est laborum.
+\begin{figure}[tbp]
+\raggedright
+\fbox{$\compile{M} = N$}
+{\footnotesize
+\begin{align*}
+    \small
+    % App
+    \intertext{Let $L, M$ be well-typed programs $\Gamma; g' \vdash L : (\Fun{A}{\gc}{B})_g, \Gamma; g' \vdash M : A'$}
+    \compile{\app{L}{M}{p}} =&
+    \begin{cases}
+      \ccapp{(\cccast{\compile{L}}{\bm{c_1}})}{(\cccast{\compile{M}}{\bm{c_2}})}{A}{B}{g} \qquad\text{if $g$, $g'$ and $\gc$ are all specific} \\
+      \qquad\text{where}~ \bm{c_1} = (\Fun{A}{\gc}{B})_g \Rightarrow^{\bl{p}} (\Fun{A}{g' \curlyvee g}{B})_g, \bm{c_2} = A' \Rightarrow^{\bl{p}} A \\
+      \cccast{(\ccappstar{(\cccast{\compile{L}}{\bm{c_1}})}{(\cccast{\compile{M}}{\bm{c_2}})}{A}{T})}{\bm{d}} \quad~\text{otherwise} \\
+      \qquad\text{where}~ B = T_{g''}, \bm{c_1} = (\Fun{A}{\gc}{T_{g''}})_g \Rightarrow^{\bl{p}} (\Fun{A}{\unk}{T_{\unk}})_{\unk} \\
+      \qquad\qquad~ \bm{c_2} = A' \Rightarrow^{\bl{p}} A, \bm{d} = T_{\unk} \Rightarrow^{\bl{p}} (\textit{stamp}\;T_{g''}\;g)
+    \end{cases}
+    % Assign
+    \intertext{Let $L, M$ be well-typed programs $\Gamma; g' \vdash L : (\Refer{T_{\hat{g}}})_g, \Gamma; g' \vdash M : A$}
+    \compile{\assign{L}{M}{p}} =&
+    \begin{cases}
+    \ccassign{(\compile{L})}{(\cccast{(\compile{M})}{\bm{c_2}})}{T}{\hat{g}}{g} & ~\text{if $g$, $g'$ and $\hat{g}$ are all specific} \\
+    \ccassignproj{(\cccast{(\compile{L})}{\bm{c_1}})}{(\cccast{(\compile{M})}{\bm{c_2}})}{T}{\hat{g}}{\bl{p}} & ~\text{otherwise}
+    \end{cases} \\
+    &\text{where}~
+    \bm{c_1} = (\Refer{T_{\hat{g}}})_g \Rightarrow^{\bl{p}} (\Refer{T_{\hat{g}}})_{\unk} , \bm{c_2} = A \Rightarrow^{\bl{p}} T_{\hat{g}}
+\end{align*}}
+\caption{Compilation from \Surface to \CC}
+\label{fig:compile}
+\end{figure}
+
+The compile function takes the form $\compile{M} = M'$, where $M$ is a \Surface
+program and $M'$ is a \CC term. Consider the case for assignment. If $g$, $g'$,
+and $\hat{g}$ are specific, the check for heap policy can be statically
+justified. We recursively compile both $L$ and $M$ and generate a static
+\texttt{assign}. We cast $M'$ using coercion $\bm{c_2}$, which casts from the
+type of $M'$ to the type of the memory cell. The coercion is produced by the
+coerce function, $({-}\Rightarrow^{-}{-})$, which takes two types and a blame
+label, returning a coercion on values by calling the coerce function of labels
+on each pair of security labels inside those two types. If at least one of the
+three security labels is \unk, the typing information is insufficient to justify
+the assignment. The compilation produces an \texttt{assign?} instead, whose
+semantics performs NSU checking at runtime.
