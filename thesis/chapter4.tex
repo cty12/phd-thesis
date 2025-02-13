@@ -7,8 +7,14 @@
 {\footnotesize
 \begin{align*}
     \small
+    % Const
+    \compile{\const{k}{\ell}} =& \ccconst{k} \\
+    % Var
+    \compile{x} =& x \\
+    % Lam
+    \compile{\lam{g}{x}{A}{N}{\ell}} =& \cclam{x}{\compile{N}} \\
     % App
-    \intertext{Let $L, M$ be well-typed programs $\Gamma; g' \vdash L : (\Fun{A}{\gc}{B})_g, \Gamma; g' \vdash M : A'$}
+    \intertext{Let $L, M$ be well-typed $\Gamma; g' \vdash L : (\Fun{A}{\gc}{B})_g, \Gamma; g' \vdash M : A'$}
     \compile{\app{L}{M}{p}} =&
     \begin{cases}
       \ccapp{(\cccast{\compile{L}}{\bm{c_1}})}{(\cccast{\compile{M}}{\bm{c_2}})}{A}{B}{g} \qquad\text{if $g$, $g'$ and $\gc$ are all specific} \\
@@ -18,7 +24,7 @@
       \qquad\qquad~ \bm{c_2} = A' \Rightarrow^{\bl{p}} A, \bm{d} = T_{\unk} \Rightarrow^{\bl{p}} (\textit{stamp}\;T_{g''}\;g)
     \end{cases}
     % Assign
-    \intertext{Let $L, M$ be well-typed programs $\Gamma; g' \vdash L : (\Refer{T_{\hat{g}}})_g, \Gamma; g' \vdash M : A$}
+    \intertext{Let $L, M$ be well-typed $\Gamma; g' \vdash L : (\Refer{T_{\hat{g}}})_g, \Gamma; g' \vdash M : A$}
     \compile{\assign{L}{M}{p}} =&
     \begin{cases}
     \ccassign{(\compile{L})}{(\cccast{(\compile{M})}{\bm{c_2}})}{T}{\hat{g}}{g} & ~\text{if $g$, $g'$ and $\hat{g}$ are all specific} \\
