@@ -2,6 +2,7 @@
 \label{ch:examples}
 
 %%\todo[inline]{Add a scientific story about our experiments of different design choices}
+{\color{NavyBlue} %%%% new text
 I started the journey by retrofitting GLIO with vigilance. As discussed in
 Chapter~\ref{ch:intro}, there are two major differences between
 \GSLRef~\parencite{Toro:2018aa}, which satisfies noninterference but not the
@@ -49,6 +50,7 @@ by discussing the static and the dynamic extremes of \Surface. The static
 extreme, \SSLRef, is a static IFC language. The dynamic extreme, \DynIFC is a
 dynamic IFC language. \Surface enables a continuum of IFC enforcement between
 the static and dynamic extremes that it embeds.
+}  %%%% end new text
 
 \section{The Gradual IFC Language \Surface}
 \label{sec:surface-def}
@@ -402,20 +404,22 @@ because it is newly created and cannot leak information.
 \label{sec:surface-semantics}
 
 %% foreshadow the semantics by defining the eval function
-
+{\color{NavyBlue}   %%%% new text
 I define the semantics of \Surface through a compile function that takes a
 well-typed \Surface program and returns a cast-calculus (\CC) term. The compile
 function takes the form $\compile{M} = M'$, where $M$ is a \Surface program and
-$M'$ is a \CC term.
+$M'$ is a \CC term. I will define the compile function in
+Chapter~\ref{ch:compile}.
 
 I define the evaluation function (\textit{eval}, see below) for \Surface by (1)
 compiling from \Surface to \CC and (2) running the compiled \CC term using its
-operational semantics. I will define the compile function and the operational
-semantics for \CC in Chapter~\ref{ch:sem}. The \textit{eval} function takes a
-well-typed \Surface program $\emptyset ; \low \vdash M : \iota_g$, where $\iota
-\in \{\Unit, \Bool\}$, $g \in \{\low, \high, \unk\}$, and $k \in \{\true,
-\false, \unit\}$. The \textit{eval} function evaluates the program to a
-constant, signals a runtime error, or diverges:
+operational semantics. I will define the $M \Downarrow N$ operator, which
+evaluates a \CC term $M$ to a value or a blame, and the $M \Uparrow$ operator,
+which means the \CC term $M$ diverges, in Chapter~\ref{ch:sem}. The
+\textit{eval} function takes a well-typed \Surface program $\emptyset ; \low
+\vdash M : \iota_g$, where $\iota \in \{\Unit, \Bool\}$, $g \in \{\low, \high,
+\unk\}$, and $k \in \{\true, \false, \unit\}$. The \textit{eval} function
+evaluates the program to a constant, signals a runtime error, or diverges:
 %% \begin{align*}
 %%   \mathit{eval}(M) =&\,k\;&\text{if}\;\reducemult{(\compile{M})}{\emptyset}{\low}{k}{\mu} \\
 %%   \mathit{eval}(M) =&\,k\;&\text{if}\;\reducemult{(\compile{M})}{\emptyset}{\low}{\cccast{k}{\mathbf{c}}}{\mu}\text{~and $\mathbf{c}$ is irreducible} \\
@@ -429,6 +433,7 @@ constant, signals a runtime error, or diverges:
   \mathit{eval}(M) =&\,\blame{\bl{p}}\;&\text{if~}\;\compile(M) \Downarrow \blame{\bl{p}} \\
   \mathit{eval}(M) =&\,\text{diverge}\;&\text{if~}\;\compile(M) \Uparrow
 \end{align*}
+}  %%%% end new text
 
 \section{\Surface in Action}
 \label{sec:examples}
@@ -1011,6 +1016,7 @@ projection.
 \section{The Static and Dynamic Extremes of \Surface}
 \label{sec:embedding}
 
+{\color{NavyBlue}  %%%% new text
 Gradual IFC embeds both static and dynamic IFC. In this section, we discuss the
 static and dynamic extremes of \Surface. We compare them to existing static and
 dynamic IFC languages in the literature.
@@ -1235,3 +1241,5 @@ from a security label value produced at runtime. In comparison, in \Surface the
 programmer has to specify this security level during development. In future, I
 plan to support first-class labels, similar to that of LIO, in \Surface. I will
 discuss future work in Chapter~\ref{ch:conclusion}.
+
+}  %%%% end new text
