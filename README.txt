@@ -1,3 +1,7 @@
+This repository contains Tianyu's awesome PhD dissertation on gradual
+information-flow control.
+
+
 Topics:
 1. Overview
 2. Review of Static IFC
