@@ -426,6 +426,30 @@ let input = private-input () in publish (¬ input)
 
 \end{frame}
 
+%%%%%%%%%% Dynamic IFC, Through Heap %%%%%%%%%%%
+\begin{frame}[containsverbatim]
+  \frametitle{\bluetext{Static} Enforcement of Flows Through \\ Mutable References}
+
+  \vspace{-15pt}
+  %(Implicit flow and mutable references)
+  \begin{lstlisting}[mathescape,autogobble,xleftmargin=.2\textwidth,xrightmargin=.1\textwidth]
+    let a     = ref $\low$ true in
+    let input = private_input () in
+    if input then
+        a := false
+    else
+        a := true
+    publish (! a)
+  \end{lstlisting}
+
+  \begin{itemize}
+  \item The reference has type $\Refer{(\Bool_{\low})}$. It points to a low memory location
+  \item The type of the branch condition is $\Bool_{\high}$
+  \item[\no] \st{Writing to low memory under a high branch condition}
+  \end{itemize}
+
+\end{frame}
+
 
 \begin{frame}[containsverbatim]
   \frametitle{\purpletext{Gradual Typing} Bridges Static and Dynamic IFC}
