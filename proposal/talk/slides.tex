@@ -100,21 +100,19 @@
 \newcommand{\ccaddr}[1]{\ensuremath{\ccsyntax{addr}\;{#1}}}
 \newcommand{\cclam}[2]{\ensuremath{\ccsyntax{λ}{#1}\ccsyntax{.}\,{#2}}}
 \newcommand{\ccif}[5]{\ensuremath{\ccsyntax{if}\;{#1}\;{#2}\;{#3}\;{#4}\;{#5}}}
-\newcommand{\ccifinj}[4]{\ensuremath{\ccsyntax{if!}\;{#1}\;{#2}\;{#3}\;{#4}}}
+\newcommand{\ccifstar}[4]{\ensuremath{\ccsyntax{if}{\star}\,{#1}\,{#2}\,{#3}\,{#4}}}
 \newcommand{\ccref}[2]{\ensuremath{\ccsyntax{ref}\;{#1}\;{#2}}}
 \newcommand{\ccrefproj}[3]{\ensuremath{\ccsyntax{ref?}^{\bl{#3}}\;{#1}\;{#2}}}
 \newcommand{\ccderef}[3]{\ensuremath{\ccsyntax{!}\;{#1}\;{#2}\;{#3}}}
-\newcommand{\ccderefinj}[2]{\ensuremath{\ccsyntax{!!}\;{#1}\;{#2}}}
+\newcommand{\ccderefstar}[2]{\ensuremath{\ccsyntax{!}{\star}\,{#1}\,{#2}}}
 \newcommand{\ccassign}[5]{\ensuremath{\ccsyntax{assign}\;{#1}\;{#2}\;{#3}\;{#4}\;{#5}}}
 \newcommand{\ccassignproj}[5]{\ensuremath{\ccsyntax{assign?}^{\bl{#5}}\;{#1}\;{#2}\;{#3}\;{#4}}}
-%% \newcommand{\cccast}[2]{\ensuremath{{#1}\,\left\langle{#2}\right\rangle}}
 \newcommand{\cccast}[2]{\ensuremath{{#1}\,\ccsyntax{⟨}\,{#2}\,\ccsyntax{⟩}}}
 \newcommand{\ccprot}[4]{\ensuremath{\ccsyntax{prot}\;{#1}\;{#2}\;{#3}\;{#4}}}
-\newcommand{\ccprotinj}[4]{\ensuremath{\ccsyntax{prot!}\;{#1}\;{#2}\;{#3}\;{#4}}}
 \newcommand{\cccastpc}[2]{\ensuremath{\ccsyntax{cast}_{\ccsyntax{pc}}\;{#1}\;{#2}}}
 \newcommand{\cclet}[4]{\ensuremath{\ccsyntax{let}\;{#1}\ccsyntax{=}{#2}\ccsyntax{:}{#3}\;\ccsyntax{in}\;{#4}}}
 \newcommand{\ccapp}[5]{\ensuremath{\ccsyntax{app}\;{#1}\;{#2}\;{#3}\;{#4}\;{#5}}}
-\newcommand{\ccappinj}[4]{\ensuremath{\ccsyntax{app!}\;{#1}\;{#2}\;{#3}\;{#4}}}
+\newcommand{\ccappstar}[4]{\ensuremath{\ccsyntax{app}{\star}\,{#1}\,{#2}\,{#3}\,{#4}}}
 \newcommand{\ccopaque}{\ensuremath{\ccsyntax{●}}}
 \newcommand{\lconsisjoin}{\ensuremath{\,\widetilde{\curlyvee}\,}}  % label consistent join
 \newcommand{\consisjoin}{\ensuremath{\,\widetilde{\vee}\,}}        % type consistent join
@@ -199,33 +197,14 @@
 
 
 \title{The Holy Grail of Gradual Security \\
-  {\small PL Wonks Seminar - Logic Seminar, Spring 2024} \vspace{-15pt}}
+  {\small\textcolor{NavyBlue}{Ph.D Thesis Proposal Presentation}} \vspace{-15pt}}
 \author{Tianyu Chen}
 \institute{\small Computer Science, Indiana University}
 \date{}
 
 \begin{document}
 
-%%%%%
-% Outline:
-% 1. Background
-%   - The intuition of noninterference and the gradual guarantee
-%   - There is a tension between the two properties
-% 2. LambdaIFCStar in action:
-%   - LambdaIFCStar embeds static IFC (the static extreme)
-%   - LambdaIFCStar embeds dynamic IFC (the dynamic extreme)
-%   - Gradual security typing in LambdaIFCStar
-%       (by removing annotations from the static extreme)
-%   - The tension (in an example) and how LambdaSecIFCStar solves it
-%   - Type-based reasoning in LambdaIFCStar
-% 3. The semantics of LambdaIFCStar
-%   - Security coercion calculci
-%   - The cast calculus LambdaIFCc
-%   - Compilation from LambdaIFCStar to LambdaIFCc
-% 4. Meta-theoretical results
-%%%%%
-
-
+%%%%%%%%%% Cover Page %%%%%%%%%%%
 \begin{frame}
   \titlepage
   \begin{tikzpicture}[remember picture,overlay]
@@ -236,22 +215,21 @@
   \vspace{-45pt}
 
   \begin{center}
-    \includegraphics[width=4in]{galahad}
+    \includegraphics[width=4in]{acanthus}
   \end{center}
 
-  \footnotetext{\textit{The Achievement of the Grail}. Tapestries by Morris \& Co, 1890. Birmingham Museum and Art Gallery}
-
+  \footnotetext{Acanthus textiles. William Morris Gallery}
 \end{frame}
 
+%%%%%%%%%% Road Map %%%%%%%%%%%
 \begin{frame}
   \frametitle{Road Map}
 
   \begin{itemize}
   \item[\textcolor{Red}{\ding{43}}] \cul{Background:}
     \begin{itemize}
-    \item Information flow properties and noninterference
+    \item Explicit flow and implicit flow
     \item Information flow control: static, dynamic, gradual
-    \item The gradual guarantee
     \item The tension between noninterference and the gradual guarantee
     \end{itemize}
   \item \Surface in Action
@@ -264,78 +242,86 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}
-  \frametitle{Information-Flow and Noninterference}
+%%%%%%%%%% Explicit Information Flow %%%%%%%%%%%
+\begin{frame}[fragile]
+  \frametitle{Explicit Information Flow}
 
-  Consider boolean negation. Can we infer \texttt{output} from \texttt{input}?
-  \[
-  \key{let} \; \key{output} = \neg \key{input}
-  \]
+  Can we infer output from input in the following program?
 
+\begin{verbatim}
+let input = private-input () in publish (¬ input)
+\end{verbatim}
+
+\onslide<2-> {
   \begin{itemize}
-  \onslide<2-> {
-  \item[] Yes! \quad \yes
-  }
-  \onslide<3-> {
-  \item Requires witnessing at least two executions:
-    {\footnotesize $\key{input}=\key{true}, \key{output}=\key{false}$} and
-    {\footnotesize $\key{input}=\key{false}, \key{output}=\key{true}$}
-  \item An information-flow property is a hyperproperty: a predicate on sets of executions
-  \item Noninterference: \footnote{Specifically, termination-insensitive noninterference (TINI) for a functional programming language}
-    two successful executions of a program produce the same value for different input.
-  }
+  \item[\yes] Yes!
+  \item Witness at least two executions
+  \item Output is the negation of input
+  \item \purpletext{Explicit flow}
   \end{itemize}
+}
+
 \end{frame}
 
+%%%%%%%%%% Implicit Information Flow %%%%%%%%%%%
+\begin{frame}[fragile]
+  \frametitle{Implicit Information Flow}
 
+  Can we infer output from input in the following program?
+\begin{verbatim}
+  let input = private-input () in
+      publish (if input then false else true)
+\end{verbatim}
+
+\onslide<2-> {
+\begin{itemize}
+  \item[\yes] Also yes
+  \item Again, output is the negation of input
+  \item \purpletext{Implicit flow}: input influences output through {\large\textit{branching}}
+\end{itemize}
+}
+
+\end{frame}
+
+%%%%%%%%%% IFC %%%%%%%%%%%
 \begin{frame}
   \frametitle{Information-Flow Control (IFC)}
 
   \begin{itemize}
-    \item Security labels. Label input as \high; output as \low.
-    \item[] Track and check the security labels
-    \item IFC in a programming language, traditionally
-      \begin{itemize}
-      \item \bluetext{\ul{Static:}} using a type system
-      \item \redtext{\ul{Dynamic:}} using runtime monitoring
-      \end{itemize}
-    \item A \textit{gradual} security programming language
-      \begin{itemize}
-      \item embeds both \bluetext{static} and \redtext{dynamic} IFC
-      \item enables seamless transition between static and dynamic
-      \item security label annotations
-        \(
-        \left\{
-        \begin{minipage}[c]{0.5\linewidth}
-          \item[] specific: $\low, \high$
-          \item[] statically unknown: \unk
-          \end{minipage}
-        \right.
-        \)
-    \end{itemize}
+  \item Ensures that information transfers adhere to a security policy
+    \item For example, \high input must not flow to \low output
+    \item Propagate and check the security labels
+    \item IFC in PL
+      \(
+      \left\{
+      \begin{minipage}[c]{0.75\linewidth}
+      \item[] \bluetext{\Large static} using a type system
+      \item[] \redtext{\Large dynamic} using runtime monitoring
+      \end{minipage}
+      \right.
+      \)
   \end{itemize}
 \end{frame}
 
-
+%%%%%%%%%% Static IFC %%%%%%%%%%%
 \begin{frame}[containsverbatim]
-  \frametitle{Review: \bluetext{Static IFC} Using a Type System}
+  \frametitle{\bluetext{Static IFC} Allows \textcolor{Green}{Legal} Explicit Flows}
 
-  Modeling input and output:
   \begin{lstlisting}[mathescape,autogobble,numbers=none]
-    user-input : $\Unit_{\low}$ → $\Bool_{\high}$    publish : $\Bool_{\low}$ → $\Unit_{\low}$
+    private-input : $\Unit_{\low}$ → $\Bool_{\high}$  publish : $\Bool_{\low}$ → $\Unit_{\low}$
   \end{lstlisting}
+  \vspace{10pt}
 
-  Consider a statically-typed program:
-
-  \begin{lstlisting}[mathescape,autogobble,xleftmargin=.15\textwidth,xrightmargin=.15\textwidth,frame=lines]
+  Statically-typed program:
+  \begin{lstlisting}[mathescape,autogobble,xleftmargin=.15\textwidth,xrightmargin=.15\textwidth]
     let fconst = λ b : $\Bool_{\high}$. false in
-    let input  = user-input () in
+    let input  = private-input () in
     let result = fconst input in
       publish result
   \end{lstlisting}
 
   \begin{itemize}
-  \item[\yes] \textcolor{Green}{Well-typed} \qquad \textit{and} \qquad
+  \item[\yes] \textcolor{Green}{Well-typed} \qquad~and~\qquad
     \yes \; \textcolor{Green}{Runs successfully} to \texttt{unit}
   \item Why? The return value of \texttt{fconst} is
     \(
@@ -346,33 +332,31 @@
     \end{minipage}
     \right.
     \)
-  \item No runtime check!
-  \item IFC enforced by the type system alone
+  \item Accepted by type-checker. No runtime check
   \end{itemize}
 \end{frame}
 
 
 \begin{frame}[containsverbatim]
-  \frametitle{Guarding Against Illegal \ul{Explicit Flows}, \bluetext{Statically}}
+  \frametitle{\bluetext{Static IFC} Guards Against \textcolor{Red}{Illegal} Explicit Flows}
 
-  Consider another \bluetext{fully static} program:
+  Replace \texttt{fconst} with \texttt{fid} that takes a low-security Bool:
 
-  \begin{lstlisting}[mathescape,autogobble,xleftmargin=.15\textwidth,xrightmargin=.15\textwidth,frame=lines]
+  \begin{lstlisting}[mathescape,autogobble,xleftmargin=.1\textwidth]
     let fid    = λ b : $\highlightblue{\Bool_{\low}}$. b in
-    let input  = user-input () in
-    let result = fid input in    $\graytext{\text{// error}}$
+    let input  = private-input () in
+    let result = fid input in  $\graytext{\text{// compilation error}}$
       publish result
   \end{lstlisting}
+  \vspace{15pt}
 
   \begin{itemize}
-  \item[\no] \textcolor{Red}{Ill-typed.} Why?
-  \item \textit{Illegal} \ul{explicit flow} from the \high-security input
-    to \texttt{fid}
+  \item[\no] \textcolor{Red}{Ill-typed.} Illegal explicit flow:
   \begin{itemize}
-    \item \texttt{fid} expects \low argument
+  \item input is \high
+  \item \texttt{fid} expects \low argument
   \end{itemize}
-  \item[\ding{82}] Program rejected by type-checker. Illegal explicit flow ruled out
-    \bluetext{at compile time}
+  \item Rejected by type-checker. Again no runtime check
   \end{itemize}
 \end{frame}
 
@@ -384,7 +368,7 @@
   \begin{lstlisting}[mathescape,autogobble,xleftmargin=.1\textwidth,xrightmargin=.1\textwidth,frame=lines]
     let flip : $\Bool_{\high}$ → $\Bool_{\low}$ =
       λ b : $\Bool_{\high}$. $\highlightblue{\text{if b then false else true}}$ in
-    let input  = user-input () in
+    let input  = private-input () in
     let result = flip input in
       publish result
   \end{lstlisting}
@@ -412,7 +396,7 @@
 
   \begin{lstlisting}[mathescape,autogobble,xleftmargin=.15\textwidth,xrightmargin=.15\textwidth,frame=lines]
     let fid    = λ b : $\highlightred{\Bool_{\unk}}$. b in
-    let input  = user-input () in
+    let input  = private-input () in
     let result = fid input in    $\graytext{\text{// error}}$
       publish result
   \end{lstlisting}
@@ -440,7 +424,7 @@
 
 %%   \begin{lstlisting}[mathescape,autogobble,xleftmargin=.15\textwidth,xrightmargin=.15\textwidth,frame=lines]
 %%     let fid    = λ b. b in
-%%     let input  = user-input () in
+%%     let input  = private-input () in
 %%     let result = fid (input $\highlight{highlight}{\texttt{⟨\,\inj{\high}\,⟩}}$) in
 %%       publish (result $\highlight{highlight}{\texttt{⟨\,\proj{\low}{p}\,⟩}}$)
 %%   \end{lstlisting}
@@ -475,7 +459,7 @@
   \begin{lstlisting}[mathescape,autogobble,xleftmargin=.1\textwidth,xrightmargin=.1\textwidth,frame=lines]
     let flip : $\highlightred{\Bool_{\unk}}$ → $\highlightred{\Bool_{\unk}}$ =
       λ b : $\highlightred{\Bool_{\unk}}$. if b then false else true in
-    let input  = user-input () in
+    let input  = private-input () in
     let result = flip input in
       publish result
   \end{lstlisting}
@@ -499,7 +483,7 @@
 %%   \begin{lstlisting}[mathescape,autogobble,xleftmargin=.1\textwidth,xrightmargin=.1\textwidth,frame=lines]
 %%     let flip = λ b . if b then (false $\highlight{highlight}{\texttt{⟨\,\inj{\low}\,⟩}}$)
 %%     else (true $\highlight{highlight}{\texttt{⟨\,\inj{\low}\,⟩}}$) in
-%%     let input  = user-input () in
+%%     let input  = private-input () in
 %%     let result = flip (input $\highlight{highlight}{\texttt{⟨\,\inj{\high}\,⟩}}$) in
 %%     publish (result $\highlight{highlight}{\texttt{⟨\,\proj{\low}{p}\,⟩}}$)
 %%   \end{lstlisting}
@@ -604,7 +588,7 @@
   \begin{lstlisting}[mathescape,autogobble,xleftmargin=.1\textwidth,xrightmargin=.1\textwidth,frame=lines]
     let flip : $\highlightred{\Bool_{\unk}}$ → $\highlightblue{\Bool_{\low}}$ =
       λ b : $\highlightred{\Bool_{\unk}}$. if b then false else true in
-    let input  = user-input () in
+    let input  = private-input () in
     let result = flip input in
       publish result
   \end{lstlisting}
@@ -675,7 +659,7 @@
   \end{itemize}
 
   \begin{lstlisting}[mathescape,autogobble,xleftmargin=.1\textwidth,xrightmargin=.1\textwidth,frame=lines]
-  let input : $\Bool_{\unk}$ = user-input () in
+  let input : $\Bool_{\unk}$ = private-input () in
   let a     = ref $\low$ true in
     if input then a := false else a := true ;
     publish (! a)
@@ -702,7 +686,7 @@
     \noindent
     \redtext{\textbf{Left:} less precise, more dynamic}
     \begin{lstlisting}[mathescape,autogobble]
-      let x = user-input () in
+      let x = private-input () in
       let y = ref $\Bool_{\unk}$ $\true_{\unk}$ in
         if x then (y := $\false_{\high}$)
              else ()
@@ -710,7 +694,7 @@
     \columnbreak
     \bluetext{\textbf{Right:} more precise, more static}
     \begin{lstlisting}[mathescape,autogobble,numbers=none]
-      let x = user-input () in
+      let x = private-input () in
       let y = ref $\Bool_{\high}$ $\true_{\high}$ in
         if x then (y := $\false_{\high}$)
              else ()
@@ -791,7 +775,7 @@
     \noindent
     \redtext{\textbf{Left:} less precise, more dynamic}
     \begin{lstlisting}[mathescape,autogobble]
-      let x = user-input () in
+      let x = private-input () in
       let y : $\highlightred{(\Refer{\Bool_{\unk}})_{\unk}}$ =
           ref $\high$ $\true_{\high}$ in
         if x then (y := $\false_{\high}$)
@@ -800,7 +784,7 @@
     \columnbreak
     \bluetext{\textbf{Right:} more precise, more static}
     \begin{lstlisting}[mathescape,autogobble,numbers=none]
-      let x = user-input () in
+      let x = private-input () in
       let y : $\highlightblue{(\Refer{\Bool_{\high}})_{\high}}$ =
           ref $\high$ $\true_{\high}$ in
       if x then (y := $\false_{\high}$)
@@ -838,14 +822,14 @@
     \noindent
     \redtext{Less precise in \GSLRef:}
     \begin{lstlisting}[mathescape,autogobble]
-      let x = user-input () in
+      let x = private-input () in
       let y = ref $\highlightred{\Bool_{\unk}}$ $\highlightred{\true_{\unk}}$ in
         if x then (y := $\false_{\high}$)
              else ()
     \end{lstlisting}
     \redtext{Less precision in \Surface:}
     \begin{lstlisting}[mathescape,autogobble]
-      let x = user-input () in
+      let x = private-input () in
       let y : $\highlightred{(\Refer{\Bool_{\unk}})_{\unk}}$ =
           ref $\highlight{highlight}{\high}$ $\highlight{highlight}{\true_{\high}}$ in
         if x then (y := $\false_{\high}$)
@@ -854,14 +838,14 @@
     \columnbreak
     \bluetext{More precise in \GSLRef:}
     \begin{lstlisting}[mathescape,autogobble,numbers=none,breaklines=false]
-      let x = user-input () in
+      let x = private-input () in
       let y = ref $\highlightblue{\Bool_{\high}}$ $\highlightblue{\true_{\high}}$ in
         if x then (y := $\false_{\high}$)
              else ()
     \end{lstlisting}
     \bluetext{More precise in \Surface:}
     \begin{lstlisting}[mathescape,autogobble,numbers=none]
-      let x = user-input () in
+      let x = private-input () in
       let y : $\highlightblue{(\Refer{\Bool_{\high}})_{\high}}$ =
           ref $\highlight{highlight}{\high}$ $\highlight{highlight}{\true_{\high}}$ in
         if x then (y := $\false_{\high}$)
@@ -885,7 +869,7 @@
     \noindent
     \text{Less precise in \GSLRef:}
     \begin{lstlisting}[mathescape,autogobble]
-      let x = user-input () in
+      let x = private-input () in
       let y = ref $\Bool_{\unk}$ $\true_{\unk}$ in
         if x then (y := $\false_{\high}$)
              else ()
@@ -893,7 +877,7 @@
     \columnbreak
     \purpletext{Less precision in \Surface:}
     \begin{lstlisting}[mathescape,autogobble,numbers=none]
-      let x = user-input () in
+      let x = private-input () in
       let y : $(\Refer{\Bool_{\unk}})_{\unk}$ =
           ref $\high$ true in
         if x then (y := false)
@@ -958,7 +942,7 @@
   \begin{lstlisting}[mathescape,autogobble,xleftmargin=.1\textwidth,frame=lines]
     let flip : $\highlightred{\Bool_{\unk}}$ → $\highlightred{\Bool_{\unk}}$ =
         λ b : $\highlightred{\Bool_{\unk}}$. if b then false else true in
-    let input  = user-input () in
+    let input  = private-input () in
     let result = flip input in
       publish result
   \end{lstlisting}
@@ -969,7 +953,7 @@
   \begin{lstlisting}[mathescape,autogobble,xleftmargin=.1\textwidth,frame=lines]
     let flip = λ b . if b then (false $\highlight{highlight}{\texttt{⟨\,\inj{\low}\,⟩}}$)
                           else (true $\highlight{highlight}{\texttt{⟨\,\inj{\low}\,⟩}}$) in
-    let input  = user-input () in
+    let input  = private-input () in
     let result = flip (input $\highlight{highlight}{\texttt{⟨\,\inj{\high}\,⟩}}$) in
       publish (result $\highlight{highlight}{\texttt{⟨\,\proj{\low}{p}\,⟩}}$)
   \end{lstlisting}
