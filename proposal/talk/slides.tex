@@ -178,7 +178,7 @@
   keywordstyle=\color{Magenta},
   numberstyle=\tiny\color{Gray},
   stringstyle=\color{Purple},
-  basicstyle=\ttfamily\footnotesize,
+  basicstyle=\ttfamily\small,
   breakatwhitespace=false,
   breaklines=true,
   captionpos=b,
@@ -229,8 +229,8 @@
   \item[\textcolor{Red}{\ding{43}}] \cul{Background:}
     \begin{itemize}
     \item Explicit flow and implicit flow
-    \item Information flow control: static, dynamic, gradual
-    \item The tension between noninterference and the gradual guarantee
+    \item Information flow control (IFC), static and dynamic
+    \item The tension between IFC and gradual typing
     \end{itemize}
   \item \Surface in Action
     \begin{itemize}
@@ -295,24 +295,19 @@ let input = private-input () in publish (¬ input)
       \(
       \left\{
       \begin{minipage}[c]{0.75\linewidth}
-      \item[] \bluetext{\Large static} using a type system
-      \item[] \redtext{\Large dynamic} using runtime monitoring
+      \item[] \bluetext{\Huge static} using a type system
+      \item[] \redtext{\Huge dynamic} using runtime monitoring
       \end{minipage}
       \right.
       \)
   \end{itemize}
 \end{frame}
 
-%%%%%%%%%% Static IFC %%%%%%%%%%%
+%%%%%%%%%% Static IFC, Explicit Flow %%%%%%%%%%%
 \begin{frame}[containsverbatim]
-  \frametitle{\bluetext{Static IFC} Allows \textcolor{Green}{Legal} Explicit Flows}
+  \frametitle{\bluetext{Static IFC} Accepts \textcolor{Green}{Legal} Explicit Flow}
 
-  \begin{lstlisting}[mathescape,autogobble,numbers=none]
-    private-input : $\Unit_{\low}$ → $\Bool_{\high}$  publish : $\Bool_{\low}$ → $\Unit_{\low}$
-  \end{lstlisting}
-  \vspace{10pt}
-
-  Statically-typed program:
+  (Static IFC using a type system)
   \begin{lstlisting}[mathescape,autogobble,xleftmargin=.15\textwidth,xrightmargin=.15\textwidth]
     let fconst = λ b : $\Bool_{\high}$. false in
     let input  = private-input () in
@@ -334,18 +329,19 @@ let input = private-input () in publish (¬ input)
     \)
   \item Accepted by type-checker. No runtime check
   \end{itemize}
+
+  \footnotetext{\texttt{private-input : $\Unit_{\low}$ → $\Bool_{\high}$}~and~\texttt{publish : $\Bool_{\low}$ → $\Unit_{\low}$}}
 \end{frame}
 
 
 \begin{frame}[containsverbatim]
-  \frametitle{\bluetext{Static IFC} Guards Against \textcolor{Red}{Illegal} Explicit Flows}
+  \frametitle{\bluetext{Static IFC} Rejects \textcolor{Red}{Illegal} Explicit Flow}
 
-  Replace \texttt{fconst} with \texttt{fid} that takes a low-security Bool:
-
+  (Replace \texttt{fconst} with \texttt{flip})
   \begin{lstlisting}[mathescape,autogobble,xleftmargin=.1\textwidth]
-    let fid    = λ b : $\highlightblue{\Bool_{\low}}$. b in
+    let flip   = λ b : $\highlightblue{\Bool_{\low}}$. ¬ b in
     let input  = private-input () in
-    let result = fid input in  $\graytext{\text{// compilation error}}$
+    let result = flip input in  $\graytext{\text{// compilation error}}$
       publish result
   \end{lstlisting}
   \vspace{15pt}
@@ -354,20 +350,47 @@ let input = private-input () in publish (¬ input)
   \item[\no] \textcolor{Red}{Ill-typed.} Illegal explicit flow:
   \begin{itemize}
   \item input is \high
-  \item \texttt{fid} expects \low argument
+  \item \texttt{flip} expects \low argument
   \end{itemize}
   \item Rejected by type-checker. Again no runtime check
   \end{itemize}
 \end{frame}
 
+%%%%%%%%%% Dynamic IFC, Explicit Flow %%%%%%%%%%%
 \begin{frame}[containsverbatim]
-  \frametitle{Guarding Against Illegal \ul{Implicit Flows}, \bluetext{Statically}}
+  \frametitle{\redtext{Dynamic} Enforcement of Explicit Flow}
 
-  Different observable behaviors in different branches:
+  (Revisit \texttt{flip} with dynamic IFC)
+  \begin{lstlisting}[mathescape,autogobble,xleftmargin=.15\textwidth,xrightmargin=.15\textwidth]
+    let flip    = λ b. ¬ b in
+    let input   = private-input () in
+    let result  = flip input in
+      publish result    $\graytext{\text{// runtime error}}$
+  \end{lstlisting}
 
-  \begin{lstlisting}[mathescape,autogobble,xleftmargin=.1\textwidth,xrightmargin=.1\textwidth,frame=lines]
-    let flip : $\Bool_{\high}$ → $\Bool_{\low}$ =
-      λ b : $\Bool_{\high}$. $\highlightblue{\text{if b then false else true}}$ in
+  \begin{itemize}
+  \item[\no] \textcolor{Red}{Fails} at runtime (regardless of input)
+  \item \redtext{A runtime check} happens before calling \texttt{publish}
+  \end{itemize}
+
+  In dynamic IFC, runtime values are tagged with their security level. The
+  labels can originate from
+  \begin{itemize}
+  \item primitive operations
+  \item annotations on literals
+  \item the security level of the execution context
+  \end{itemize}
+
+\end{frame}
+
+%%%%%%%%%% Static IFC, Implicit Flow %%%%%%%%%%%
+\begin{frame}[containsverbatim]
+  \frametitle{\bluetext{Static} Enforcement of Implicit Flow}
+
+  (Different behavior in different branches)
+  \begin{lstlisting}[mathescape,autogobble,xleftmargin=.1\textwidth]
+    let flip : $\Bool_{\high}$ → $\highlightblue{\Bool_{\low}}$ =
+        λ b : $\Bool_{\high}$. $\highlightred{\text{if b then false else true}}$ in
     let input  = private-input () in
     let result = flip input in
       publish result
@@ -375,208 +398,33 @@ let input = private-input () in publish (¬ input)
 
   \begin{itemize}
   \item[\no] \textcolor{Red}{Ill-typed}
-  \item Security label on the type of \texttt{if} is the \ul{join} of its branches (both \low)
-    and the branch condition (\high).
-  \begin{itemize}
-  \footnotesize
-  \item Expected: \low \;\;\quad (from type annotation $\Bool_{\low}$)
-  \item Actual: \quad \high \quad (because of conditional)
-  \end{itemize}
-  \item[\ding{82}] $\high \npreccurlyeq \low$, thus rejected by type-checker.
-    Illegal implicit flow ruled out \bluetext{at compile time}
+  \item Security label on the type of \texttt{if} is the join (least upper
+    bound) of its branches (\low) and the branch condition (\high).
+  \item Rejected by type-checker. No runtime check
   \end{itemize}
 
 \end{frame}
 
+%%%%%%%%%% Dynamic IFC, Implicit Flow %%%%%%%%%%%
 \begin{frame}[containsverbatim]
-  \frametitle{Guarding Against Illegal Explicit Flows, \redtext{Dynamically}}
+  \frametitle{\redtext{Dynamic} Enforcement of Implicit Flow}
 
-  Consider the following dynamically-typed \texttt{fid} example that could
-  potentially leak information through explicit flow:
-
-  \begin{lstlisting}[mathescape,autogobble,xleftmargin=.15\textwidth,xrightmargin=.15\textwidth,frame=lines]
-    let fid    = λ b : $\highlightred{\Bool_{\unk}}$. b in
-    let input  = private-input () in
-    let result = fid input in    $\graytext{\text{// error}}$
-      publish result
-  \end{lstlisting}
-
-  \begin{itemize}
-  \item[\yes] \textcolor{Green}{Well-typed} \qquad \textit{but} \qquad
-    \no \; \textcolor{Red}{Fails at runtime}
-  \item The program errors regardless of input
-  \item A runtime happens before the call to \texttt{publish} and checks
-    whether \high can flow to \low (of course, no)
-  \item[\ding{82}] Illegal explicit flow ruled out \redtext{at runtime}
-  \end{itemize}
-
-  \footnotetext{We annotate $\Bool_{\unk}$ explicitly, which conforms with the syntax of \Surface}
-
-\end{frame}
-
-
-%% \begin{frame}[containsverbatim]
-%%   \frametitle{\textit{Coercions} as Runtime IFC Monitor}
-
-%%   The program is compiled to an IR, \CC.
-%%   Call \CC a \textit{cast calculus}, because all casts,
-%%   represented using \textit{coercions}, are made explicit:
-
-%%   \begin{lstlisting}[mathescape,autogobble,xleftmargin=.15\textwidth,xrightmargin=.15\textwidth,frame=lines]
-%%     let fid    = λ b. b in
-%%     let input  = private-input () in
-%%     let result = fid (input $\highlight{highlight}{\texttt{⟨\,\inj{\high}\,⟩}}$) in
-%%       publish (result $\highlight{highlight}{\texttt{⟨\,\proj{\low}{p}\,⟩}}$)
-%%   \end{lstlisting}
-
-%%   Running the program with input \texttt{true} (running with \texttt{false} is similar)
-%%   results in the following reduction sequence of \CC:
-
-%%   \vspace{-15pt}
-%%   {\footnotesize
-%%   \begin{align}
-%%     \longrightarrow^{*} &
-%%     \quad \key{publish} \; (\cccast{\cccast{\key{true}}{\inj{\high}}}{\proj{\low}{p}}) \\[1ex]
-%%     \longrightarrow^{*} &
-%%     \quad \key{publish} \; (\cccast{\key{true}}{\inj{\high} \seq \proj{\low}{p}}) \\[1ex]
-%%     \longrightarrow^{*} &
-%%     \quad \blame{p}
-%%   \end{align}}
-
-%%   \vspace{-5pt}
-%%   The coercion sequence $\inj{\high} \seq \proj{\low}{p}$ captures an explicit flow
-%%   from \high through \unk to \low, which is prohibited and triggers a blame.
-
-%% \end{frame}
-
-
-\begin{frame}[containsverbatim]
-  \frametitle{Against Illegal Implicit Flows, \redtext{Dynamically}}
-
-  Consider the following dynamically-typed \texttt{flip} example that
-  could potentially leak information through implicit flow:
-
-  \begin{lstlisting}[mathescape,autogobble,xleftmargin=.1\textwidth,xrightmargin=.1\textwidth,frame=lines]
-    let flip : $\highlightred{\Bool_{\unk}}$ → $\highlightred{\Bool_{\unk}}$ =
-      λ b : $\highlightred{\Bool_{\unk}}$. if b then false else true in
+  (Enforcing implicit flow with dynamic IFC)
+  \begin{lstlisting}[mathescape,autogobble,xleftmargin=20pt]
+    let flip   = λ b. if b then false else true in
     let input  = private-input () in
     let result = flip input in
       publish result
   \end{lstlisting}
 
   \begin{itemize}
-  \item[\yes] \textcolor{Green}{Well-typed} \qquad \textit{but} \qquad
-    \no \; \textcolor{Red}{Fails at runtime}
-  \item The program (again) errors regardless of input
+  \item[\no] \textcolor{Red}{Fails} at runtime (regardless of input)
   \item \texttt{flip} produces a \high value because of \high branch condition
-  \item A runtime happens before the call to \texttt{publish} and checks
-    whether \high can flow to \low (of course, no)
-  \item[\ding{82}] Illegal implicit flow ruled out \redtext{at runtime}
+  \item A runtime check happens before calling \texttt{publish}
+  \item Illegal implicit flow ruled out \redtext{at runtime}
   \end{itemize}
 
 \end{frame}
-
-
-%% \begin{frame}[containsverbatim]
-%%   \frametitle{\textit{Stamping} on Coercions Enforces Implicit Flow}
-
-%%   \begin{lstlisting}[mathescape,autogobble,xleftmargin=.1\textwidth,xrightmargin=.1\textwidth,frame=lines]
-%%     let flip = λ b . if b then (false $\highlight{highlight}{\texttt{⟨\,\inj{\low}\,⟩}}$)
-%%     else (true $\highlight{highlight}{\texttt{⟨\,\inj{\low}\,⟩}}$) in
-%%     let input  = private-input () in
-%%     let result = flip (input $\highlight{highlight}{\texttt{⟨\,\inj{\high}\,⟩}}$) in
-%%     publish (result $\highlight{highlight}{\texttt{⟨\,\proj{\low}{p}\,⟩}}$)
-%%   \end{lstlisting}
-
-%%   \vspace{-12pt}
-%%   {\footnotesize
-%%   \begin{align}
-%%     \longrightarrow^{*}
-%%     \begin{split}
-%%       &\; \texttt{let result = ((λ b. if b then (\cccast{\false}{\inj{\low}}) else ...)} \\[-3pt]
-%%       &\; \texttt{\qquad\qquad\qquad\quad (\cccast{\true}{\inj{\high}})) in} \\[-3pt]
-%%       &\; \texttt{\qquad \key{publish}\;(\cccast{\key{result}}{\proj{\low}{p}})}
-%%     \end{split} \\[1ex]
-%%     \longrightarrow^{*}
-%%     \begin{split}
-%%       &\; \texttt{let result = prot \low (if (\cccast{\true}{\highlight{highlight}{\inj{\high}}})} \\[-3pt]
-%%       &\; \texttt{\qquad\qquad\qquad\qquad\qquad\qquad then (\cccast{\false}{\inj{\low}}) else ...) in} \\[-3pt]
-%%       &\; \texttt{\qquad \key{publish}\;(\cccast{\key{result}}{\proj{\low}{p}})}
-%%     \end{split} \\[1ex]
-%%     \longrightarrow^{*}
-%%     \begin{split}
-%%       &\; \texttt{let result = prot \low (prot \highlight{highlight}{\high} (\cccast{\false}{\inj{\low}})) in} \\[-3pt]
-%%       &\; \texttt{\qquad \key{publish}\;(\cccast{\key{result}}{\proj{\low}{p}})}
-%%     \end{split} \\[1ex]
-%%     \longrightarrow^{*}
-%%     \begin{split}
-%%       &\; \texttt{let result = prot \low (\cccast{\false}{\highlight{highlight}{\up \seq \inj{\high}}}) in} \\[-3pt]
-%%       &\; \texttt{\qquad \key{publish}\;(\cccast{\key{result}}{\proj{\low}{p}})}
-%%     \end{split} \\[1ex]
-%%     \longrightarrow^{*} &
-%%     \; \texttt{publish (\cccast{\cccast{\false}{\up \seq \inj{\high}}}{\proj{\low}{p}})} \\[1ex]
-%%     \longrightarrow^{*} &
-%%     \; \texttt{publish (\cccast{\false}{\up \seq \highlightred{\inj{\high} \seq \proj{\low}{p}}})} \\[1ex]
-%%     \longrightarrow^{*} &
-%%     \; \texttt{\blame{p}}
-%%   \end{align}}
-
-%%   \footnotetext{The information flow violation is detected before the call to \texttt{publish}.}
-
-%% \end{frame}
-
-
-%% \begin{frame}
-%%   \frametitle{Noninterference: the Meta-theory of Information-Flow Security}
-
-%%   Noninterference: information is only allowed to flow between
-%%   entities in a system that are associated with labels related by
-%%   the flow relation
-
-%%   \begin{itemize}
-%%   \item Noninterference is a generalization over various information-
-%%     flow properties
-%%   \item Conversely, an information-flow property is an instantiation of noninterference
-%%     with a particular system, set of labels, and flow relation
-%%   \end{itemize}
-
-%%   \footnotetext{Elisavet Kozyri, Stephen Chong and Andrew C. Myers. 2022.
-%%     Expressing Information Flow Properties}
-%% \end{frame}
-
-%% \begin{frame}
-%%   \frametitle{Security Policies as Information-Flow Properties}
-
-%%   Computer security can be expressed as information-flow properties
-%%   by choosing appropriate labels and flow relations: \\
-%%   \begin{itemize}
-%%   \item[+] \ul{Confidentiality:}
-%%     $\{\greentext{\key{Public}}, \orangetext{\key{Secret}}\}$,
-%%     $\begin{cases}
-%%      \greentext{\key{Public}} \preccurlyeq \orangetext{\key{Secret}} \\
-%%      \orangetext{\key{Secret}} \npreccurlyeq \greentext{\key{Public}}
-%%      \end{cases}$
-%%   \item[+] \ul{Integrity:}
-%%     $\{\greentext{\key{Trusted}}, \orangetext{\key{Untrusted}}\}$,
-%%     $\begin{cases}
-%%      \greentext{\key{Trusted}} \preccurlyeq \orangetext{\key{Untrusted}} \\
-%%      \orangetext{\key{Untrusted}} \npreccurlyeq \greentext{\key{Trusted}}
-%%      \end{cases}$
-%%   \item[+] \ul{Availability:}
-%%     $\{\greentext{\key{HighAvailability}}, \orangetext{\key{LowAvailability}}\}$,
-%%     $\begin{cases}
-%%      \greentext{\key{HighAvailability}} \preccurlyeq \orangetext{\key{LowAvailability}} \\
-%%      \orangetext{\key{LowAvailability}} \npreccurlyeq \greentext{\key{HighAvailability}}
-%%      \end{cases}$
-%%   \end{itemize}
-
-%%   For simplicity, we consider $\{\low, \high \}$ in this talk.
-
-%%   \footnotetext{Zella G. Ruthberg and Robert G. McKenzie. 1977.
-%%     Audit and Evaluation of Computer Security}
-%%   \footnotetext{Peng Li, Yun Mao and Steve Zdancewic. 2003. Information Integrity Policies}
-
-%% \end{frame}
 
 
 \begin{frame}[containsverbatim]
