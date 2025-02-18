@@ -258,9 +258,12 @@
 
   Can we infer output from input in the following program?
 
-\begin{verbatim}
-let input = private-input () in publish (¬ input)
-\end{verbatim}
+
+\begin{lstlisting}[autogobble,numbers=none,xleftmargin=.2\textwidth,xrightmargin=.2\textwidth]
+let input = private-input () in
+  publish (¬ input)
+\end{lstlisting}
+
 
 \onslide<2-> {
   \begin{itemize}
@@ -278,10 +281,12 @@ let input = private-input () in publish (¬ input)
   \frametitle{Implicit Information Flow}
 
   Can we infer output from input in the following program?
-\begin{verbatim}
+
+
+\begin{lstlisting}[autogobble,numbers=none,xleftmargin=.05\textwidth]
   let input = private-input () in
       publish (if input then false else true)
-\end{verbatim}
+\end{lstlisting}
 
 \onslide<2-> {
 \begin{itemize}
