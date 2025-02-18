@@ -426,12 +426,11 @@ let input = private-input () in publish (¬ input)
 
 \end{frame}
 
-%%%%%%%%%% Dynamic IFC, Through Heap %%%%%%%%%%%
+%%%%%%%%%% Static IFC Through Heap %%%%%%%%%%%
 \begin{frame}[containsverbatim]
   \frametitle{\bluetext{Static} Enforcement of Flows Through \\ Mutable References}
 
   \vspace{-15pt}
-  %(Implicit flow and mutable references)
   \begin{lstlisting}[mathescape,autogobble,xleftmargin=.2\textwidth,xrightmargin=.1\textwidth]
     let a     = ref $\low$ true in
     let input = private_input () in
@@ -447,6 +446,28 @@ let input = private-input () in publish (¬ input)
   \item The type of the branch condition is $\Bool_{\high}$
   \item[\no] \st{Writing to low memory under a high branch condition}
   \end{itemize}
+
+\end{frame}
+
+%%%%%%%%%% Dynamic IFC Through Heap %%%%%%%%%%%
+\begin{frame}[containsverbatim]
+  \frametitle{\redtext{Dynamic} Enforcement of Flows Through \\ Mutable References}
+
+  \vspace{-15pt}
+  \begin{lstlisting}[mathescape,autogobble,xleftmargin=.2\textwidth,xrightmargin=.1\textwidth]
+    let a     = ref $\low$ true in
+    let input = private_input () in
+    if input then
+        a := false
+    else
+        a := true
+    publish (! a)
+  \end{lstlisting}
+
+  The assignments fail at runtime because the no-sensitive-upgrade (NSU)
+  mechanism \footnote{Austin and Flanagan, Efficient purely-dynamic information
+  flow analysis. Programming Languages and Analysis for Security, 2009.}
+  prevents writing to a \low security pointer in a \high security branch.
 
 \end{frame}
 
