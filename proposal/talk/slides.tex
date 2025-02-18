@@ -92,7 +92,7 @@
 \newcommand{\app}[3]{\ensuremath{\syntax{(}{#1}\;{#2}\syntax{)}^{\bl{#3}}}}
 \newcommand{\ifexp}[4]{\ensuremath{\syntax{(if}\;{#1}\;\syntax{then}\;{#2}\;\syntax{else}\;{#3}\syntax{)}^{\bl{#4}}}}
 \newcommand{\refexp}[3]{\ensuremath{\syntax{(ref}\;{#1}\;{#2}\syntax{)}^{\bl{#3}}}}
-\newcommand{\deref}[1]{\ensuremath{\syntax{!}\;{#1}}}
+\newcommand{\deref}[2]{\ensuremath{\syntax{!}^{\bl{#2}}\;{#1}}}
 \newcommand{\assign}[3]{\ensuremath{\syntax{(}{#1}\;\syntax{:=}\;{#2}\syntax{)}^{\bl{#3}}}}
 \newcommand{\ann}[3]{\ensuremath{\syntax{(}{#1}\;\syntax{:}\;{#2}\syntax{)}^{\bl{#3}}}}
 \newcommand{\letexp}[3]{\ensuremath{\syntax{let}\;{#1}={#2}\;\syntax{in}\;{#3}}}
@@ -673,6 +673,37 @@ Removing \unk from the runtime labels enables the gradual guarantee.
           {\includegraphics[height=90pt]{yay}};
   \end{tikzpicture}
   }
+\end{frame}
+
+%%%%%%%%%% Technical Development %%%%%%%%%%%
+\begin{frame}
+  \frametitle{Technical Development}
+
+  We define a gradual IFC calculus \Surface with mutable
+  references, first-class functions, and conditionals.
+
+  \begin{itemize}
+  \item The semantics of \Surface is by translation $\mathcal{C}$ to a cast
+    calculus \CC
+  \item Casts are represented by coercions on types (a la Henglein) and
+    coercions on security labels
+  \end{itemize}
+
+  \vspace{-15pt}
+  {\small \[
+  \begin{array}{rcl}
+    \ell & \in & \{\low,\high\}  \\
+    g & \in & \{\low,\high,\unk\} \\
+    M & ::=  & x \MID \const{k}{\ell} \MID \lam{g}{x}{A}{M}{\ell} \MID \app{M}{M}{p} \\
+      & \MID & \ifexp{M}{M}{M}{p} \\
+      & \MID & \refexp{\ell}{M}{p} \MID \deref{M}{p} \MID \assign{M}{M}{p} \\
+    N & ::=  &  \ldots \MID \ccaddr{n} \MID \cccast{N}{c} \MID \blame{p} \MID \ccprot{\mathit{e}}{\ell}{M}{} \\
+    c & ::= & \coerc{\id{\iota}}{s} \MID \coerc{(\refco{c}{d})}{s} \MID \coerc{\funco{s}{c}{c}}{s}  \\
+    s & ::= & \id{g} \MID \up \MID \inj{\ell} \MID \proj{\ell}{p} \MID \bot^{\bl{p}} \MID s \seq s \\
+    e & ::= & \ell \MID \blame{p} \MID \cccast{e}{s}
+  \end{array}
+  \]}
+
 \end{frame}
 
 \begin{frame}
