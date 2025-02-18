@@ -725,10 +725,40 @@ Removing \unk from the runtime labels enables the gradual guarantee.
 
 \end{frame}
 
+%%%%%%%%%% Noninterference %%%%%%%%%%%
+\begin{frame}
+  \begin{theorem}[Noninterference for \Surface]
+    Suppose program $M$ is well-typed: $(x{:}\Bool_{\high}) ; \low \vdash M : \Bool_{\low}$. \\
+    If for any boolean inputs $b_1,b_2$,
+    {\normalfont
+      \begin{gather*}
+        (\compile{M})[x := b_1] \mid \emptyset \mid \low \longrightarrow^{*} V_1 \mid \mu_1 \\
+        (\compile{M})[x := b_2] \mid \emptyset \mid \low \longrightarrow^{*} V_2 \mid \mu_2
+    \end{gather*}}
+    then $V_1 = V_2$.
+  \end{theorem}
+\end{frame}
+
 %%%%%%%%%% The End %%%%%%%%%%%
 \begin{frame}
-  \centering \Huge
-  \bluetext{Thank you!}
+  \frametitle{Conclusion}
+
+  \begin{itemize}
+  \item Noninterference and the gradual guarantee can co-exist if we
+    keep \unk out of the runtime security labels.
+  \item Gradual information flow can be nicely expressed using coercions, which
+    is the first step towards an efficient implementation.
+  \item The Agda mechanization of \Surface, the proof of the gradual
+    guarantee, and some of the noninterfence proof are available at
+    \begin{center}
+      \url{https://github.com/Gradual-Typing/LambdaIFCStar}
+    \end{center}
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \centering \Huge \bluetext{Thank you!}
 \end{frame}
 
 \end{document}
