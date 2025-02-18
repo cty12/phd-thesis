@@ -706,240 +706,29 @@ Removing \unk from the runtime labels enables the gradual guarantee.
 
 \end{frame}
 
+%%%%%%%%%% Gradual Guarantee %%%%%%%%%%%
 \begin{frame}
-  \frametitle{Coercion Calculus for Security Labels}
-
-  Syntax and typing for security coercions and
-  coercion sequences:
-
-  \vspace{-20pt}
-  \begin{figure}[tbp]
-  \raggedright
-  \[
-  \begin{array}{rcll}
-    \text{specific security labels} & \ell & \in & \{ \low , \high \} \\
-    \text{gradual security labels}  & g    & ::= & \unk \MID \ell \\
-    \text{blame labels}         & \bl{p}, \bl{q}     &      & \\
-    \text{security coercions}            & c, d     & ::=  & \id{g} \MID \up \MID \inj{\ell} \MID \proj{\ell}{p} \MID \bot^{\bl{p}} \\
-    \text{coercion sequences} & \bar{c}, \bar{d} & ::=  & \id{g} \MID \err{g_1}{g_2}{p} \MID \bar{c} \seq c
-  \end{array}
-  \]
-  \fbox{$\vdash c : g_1 \Rightarrow g_2$}
-  \begin{gather*}
-    \inference{}{\vdash \id{g} : g \Rightarrow g}
-    \quad
-    \inference{}
-              {\vdash \,\up\, : \low \Rightarrow \high}
-    \quad
-    \inference{}
-              {\vdash \inj{\ell} : \ell \Rightarrow \unk}
-    \\[1ex]
-    \inference{}
-              {\vdash \proj{\ell}{p} : \unk \Rightarrow \ell}
-    \quad
-    \inference{}
-              {\vdash \bot^{\bl{p}} : \high \Rightarrow \low}
-  \end{gather*}
-  \end{figure}
-\end{frame}
-
-
-\begin{frame}
-  Reduction semantics and normal forms of the coercion calculus on security labels:
-
-\begin{figure}[tbp]
-  \footnotesize
-\raggedright
-  \fbox{$\mathbf{NF}\; \bar{c}$}
-  \begin{gather*}
-  \inference{}{\mathbf{NF}\; \id{g}}
-  \quad
-  \inference{}{\mathbf{NF}\; \id{\unk} \seq \proj{\ell}{p}}
-  \quad
-  \inference{\mathbf{NF}\; \bar{c}}{\mathbf{NF}\; \bar{c}\seq\inj{\ell}}
-  \quad
-  \inference{\mathbf{NF}\; \bar{c}}{\mathbf{NF}\; \bar{c}\seq\up}
-  \end{gather*}
-  \fbox{$c \mathrel{;} c \longrightarrow c$}
-  \begin{gather*}
-  \textit{?-id}~
-  \inference{}
-            {\inj{\ell} \seq \proj{\ell}{p} \longrightarrow \id{\ell}}
-  \quad
-  \textit{?-}\uparrow~
-  \inference{}
-            {\inj{\low} \seq \proj{\high}{p} \longrightarrow \;\;\up}
-  \\[1ex]
-  \textit{?-}\bot~
-  \inference{}
-            {\inj{\high} \seq \proj{\low}{p} \longrightarrow \bot^{\bl{p}}}
-  \end{gather*}
-  \fbox{$\bar{c} \longrightarrow \bar{d}$}
-  \begin{gather*}
-  \textit{id}~
-  \inference{\mathbf{NF}\; \bar{c}}
-            {\bar{c} \seq \id{g} \longrightarrow \bar{c}}
-  \qquad
-  \bot~
-  \inference{\mathbf{NF}\; \bar{c} & \vdash \bar{c} : g_1 \Rightarrow g_2}
-            {\bar{c} \seq \bot^{\bl{p}} \longrightarrow \err{g_1}{\low}{p} }
-  \\[1ex]
-  \xi\textit{-}\bot~
-  \inference{\vdash c : g_2 \Rightarrow g_3}
-    {\err{g_1}{g_2}{p} \seq c \longrightarrow \err{g_1}{g_3}{p}}
-  \\[1ex]
-  \xi_L~
-  \inference{\bar{c} \longrightarrow \bar{d}}{\bar{c} \seq c \longrightarrow \bar{d} \seq c}
-  \qquad
-  \xi_R~
-  \inference{\mathbf{NF}\; \bar{c} & c \seq d \longrightarrow c'}
-            {\bar{c} \seq c \seq d \longrightarrow \bar{c}; c'}
-  \end{gather*}
-\end{figure}
-\end{frame}
-
-\begin{frame}
-  \frametitle{(A Glimpse of) the Cast Calculus \CC}
-
-  \begin{itemize}
-    \item Representation of PC: label expressions
-      {\small $e, \PC ::= \ell \MID \blame{p} \MID \cccast{e}{\bar{c}}$}
-    \item Coercions on values of \CC:
-      \vspace{-5pt}
-      \[
-      \footnotesize
-      \begin{array}{rcll}
-        \text{base types}               & \iota     & ::= & \Unit \MID \Bool \\
-        \text{raw types}                & T, S      & ::= & \iota \MID \Fun{A}{gc}{B} \mid \Refer{(T_g)} \\
-        \text{types}                    & A, B      & ::= & T_g \\
-        \text{raw coercions}            & c_r, d_r  & ::=  & \id{\iota} \MID \refco{\bm{c}}{\bm{d}} \MID \left( \funco{\bar{d}}{\bm{c}}{\bm{d}} \right) \\
-        \text{coercions}                & \bm{c}, \bm{d} & ::= & \coerc{c_r}{\bar{c}}
-      \end{array}
-      \]
-    \item NSU checking: reducing label expressions
-      \vspace{-5pt}
-      {\scriptsize
-      \begin{gather*}
-      \inference{n \; \mathbf{FreshIn} \; \mu(\ell) & \highlightred{\cccast{\PC}{\unk \Rightarrow^{\bl{p}} \ell} \longrightarrow^{*} \PC'} }
-                {\reduce{\ccrefproj{\ell}{V}{p}}{\mu}{\PC}{\ccaddr{n}}{(\mu , \ell \mapsto n \mapsto V)}}
-      \\[1ex]
-      \begin{split}
-      \inference{\mathbf{NF}\;\bar{c} & \highlightred{\cccast{(\mathit{stamp!}\;\PC\;|\bar{c}|)}{\unk \Rightarrow^{\bl{p}} \hat{\ell}} \longrightarrow^{*} \PC'} & \cccast{V}{\bm{c}} \longrightarrow^{*} W}
-                {\reduce{\ccassignproj{\left(\cccast{\ccaddr{n}}{\coerc{\refco{\bm{c}}{\bm{d}}}{\bar{c}}}\right)}{V}{T}{g}{p}}{\mu}{\PC}{\ccconst{\unit}}{[\hat{\ell} \mapsto n \mapsto W] \; \mu}} \\
-      \vdash \bm{c} : T_g \Rightarrow S_{\hat{\ell}} , \vdash \bm{d} : S_{\hat{\ell}} \Rightarrow T_g
-      \end{split}
-      \end{gather*}
-      }
-  \end{itemize}
-\end{frame}
-
-
-\begin{frame}
-  \frametitle{Road Map}
-
-  \begin{itemize}
-  \item \textcolor{gray}{Background}
-  \item \textcolor{gray}{\Surface in Action}
-  \item \textcolor{gray}{Coercion-based Semantics for Gradual Security}
-  \item[\textcolor{Red}{\ding{43}}] \cul{Meta-theoretical Results of \Surface}
-  \end{itemize}
-\end{frame}
-
-
-\begin{frame}
-  \begin{theorem}[Compilation preserves types]
-    \label{thm:compile-pres}
-    If $\Gamma ; g \vdash M : A$, then $\Gamma ; \emptyset ; g ; \low \vdash \compile{M} : A$.
+  \begin{theorem}[Gradual guarantee for \Surface]
+    \label{thm:gg}
+    Suppose $M$ and $M'$ are well-typed terms in \Surface.\\
+    If
+    \begin{align*}
+      &M \sqsubseteq M' \\
+      &\compile{M'}\mid\emptyset\mid\low \longrightarrow^{*} V'\mid\mu'
+    \end{align*}
+    then there exists a value $V$ and heap $\mu$ such that
+    \begin{align*}
+      &\compile{M}\mid\emptyset\mid\low \longrightarrow^{*} V\mid\mu \\
+      &V \sqsubseteq V'
+    \end{align*}
   \end{theorem}
 
-  \begin{theorem}[Progress]
-    \label{thm:progress}
-    Suppose \PC is well-typed: $\vdash \PC \Leftarrow g$,
-    $M$ is well-typed: $\emptyset ; \Sigma ; g ; | \PC | \vdash M \Leftarrow A$,
-    and the heap $\mu$ is well-typed: $\Sigma \vdash \mu$. \\
-    Then either (1) $M$ is a value or (2) $M$ is a blame
-    or (3) $M$ can take a reduction step:
-    $\reduce{M}{\mu}{\PC}{N}{\mu'}$ for some $N$ and $\mu'$.
-  \end{theorem}
-
-  \begin{theorem}[Preservation]
-    \label{thm:preservation}
-    Suppose \PC is well-typed:  $\vdash \PC \Leftarrow g$,
-    $M$ is well-typed: $\emptyset ; \Sigma ; g ; |\PC| \vdash M \Leftarrow A$
-    and the heap $\mu$ is well-typed: $\Sigma \vdash \mu$. \\
-    If $\reduce{M}{\mu}{\PC}{N}{\mu'}$, there exists $\Sigma'$ s.t
-    $\Sigma' \supseteq \Sigma$, $\emptyset ; \Sigma' ; g ; |\PC| \vdash N \Leftarrow A$,
-    and $\Sigma' \vdash \mu'$.
-  \end{theorem}
 \end{frame}
 
+%%%%%%%%%% The End %%%%%%%%%%%
 \begin{frame}
-  \begin{theorem}[The gradual guarantee]
-    Suppose $M$, $M'$ are related by precision:
-    $$\precctx{\emptyset}{\emptyset}{\emptyset}{\emptyset}{\low}{\low}{\low}{\low}\ccprec{M}{M'}{A}{A'}$$
-    If $M'$ evaluations to a value:
-    $$M'\mid\emptyset\mid\low \longrightarrow^{*} V'\mid\mu'$$
-    there exists $V$ and $\mu$ s.t. $M$ evaluates to $V$:
-    $$M\mid\emptyset\mid\low \longrightarrow^{*} V\mid\mu$$
-    and the resulting values are related by precision for some $\Sigma$, $\Sigma'$:
-    $$\precctx{\emptyset}{\emptyset}{\Sigma}{\Sigma'}{\low}{\low}{\low}{\low}\ccprec{V}{V'}{A}{A'}$$
-  \end{theorem}
-\end{frame}
-
-\begin{frame}
-
-  The noninterference of \Surface is conjectured by that of \SurfaceOld:
-  \bigskip
-
-  \Surface performs type-guided classification but \SurfaceOld does not,
-  so the value that a \Surface program produces is at least as secure as
-  the value produced by the same program in \SurfaceOld.
-  \bigskip
-
-  \begin{theorem}[Noninterference of \SurfaceOld]
-    \label{thm:NI}
-    If $M$ is well-typed
-    $(x{:}\Bool_{\high}) ; \emptyset ; \low ; \low \vdash M : \Bool_{\low}$
-    and
-    \begin{equation*}
-    \begin{split}
-        \bigstep{\emptyset}{\low}{M [ x := (b_1)_{\high}]}{V_1}{\mu_1} \\
-        \bigstep{\emptyset}{\low}{M [ x := (b_2)_{\high}]}{V_2}{\mu_2}
-    \end{split}
-    \end{equation*}
-    then $V_1 = V_2$.
-  \end{theorem}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Code and Data Availability}
-
-  \purpletext{\large \url{https://github.com/Gradual-Typing/LambdaSecStar}}
-  \bigskip
-
-  \includegraphics[width=\textwidth]{repo_stats}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Main Takeaways}
-
-  \begin{enumerate}
-    \item It is possible to satisfy both noninterference and the gradual guarantee
-      in a gradual security-typed language,
-      provided that the security level of data remains specific at runtime
-      \smallskip
-    \item Gradual information flow can be represented as coercions. In particular,
-      NSU checking is a special projection that casts PC to the security of the memory
-      location to modify
-      \smallskip
-    \item The key to the semantics design of of a gradual security-typed language is
-      identifying injections ($\inj{\ell}$) and projections ($\proj{\ell}{p}$)
-  \end{enumerate}
-\end{frame}
-
-\begin{frame}
-  \centering \Large
-  \redtext{Thank you} \bluetext{for your attention!}
+  \centering \Huge
+  \bluetext{Thank you!}
 \end{frame}
 
 \end{document}
