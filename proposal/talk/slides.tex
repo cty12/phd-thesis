@@ -221,24 +221,34 @@
   \footnotetext{Acanthus textiles. William Morris Gallery}
 \end{frame}
 
+%%%%%%%%%% Statement %%%%%%%%%%%
+\begin{frame}
+  \frametitle{Tianyu's Thesis Statement}
+
+  \vspace{10pt}
+  \begin{center}
+  \fbox{
+	  \parbox{0.9\linewidth}{\large It \ul{is possible} to design a gradual IFC
+      programming language that satisfies both noninterference and the gradual
+      guarantee, by excluding the unknown label \unk from runtime security
+      labels. } }
+  \end{center}
+\end{frame}
+
 %%%%%%%%%% Road Map %%%%%%%%%%%
 \begin{frame}
   \frametitle{Road Map}
 
   \begin{itemize}
-  \item[\textcolor{Red}{\ding{43}}] \cul{Background:}
+  \item[\ding{43}] Background
     \begin{itemize}
     \item Explicit flow and implicit flow
-    \item Information flow control (IFC), static and dynamic
-    \item The tension between IFC and gradual typing
+    \item Information flow control (IFC): static, dynamic, and gradual
+    \item The gradual guarantee and its tension with IFC
     \end{itemize}
-  \item \Surface in Action
-    \begin{itemize}
-    \item[\ding{79}] Solving the Tension Between Noninterference and the Gradual Guarantee
-    \item Type-Based Reasoning in \Surface
-    \end{itemize}
-  \item Coercion-based Semantics for Gradual Security
-  \item Meta-theoretical Results of \Surface
+  \item[\ding{79}] Source of the tension: including \unk in runtime labels
+  \item The technical development of \Surface
+  \item The gradual guarantee and noninterference for \Surface
   \end{itemize}
 \end{frame}
 
@@ -758,7 +768,7 @@ Removing \unk from the runtime labels enables the gradual guarantee.
 \end{frame}
 
 \begin{frame}
-  \centering \Huge \bluetext{Thank you!}
+  \centering \Huge \bluetext{Thank you! \smiley{}}
 \end{frame}
 
 \end{document}
