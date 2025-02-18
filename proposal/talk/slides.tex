@@ -685,6 +685,26 @@ Removing \unk from the runtime labels enables the gradual guarantee.
   }
 \end{frame}
 
+%%%%%%%%%% Defaults in LambdaIFCStar %%%%%%%%%%%
+\begin{frame}[fragile]
+  \frametitle{Too Many Annotations?}
+
+  \begin{itemize}
+  \item The default security label in \Surface is \low, so the programmer does not
+  have to label constants
+  \item Remove the labels on constants to obtain the following program, which also
+  reduces successfully to unit:
+  \end{itemize}
+  \vspace{10pt}
+
+  \begin{lstlisting}[mathescape,autogobble,numbers=none,xleftmargin=.15\textwidth,xrightmargin=.15\textwidth]
+    let x = private-input () in
+    let y : $(\Refer{\Bool_{\unk}})_{\unk}$ = ref $\high$ true in
+    if x then (y := false)
+         else ()
+  \end{lstlisting}
+\end{frame}
+
 %%%%%%%%%% Technical Development %%%%%%%%%%%
 \begin{frame}
   \frametitle{Technical Development}
