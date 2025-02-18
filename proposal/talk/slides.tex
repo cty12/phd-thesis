@@ -426,6 +426,75 @@ let input = private-input () in publish (¬ input)
 
 \end{frame}
 
+%%%%%%%%%% Dynamic IFC, Implicit Flow %%%%%%%%%%%
+\begin{frame}[containsverbatim]
+  \frametitle{\purpletext{Gradual Typing} Bridges Static and Dynamic IFC}
+
+  Partially-annotated \texttt{flip}:
+  \begin{lstlisting}[mathescape,autogobble,xleftmargin=20pt]
+    let flip : $\highlightred{\Bool_{\unk}}$ → $\highlightblue{\Bool_{\low}}$ =
+        λ b : $\highlightred{\Bool_{\unk}}$. if b then false else true in
+    let input  = private-input () in
+    let result = flip input in
+      publish result
+  \end{lstlisting}
+
+  \begin{itemize}
+  \item \textcolor{Green}{Well-typed}\quad~but~\quad\textcolor{Red}{errors at runtime}
+  \item Checking happens on the boundaries between static and dynamic fragments
+  \item The information flow violation is detected earlier than the dynamic
+    version, as \texttt{flip} returns
+  \end{itemize}
+
+\end{frame}
+
+%%%%%%%%%% Gradual Guarantee %%%%%%%%%%%
+\begin{frame}[containsverbatim]
+  \frametitle{\purpletext{The Gradual Guarantee}}
+
+  \begin{minipage}{0.3\textwidth}
+    \redtext{\footnotesize less precise}
+  \begin{lstlisting}[mathescape,autogobble,basicstyle=\tiny\ttfamily,numbers=none]
+    let f : $\highlightred{\Bool_{\unk}}$→$\highlightred{\Bool_{\unk}}$ =
+        λ b : $\highlightred{\Bool_{\unk}}$. true in
+    let i = private-input () in
+    let result = f i in
+      publish result
+  \end{lstlisting}
+  \end{minipage}
+  {\tiny $\sqsubseteq~$}
+  \begin{minipage}{0.3\textwidth}
+    \phantom{middling precise}
+  \begin{lstlisting}[mathescape,autogobble,basicstyle=\tiny\ttfamily,numbers=none]
+      let f : $\highlightred{\Bool_{\unk}}$→$\highlightblue{\Bool_{\low}}$ =
+          λ b : $\highlightred{\Bool_{\unk}}$. true in
+      let i = private-input () in
+      let result = f i in
+        publish result
+  \end{lstlisting}
+  \end{minipage}
+  {\tiny $\sqsubseteq~$}
+  \begin{minipage}{0.3\textwidth}
+    \bluetext{\footnotesize more precise}
+  \begin{lstlisting}[mathescape,autogobble,basicstyle=\tiny\ttfamily,numbers=none]
+      let f : $\highlightblue{\Bool_{\high}}$→$\highlightblue{\Bool_{\low}}$ =
+          λ b : $\highlightblue{\Bool_{\high}}$. true in
+      let i = private-input () in
+      let result = f i in
+        publish result
+  \end{lstlisting}
+  \end{minipage}
+
+  \vspace{20pt}
+
+  \begin{itemize}
+  \item In the absense of errors, adding or removing security annotations does
+    not change the result of the program
+  \item Adding security annotations may trigger errors
+  \item Removing security annotations may not trigger errors
+  \end{itemize}
+\end{frame}
+
 %%%%%%%%%% Static IFC Through Heap %%%%%%%%%%%
 \begin{frame}[containsverbatim]
   \frametitle{\bluetext{Static} Enforcement of Flows Through \\ Mutable References}
@@ -469,54 +538,6 @@ let input = private-input () in publish (¬ input)
   flow analysis. Programming Languages and Analysis for Security, 2009.}
   prevents writing to a \low security pointer in a \high security branch.
 
-\end{frame}
-
-
-\begin{frame}[containsverbatim]
-  \frametitle{\purpletext{Gradual Typing} Bridges Static and Dynamic IFC}
-
-  Consider the following \purpletext{partially annotated} version of \texttt{flip}.
-  The return value must be \low, because we intend to output the result:
-
-  \begin{lstlisting}[mathescape,autogobble,xleftmargin=.1\textwidth,xrightmargin=.1\textwidth,frame=lines]
-    let flip : $\highlightred{\Bool_{\unk}}$ → $\highlightblue{\Bool_{\low}}$ =
-      λ b : $\highlightred{\Bool_{\unk}}$. if b then false else true in
-    let input  = private-input () in
-    let result = flip input in
-      publish result
-  \end{lstlisting}
-
-  \begin{itemize}
-  \item[\yes] \textcolor{Green}{Well-typed} \quad \textit{but} \quad
-    \no \; \textcolor{Red}{Fails at runtime} {\scriptsize (for both \texttt{true} and \texttt{false})}
-    \begin{itemize}
-      \item thus preventing the leak through implicit flow
-    \end{itemize}
-  \item The information flow violation is detected \textit{ealier} than the dynamic
-    version, as \texttt{flip} returns
-  \item[\ding{82}] Checking happens on the boundaries between statically- and
-      dynamically-typed code fragments
-  \end{itemize}
-
-\end{frame}
-
-
-\begin{frame}
-  \frametitle{\purpletext{The Gradual Guarantee}}
-  \begin{itemize}
-    \item[\bluetext{\ding{82}}] \bluetext{{\large Removing} annotations} from a correctly running program:
-      \begin{itemize}
-      \item[] Example: {\small $(42 : \low : \high) \sqsupseteq (42 : \unk : \high) \sqsupseteq (42 : \unk : \unk)$}
-      \item[$\rightarrow$] ... results in the same runtime behavior ($42$)
-      \end{itemize}
-    \vspace{15pt}
-    \item[\redtext{\ding{82}}] \redtext{{\large Adding} annotations} may introduce more errors:
-      \begin{itemize}
-      \item[] Example: {\small $(42 : \unk : \unk : \unk) \sqsubseteq (42 : \high : \unk : \low)$}
-      \item {\small $(42 : \unk : \unk : \unk) \Downarrow 42$} but
-        {\small $(42 : \high : \unk : \low) \Downarrow \key{error}$ }
-      \end{itemize}
-  \end{itemize}
 \end{frame}
 
 \begin{frame}
