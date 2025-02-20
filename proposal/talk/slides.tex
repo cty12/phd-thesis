@@ -763,10 +763,9 @@ Removing \unk from the runtime labels enables the gradual guarantee.
   \begin{itemize}
   \item Noninterference and the gradual guarantee can co-exist if we
     keep \unk out of the runtime security labels.
-  \item Gradual information flow can be nicely expressed using coercions, which
-    is the first step towards an efficient implementation.
-  \item The Agda mechanization of \Surface, the proof of the gradual
-    guarantee, and some of the noninterfence proof are available at
+  \item The security labels on constants and memory locations should default to
+    \low or \high instead of \unk.
+  \item The Agda mechanization of \Surface is at
     \begin{center}
       \url{https://github.com/Gradual-Typing/LambdaIFCStar}
     \end{center}
