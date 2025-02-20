@@ -247,8 +247,8 @@
     \item The gradual guarantee and its tension with IFC
     \end{itemize}
   \item[\ding{79}] Source of the tension: including \unk in runtime labels
-  \item The technical development of \Surface
-  \item The gradual guarantee and noninterference for \Surface
+  \item Comparing \Surface with \GSLRef
+  \item Timeline of dissertation writing
   \end{itemize}
 \end{frame}
 
@@ -331,8 +331,8 @@ let input = private-input () in
   \end{lstlisting}
 
   \begin{itemize}
-  \item[\yes] \textcolor{Green}{Well-typed} \qquad~and~\qquad
-    \yes \; \textcolor{Green}{Runs successfully} to \texttt{unit}
+  \item[\yes] \textcolor{Green}{Well-typed}\quad~and~\quad
+    \textcolor{Green}{runs successfully} to \texttt{unit}
   \item Why? The return value of \texttt{fconst} is
     \(
     \left\{
@@ -384,7 +384,7 @@ let input = private-input () in
   \end{lstlisting}
 
   \begin{itemize}
-  \item[\no] \textcolor{Red}{Fails} at runtime (regardless of input)
+  \item[\no] \textcolor{Red}{Errors} at runtime (regardless of input)
   \item \redtext{A runtime check} happens before calling \texttt{publish}
   \end{itemize}
 
@@ -433,7 +433,7 @@ let input = private-input () in
   \end{lstlisting}
 
   \begin{itemize}
-  \item[\no] \textcolor{Red}{Fails} at runtime (regardless of input)
+  \item[\no] \textcolor{Red}{Errors} at runtime (regardless of input)
   \item \texttt{flip} produces a \high value because of \high branch condition
   \item A runtime check happens before calling \texttt{publish}
   \item Illegal implicit flow ruled out \redtext{at runtime}
@@ -690,9 +690,9 @@ Removing \unk from the runtime labels enables the gradual guarantee.
   }
 \end{frame}
 
-%%%%%%%%%% Defaults in LambdaIFCStar %%%%%%%%%%%
+%%%%%%%%%% Comparison %%%%%%%%%%%
 \begin{frame}[fragile]
-  \frametitle{Too Many Annotations?}
+  \frametitle{Comparing \Surface With \GSLRef}
 
   \begin{itemize}
   \item The default security label in \Surface is \low, so the programmer does not
@@ -700,78 +700,60 @@ Removing \unk from the runtime labels enables the gradual guarantee.
   \item Remove the labels on constants to obtain the following program, which also
   reduces successfully to unit:
   \end{itemize}
-  \vspace{10pt}
 
-  \begin{lstlisting}[mathescape,autogobble,numbers=none,xleftmargin=.15\textwidth,xrightmargin=.15\textwidth]
+  \begin{lstlisting}[mathescape,autogobble,numbers=none,xleftmargin=.15\textwidth,xrightmargin=.1\textwidth]
     let x = private-input () in
-    let y : $(\Refer{\Bool_{\unk}})_{\unk}$ = ref $\high$ true in
-    if x then (y := false)
+    let a : $(\Refer{\Bool_{\unk}})_{\unk}$ = ref $\highlight{highlight}{\high}$ true in
+    if x then (a := false)
+         else ()
+  \end{lstlisting}
+
+  \begin{center}
+  Comparing with the program in \GSLRef, which errors:
+  \end{center}
+  \begin{lstlisting}[mathescape,autogobble,numbers=none,xleftmargin=.15\textwidth,xrightmargin=.1\textwidth]
+    let x = private-input () in
+    let a = ref $\highlight{highlight}{\unk}$ $\true_{\unk}$ in
+    if x then (a := $\false_{\high}$)
          else ()
   \end{lstlisting}
 \end{frame}
 
-%%%%%%%%%% Technical Development %%%%%%%%%%%
+%%%%%%%%%% Syntax %%%%%%%%%%%
 \begin{frame}
-  \frametitle{Technical Development}
+  \frametitle{The Syntax of \Surface}
 
-  We define a gradual IFC calculus \Surface with mutable
-  references, first-class functions, and conditionals.
-
-  \begin{itemize}
-  \item The semantics of \Surface is by translation $\mathcal{C}$ to a cast
-    calculus \CC
-  \item Casts are represented by coercions on types (a la Henglein) and
-    coercions on security labels
-  \end{itemize}
-
-  \vspace{-15pt}
+  Highlighted security labels default to \low if omitted:
+  \vspace{15pt}
   {\small \[
   \begin{array}{rcl}
     \ell & \in & \{\low,\high\}  \\
     g & \in & \{\low,\high,\unk\} \\
-    M & ::=  & x \MID \const{k}{\ell} \MID \lam{g}{x}{A}{M}{\ell} \MID \app{M}{M}{p} \\
+    M & ::=  & x \MID \const{k}{\highlight{highlight}{\ell}} \MID \lam{g}{x}{A}{M}{\highlight{highlight}{\ell}} \MID \app{M}{M}{p} \\
       & \MID & \ifexp{M}{M}{M}{p} \\
-      & \MID & \refexp{\ell}{M}{p} \MID \deref{M}{p} \MID \assign{M}{M}{p} \\
-    N & ::=  &  \ldots \MID \ccaddr{n} \MID \cccast{N}{c} \MID \blame{p} \MID \ccprot{\mathit{e}}{\ell}{M}{} \\
-    c & ::= & \coerc{\id{\iota}}{s} \MID \coerc{(\refco{c}{d})}{s} \MID \coerc{\funco{s}{c}{c}}{s}  \\
-    s & ::= & \id{g} \MID \up \MID \inj{\ell} \MID \proj{\ell}{p} \MID \bot^{\bl{p}} \MID s \seq s \\
-    e & ::= & \ell \MID \blame{p} \MID \cccast{e}{s}
+      & \MID & \refexp{\highlight{highlight}{\ell}}{M}{p} \MID \deref{M}{p} \MID \assign{M}{M}{p}
   \end{array}
   \]}
 
 \end{frame}
 
-%%%%%%%%%% Gradual Guarantee %%%%%%%%%%%
+%%%%%%%%%% Schedule %%%%%%%%%%%
 \begin{frame}
-  \begin{theorem}[Gradual guarantee for \Surface]
-    \label{thm:gg}
-    Suppose $M$ and $M'$ are well-typed terms in \Surface.\\
-    If
-    \begin{align*}
-      &M \sqsubseteq M' \\
-      &\compile{M'}\mid\emptyset\mid\low \longrightarrow^{*} V'\mid\mu'
-    \end{align*}
-    then there exists a value $V$ and heap $\mu$ such that
-    \begin{align*}
-      &\compile{M}\mid\emptyset\mid\low \longrightarrow^{*} V\mid\mu \\
-      &V \sqsubseteq V'
-    \end{align*}
-  \end{theorem}
+  \frametitle{Timeline}
 
-\end{frame}
+  I have completed the technical development of \Surface. I plan to submit the
+  dissertation in early May. Planned chapters:
 
-%%%%%%%%%% Noninterference %%%%%%%%%%%
-\begin{frame}
-  \begin{theorem}[Noninterference for \Surface]
-    Suppose program $M$ is well-typed: $(x{:}\Bool_{\high}) ; \low \vdash M : \Bool_{\low}$. \\
-    If for any boolean inputs $b_1,b_2$,
-    {\normalfont
-      \begin{gather*}
-        (\compile{M})[x := b_1] \mid \emptyset \mid \low \longrightarrow^{*} V_1 \mid \mu_1 \\
-        (\compile{M})[x := b_2] \mid \emptyset \mid \low \longrightarrow^{*} V_2 \mid \mu_2
-    \end{gather*}}
-    then $V_1 = V_2$.
-  \end{theorem}
+  \begin{enumerate}
+  \item (\greentext{DONE}) Introduction
+  \item (\greentext{DONE}) Gradual IFC in \Surface
+  \item (\greentext{DONE}) The Cast Calculus \CC
+  \item (\orangetext{TODO}) Compiling From \Surface to \CC (by early March)
+  \item (\orangetext{TODO}) Type Safety of \Surface (by mid March)
+  \item (\orangetext{TODO}) Gradual Guarantee of \Surface (by late March)
+  \item (\orangetext{TODO}) Noninterference of \Surface (by early April)
+  \item (\orangetext{TODO}) Conclusion and Future Work (by early to mid April)
+  \end{enumerate}
 \end{frame}
 
 %%%%%%%%%% The End %%%%%%%%%%%
