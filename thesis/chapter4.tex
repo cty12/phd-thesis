@@ -9,7 +9,11 @@
     \unk \Rightarrow^{\bl{p}} \ell &= \id{\unk} \seq \proj{\ell}{\bl{p}} \\
     \low \Rightarrow^{\bl{p}} \low &= \id{\low} \\
     \low \Rightarrow^{\bl{p}} \high &= \id{\low} \seq \up \\
-    \high \Rightarrow^{\bl{p}} \high &= \id{\high}
+    \high \Rightarrow^{\bl{p}} \high &= \id{\high} \\
+    \iota \Rightarrow^{\bl{p}} \iota &= \id{\iota} & \fbox{$S \Rightarrow^{\bl{p}} T = c_r$} \\
+    (\Refer{A}) \Rightarrow^{\bl{p}} (\Refer{B}) &= \refco{(B \Rightarrow^{\bl{p}} A)}{(A \Rightarrow^{\bl{p}} B)} \\
+    (\Fun{A}{g_1}{B}) \Rightarrow^{\bl{p}} (\Fun{C}{g_2}{D}) &= (\funco{g_2 \Rightarrow^{\bl{p}} g_1}{(C \Rightarrow^{\bl{p}} A)}{(B \Rightarrow^{\bl{p}} D)}) \\
+    S_{g_1} \Rightarrow^{\bl{p}} T_{g_2} &= (\coerc{S \Rightarrow^{\bl{p}} T}{g_1 \Rightarrow^{\bl{p}} g_2}) & \fbox{$A \Rightarrow^{\bl{p}} B = \bm{c}$}
   \end{align*}
   \caption{Coerce functions of security labels and types}
   \label{fig:coerce}
@@ -48,6 +52,27 @@
     \end{cases} \\
     &\text{where}~
     \bm{c_1} = A \Rightarrow^{\bl{p}} A \consisjoin B, \bm{c_2} = B \Rightarrow^{\bl{p}} A \consisjoin B
+    % Ann
+    \intertext{Let $M$ be well-typed $\Gamma; g' \vdash M : A'$}
+    \compile{\ann{M}{A}{p}} =& \cccast{(\compile{M})}{A' \Rightarrow^{\bl{p}} A}
+    % Let
+    \intertext{Let $M, N$ be well-typed $\Gamma; g' \vdash M : A, (\Gamma , x{:}A) ; g' \vdash N : B$}
+    \compile{(\letexp{x}{M}{N})} =& \cclet{x}{(\compile{M})}{A}{(\compile{N})}
+    % Ref
+    \intertext{Let $M$ be well-typed $\Gamma; g' \vdash M : T_g$}
+    \compile{\refexp{\ell}{M}{p}} =&
+    \begin{cases}
+      \ccref{\ell}{(\cccast{(\compile{M})}{T_g \Rightarrow^{\bl{p}} T_{\ell}})} & ~\text{if $g'$ is specific} \\
+      \ccrefproj{\ell}{(\cccast{(\compile{M})}{T_g \Rightarrow^{\bl{p}} T_{\ell}})}{p} & ~\text{otherwise}
+    \end{cases}
+    % Deref
+    \intertext{Let $M$ be well-typed $\Gamma; g' \vdash M : (\Refer{A})_g$}
+    \compile{(\deref{M}{p})} =&
+    \begin{cases}
+      \ccderef{(\compile{M})}{A}{g} &~\text{if $g$ is specific} \\
+      \ccderefstar{(\cccast{(\compile{M})}{\bm{c}})}{T} &~\text{otherwise} \\
+      \qquad\text{where}~ A = T_{g'}, \bm{c} = (\Refer{T_{g'}})_g \Rightarrow^{\bl{p}} (\Refer{T_{\unk}})_{\unk}
+    \end{cases}
     % Assign
     \intertext{Let $L, M$ be well-typed $\Gamma; g' \vdash L : (\Refer{T_{\hat{g}}})_g, \Gamma; g' \vdash M : A$}
     \compile{\assign{L}{M}{p}} =&
