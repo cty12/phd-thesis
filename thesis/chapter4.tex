@@ -2,6 +2,20 @@
 \label{ch:compile}
 
 \begin{figure}[tbp]
+  \raggedright
+  \begin{align*}
+    \unk \Rightarrow^{\bl{p}} \unk &= \id{\unk} & \fbox{$g\Rightarrow^{\bl{p}}g=\bar{c}$} \\
+    \ell \Rightarrow^{\bl{p}} \unk &= \id{\ell} \seq \inj{\ell} \\
+    \unk \Rightarrow^{\bl{p}} \ell &= \id{\unk} \seq \proj{\ell}{\bl{p}} \\
+    \low \Rightarrow^{\bl{p}} \low &= \id{\low} \\
+    \low \Rightarrow^{\bl{p}} \high &= \id{\low} \seq \up \\
+    \high \Rightarrow^{\bl{p}} \high &= \id{\high}
+  \end{align*}
+  \caption{Coerce functions of security labels and types}
+  \label{fig:coerce}
+\end{figure}
+
+\begin{figure}[tbp]
 \raggedright
 \fbox{$\compile{M} = N$}
 {\footnotesize
@@ -23,6 +37,17 @@
       \qquad\text{where}~ B = T_{g''}, \bm{c_1} = (\Fun{A}{\gc}{T_{g''}})_g \Rightarrow^{\bl{p}} (\Fun{A}{\unk}{T_{\unk}})_{\unk} \\
       \qquad\qquad~ \bm{c_2} = A' \Rightarrow^{\bl{p}} A, \bm{d} = T_{\unk} \Rightarrow^{\bl{p}} (\textit{stamp}\;T_{g''}\;g)
     \end{cases}
+    % If
+    \intertext{Let $L, M, N$ be well-typed $\Gamma; g' \vdash L : \Bool_g, \Gamma; g' \lconsisjoin g \vdash M : A,
+      \Gamma; g' \lconsisjoin g \vdash N : B$}
+    \compile{\ifexp{L}{M}{N}{p}} =&
+    \begin{cases}
+      \ccif{(\compile{L})}{(A \consisjoin B)}{g}{(\cccast{\compile{M}}{\bm{c_1}})}{(\compile{N})} & ~\text{if $g, g'$ are both specific} \\
+      \cccast{\ccifstar{(\compile{L})}{T}{(\compile{M})}{(\compile{N})}}{\bm{d}} & ~\text{otherwise} \\
+      \qquad\text{where}~ A \consisjoin B = T_{g'}
+    \end{cases} \\
+    &\text{where}~
+    \bm{c_1} = A \Rightarrow^{\bl{p}} A \consisjoin B, \bm{c_2} = B \Rightarrow^{\bl{p}} A \consisjoin B
     % Assign
     \intertext{Let $L, M$ be well-typed $\Gamma; g' \vdash L : (\Refer{T_{\hat{g}}})_g, \Gamma; g' \vdash M : A$}
     \compile{\assign{L}{M}{p}} =&
