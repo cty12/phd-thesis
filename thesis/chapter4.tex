@@ -1,6 +1,9 @@
 \chapter{Compiling From \Surface to \CC}
 \label{ch:compile}
 
+In this section, I present the compilation function from \Surface to \CC, so
+that the semantics of \Surface can be given by \CC.
+
 \begin{figure}[tbp]
   \raggedright
   \begin{align*}
@@ -18,6 +21,11 @@
   \caption{Coerce functions of security labels and types}
   \label{fig:coerce}
 \end{figure}
+
+The coerce functions that generate casts between security labels and types are
+defined in Figure~\ref{fig:coerce}. The function
+$g_1\Rightarrow^{\bl{p}}g_2=\bar{c}$ takes two security labels and generates a
+coercion sequence, whose source is $g_1$ and target is $g_2$.
 
 \begin{figure}[tbp]
 \raggedright
