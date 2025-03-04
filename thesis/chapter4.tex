@@ -24,8 +24,24 @@ that the semantics of \Surface can be given by \CC.
 
 The coerce functions that generate casts between security labels and types are
 defined in Figure~\ref{fig:coerce}. The function
-$g_1\Rightarrow^{\bl{p}}g_2=\bar{c}$ takes two security labels and generates a
-coercion sequence, whose source is $g_1$ and target is $g_2$.
+$g_1\Rightarrow^{\bl{p}}g_2=\bar{c}$ takes two security labels that satisfies
+$g_1 \precsim g_2$ and a blame label, and generates a coercion sequence, whose
+source is $g_1$ and target is $g_2$. The blame label goes to the generated
+projections. Similarly, the function $S \Rightarrow^{\bl{p}} T = c_r$ takes two
+raw types satisfying $S \lesssim T$ and generates a raw coercion from $S$ to
+$T$, and $A \Rightarrow^{\bl{p}} B = \bm{c}$ takes two types satisfying $A
+\lesssim B$ and generates a coercion from $A$ to $B$. The coerce functions on
+types call the coerce function on security labels that the types contain. For
+example
+\[
+\Bool_{\low} \Rightarrow^{\bl{p}} \Bool_{\unk} = \coerc{\id{\Bool}}{\id{\low}\seq\inj{\low}}
+\]
+and
+\begin{align*}
+(\Fun{\Bool_{\unk}}{\low}{\Bool_{\unk}})_{\low} \Rightarrow^{\bl{p}} (\Fun{\Bool_{\low}}{\low}{\Bool_{\high}})_{\high} = &\\
+  \coerc{\funco{\id{\low}}{(\coerc{\id{\Bool}}{\id{\low} \seq \inj{\low}})}{(\coerc{\id{\Bool}}{\id{\unk} \seq \proj{\high}{p}})}}{\id{\low} \seq \up} &
+\end{align*}
+
 
 \begin{figure}[tbp]
 \raggedright
