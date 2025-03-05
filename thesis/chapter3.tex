@@ -893,7 +893,7 @@ $n$ whose security level is $\ell$.
   \label{fig:stamp-val}
 \end{figure}
 
-\textbf{\textit{Protection terms. }} A protection term is of form
+\paragraph{Protection terms.} A protection term is of form
 \ccprot{\PC'}{\ell}{M}{A}. Following standard approaches to IFC, a protection
 term has two functionalities: (1) it ensures that the reduction inside $M$ does
 not leak information through heap write operations (2) it promotes the security
@@ -913,7 +913,7 @@ with \high, the value becomes wrapped with a subtype coercion; otherwise the
 value stays unchanged. Otherwise, if the value is wrapped with an irreducible
 coercion, we stamp the top-level coercion sequence.
 
-\textbf{\textit{Function Application. }} The $\beta$ rule is standard for IFC languages.
+\paragraph{Function Application.} The $\beta$ rule is standard for IFC languages.
 It generates a \texttt{prot} term with the specific security label $\ell$ that
 comes from the label on the $\lambda$, preventing implicit
 flow from the function being applied through both the computation
@@ -936,7 +936,7 @@ and then injected using \textit{stamp!} to preserve types
 by $|\bar{c}|$ instead, because the top-level security label of the
 function is statically unknown (\unk).
 
-\textbf{\textit{If-conditional. }} The static rule \textit{if-true} is standard;
+\paragraph{If-conditional.} The static rule \textit{if-true} is standard;
 the \texttt{if} term reduces a \texttt{prot} whose security $\ell$
 comes from the type of the branch condition, guarding against implicit
 flow. The rationale of $\textit{if}{\star}\textit{-true-cast}$ follows that
@@ -944,7 +944,7 @@ of $\textit{app}{\star}\textit{-cast}$: (1) a \textit{stamp!} is generated to
 stamp and then inject the PC and (2) the security of \texttt{prot} is retrieved
 from the coercion in the branch condition.
 
-\textbf{\textit{NSU and heap operations. }} Let us consider reference creation
+\paragraph{NSU and heap operations.} Let us consider reference creation
 first. A ``static'' reference creation is secure because its typing (rule
 ${\vdash}\textit{ref}$, Figure~\ref{fig:cc-typing-full}) already enforces the
 heap policy. Consequently, the allocation can happen directly (rule

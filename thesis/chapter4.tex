@@ -112,9 +112,9 @@ and
 \end{figure}
 
 The compile function takes the form $\compile{M} = M'$, where $M$ is a \Surface
-program and $M'$ is a \CC term. We discuss interesting cases: application,
-if-conditional, annotation, reference creation, dereferencing, and reference
-assignment.
+program and $M'$ is a \CC term. We discuss interesting cases: function
+application, if-conditional, annotation, reference creation, dereferencing, and
+reference assignment.
 
 \paragraph{Function Application.}
 If the top-level labels of the function type, $g$ and \gc, as well as the
@@ -132,6 +132,14 @@ from $A'$, the type of $M$, to the domain type $A$; $\bm{d}$ casts the result of
 function application, from $T_{\unk}$ ($T$ is the raw type part of the co-domain
 type $B$) to the result of stamping the co-domain with the label of the function
 type.
+
+\paragraph{If-conditional.}
+
+\paragraph{Annotation.}
+
+\paragraph{Reference Creation.}
+
+\paragraph{Dereferencing.}
 
 \paragraph{Reference Assignment.} If $g$, $g'$, and $\hat{g}$ are
 specific, the check for heap policy can be statically justified. We recursively
