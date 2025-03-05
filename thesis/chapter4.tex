@@ -30,9 +30,9 @@ source is $g_1$ and target is $g_2$. The blame label goes to the generated
 projections. Similarly, the function $S \Rightarrow^{\bl{p}} T = c_r$ takes two
 raw types satisfying $S \lesssim T$ and generates a raw coercion from $S$ to
 $T$, and $A \Rightarrow^{\bl{p}} B = \bm{c}$ takes two types satisfying $A
-\lesssim B$ and generates a coercion from $A$ to $B$. The coerce functions on
-types call the coerce function on security labels that the types contain. For
-example
+\lesssim B$ and generates a coercion on values from $A$ to $B$. The coerce
+functions on types call the coerce function of security labels on each pair of
+labels inside the two types. For example
 \[
 \Bool_{\low} \Rightarrow^{\bl{p}} \Bool_{\unk} = \coerc{\id{\Bool}}{\id{\low}\seq\inj{\low}}
 \]
@@ -59,9 +59,9 @@ and
     \intertext{Let $L, M$ be well-typed $\Gamma; g' \vdash L : (\Fun{A}{\gc}{B})_g, \Gamma; g' \vdash M : A'$}
     \compile{\app{L}{M}{p}} =&
     \begin{cases}
-      \ccapp{(\cccast{\compile{L}}{\bm{c_1}})}{(\cccast{\compile{M}}{\bm{c_2}})}{A}{B}{g} \qquad\text{if $g$, $g'$ and $\gc$ are all specific} \\
+      \ccapp{(\cccast{(\compile{L})}{\bm{c_1}})}{(\cccast{(\compile{M})}{\bm{c_2}})}{A}{B}{g} \qquad\text{if $g$, $g'$ and $\gc$ are all specific} \\
       \qquad\text{where}~ \bm{c_1} = (\Fun{A}{\gc}{B})_g \Rightarrow^{\bl{p}} (\Fun{A}{g' \curlyvee g}{B})_g, \bm{c_2} = A' \Rightarrow^{\bl{p}} A \\
-      \cccast{(\ccappstar{(\cccast{\compile{L}}{\bm{c_1}})}{(\cccast{\compile{M}}{\bm{c_2}})}{A}{T})}{\bm{d}} \quad~\text{otherwise} \\
+      \cccast{(\ccappstar{(\cccast{(\compile{L})}{\bm{c_1}})}{(\cccast{(\compile{M})}{\bm{c_2}})}{A}{T})}{\bm{d}} \quad~\text{otherwise} \\
       \qquad\text{where}~ B = T_{g''}, \bm{c_1} = (\Fun{A}{\gc}{T_{g''}})_g \Rightarrow^{\bl{p}} (\Fun{A}{\unk}{T_{\unk}})_{\unk} \\
       \qquad\qquad~ \bm{c_2} = A' \Rightarrow^{\bl{p}} A, \bm{d} = T_{\unk} \Rightarrow^{\bl{p}} (\textit{stamp}\;T_{g''}\;g)
     \end{cases}
@@ -70,7 +70,7 @@ and
       \Gamma; g' \lconsisjoin g \vdash N : B$}
     \compile{\ifexp{L}{M}{N}{p}} =&
     \begin{cases}
-      \ccif{(\compile{L})}{(A \consisjoin B)}{g}{(\cccast{\compile{M}}{\bm{c_1}})}{(\compile{N})} & ~\text{if $g, g'$ are both specific} \\
+      \ccif{(\compile{L})}{(A \consisjoin B)}{g}{(\cccast{(\compile{M})}{\bm{c_1}})}{(\compile{N})} & ~\text{if $g, g'$ are both specific} \\
       \cccast{\ccifstar{(\compile{L})}{T}{(\compile{M})}{(\compile{N})}}{\bm{d}} & ~\text{otherwise} \\
       \qquad\text{where}~ A \consisjoin B = T_{g'}
     \end{cases} \\
@@ -112,14 +112,31 @@ and
 \end{figure}
 
 The compile function takes the form $\compile{M} = M'$, where $M$ is a \Surface
-program and $M'$ is a \CC term. Consider the case for assignment. If $g$, $g'$,
-and $\hat{g}$ are specific, the check for heap policy can be statically
-justified. We recursively compile both $L$ and $M$ and generate a static
-\texttt{assign}. We cast $M'$ using coercion $\bm{c_2}$, which casts from the
-type of $M'$ to the type of the memory cell. The coercion is produced by the
-coerce function, $({-}\Rightarrow^{-}{-})$, which takes two types and a blame
-label, returning a coercion on values by calling the coerce function of labels
-on each pair of security labels inside those two types. If at least one of the
-three security labels is \unk, the typing information is insufficient to justify
-the assignment. The compilation produces an \texttt{assign?} instead, whose
-semantics performs NSU checking at runtime.
+program and $M'$ is a \CC term. We discuss interesting cases: application,
+if-conditional, annotation, reference creation, dereferencing, and reference
+assignment.
+
+\paragraph{Function Application.}
+If the top-level labels of the function type, $g$ and \gc, as well as the
+current PC ($g'$), are all specific, we know that the constraint about PC can be
+statically justified. As a result, we recursively compile $L$ and $M$ and
+generate \texttt{app}, the static variant of function application. We cast the
+compiled function $L$ using $\bm{c_1}$, which adjusts the PC. We also cast
+compiled $M$ using $\bm{c_2}$, which casts from $A'$, the type of $M$, to $A$,
+the domain type of the function. Otherwise, if at least one of the three
+security labels is \unk, we cannot justify the constraint on PC. In this case,
+we recursively compile $L$ and $M$ and generate $\mathtt{app}{\star}$. We insert
+three casts: $\bm{c_1}$ casts both top level labels of the function type, as
+well as the top level label of the co-domain type, to \unk; $\bm{c_2}$ casts
+from $A'$, the type of $M$, to the domain type $A$; $\bm{d}$ casts the result of
+function application, from $T_{\unk}$ ($T$ is the raw type part of the co-domain
+type $B$) to the result of stamping the co-domain with the label of the function
+type.
+
+\paragraph{Reference Assignment.} If $g$, $g'$, and $\hat{g}$ are
+specific, the check for heap policy can be statically justified. We recursively
+compile both $L$ and $M$ and generate a static \texttt{assign}. We cast $M'$
+using coercion $\bm{c_2}$, which casts from the type of $M'$ to the type of the
+memory cell. If at least one of the three security labels is \unk, the typing
+information is insufficient to justify the assignment. The compilation produces
+an \texttt{assign?} instead, whose semantics performs NSU checking at runtime.
