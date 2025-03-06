@@ -63,16 +63,17 @@ and
       \qquad\text{where}~ \bm{c_1} = (\Fun{A}{\gc}{B})_g \Rightarrow^{\bl{p}} (\Fun{A}{g' \curlyvee g}{B})_g, \bm{c_2} = A' \Rightarrow^{\bl{p}} A \\
       \cccast{(\ccappstar{(\cccast{(\compile{L})}{\bm{c_1}})}{(\cccast{(\compile{M})}{\bm{c_2}})}{A}{T})}{\bm{d}} \quad~\text{otherwise} \\
       \qquad\text{where}~ B = T_{g''}, \bm{c_1} = (\Fun{A}{\gc}{T_{g''}})_g \Rightarrow^{\bl{p}} (\Fun{A}{\unk}{T_{\unk}})_{\unk} \\
-      \qquad\qquad~ \bm{c_2} = A' \Rightarrow^{\bl{p}} A, \bm{d} = T_{\unk} \Rightarrow^{\bl{p}} (\textit{stamp}\;T_{g''}\;g)
+      \qquad\qquad~ \bm{c_2} = A' \Rightarrow^{\bl{p}} A, \bm{d} = T_{\unk} \Rightarrow^{\bl{p}} (\mathit{stamp}\;T_{g''}\;g)
     \end{cases}
     % If
     \intertext{Let $L, M, N$ be well-typed $\Gamma; g' \vdash L : \Bool_g, \Gamma; g' \lconsisjoin g \vdash M : A,
       \Gamma; g' \lconsisjoin g \vdash N : B$}
     \compile{\ifexp{L}{M}{N}{p}} =&
     \begin{cases}
-      \ccif{(\compile{L})}{(A \consisjoin B)}{g}{(\cccast{(\compile{M})}{\bm{c_1}})}{(\compile{N})} & ~\text{if $g, g'$ are both specific} \\
-      \cccast{\ccifstar{(\compile{L})}{T}{(\compile{M})}{(\compile{N})}}{\bm{d}} & ~\text{otherwise} \\
-      \qquad\text{where}~ A \consisjoin B = T_{g'}
+      \ccif{(\compile{L})}{(A \consisjoin B)}{g}{(\cccast{(\compile{M})}{\bm{c_1}})}{(\cccast{(\compile{N})}{\bm{c_2}})} \quad\text{if $g, g'$ are both specific} \\
+      \cccast{(\ccifstar{(\cccast{(\compile{L})}{\bm{d_1}})}{T}{(\cccast{\cccast{(\compile{M})}{\bm{c_1}}}{\bm{d_2}})}{(\cccast{\cccast{(\compile{N})}{\bm{c_2}}}{\bm{d_3}})})}{\bm{d_4}} \\
+      \qquad\text{where}~ A \consisjoin B = T_{g''}, \bm{d_1} = \Bool_g \Rightarrow^{\bl{p}} \Bool_{\unk}, \bm{d_2} = T_{g''} \Rightarrow^{\bl{p}} T_{\unk} \\
+      \qquad \bm{d_3} = T_{g''} \Rightarrow^{\bl{p}} T_{\unk}, \bm{d_4} = (\mathit{stamp}\;(A \consisjoin B)\;\unk) \Rightarrow^{\bl{p}} (\mathit{stamp}\;(A \consisjoin B)\;g)
     \end{cases} \\
     &\text{where}~
     \bm{c_1} = A \Rightarrow^{\bl{p}} A \consisjoin B, \bm{c_2} = B \Rightarrow^{\bl{p}} A \consisjoin B
@@ -134,6 +135,8 @@ type $B$) to the result of stamping the co-domain with the label of the function
 type.
 
 \paragraph{If-conditional.}
+If the label of the branch condition, $g$, and the current PC, $g'$, are both
+specific, we recursively compile
 
 \paragraph{Annotation.}
 
