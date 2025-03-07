@@ -96,7 +96,7 @@ and
     \begin{cases}
       \ccderef{(\compile{M})}{A}{g} &~\text{if $g$ is specific} \\
       \ccderefstar{(\cccast{(\compile{M})}{\bm{c}})}{T} &~\text{otherwise} \\
-      \qquad\text{where}~ A = T_{g'}, \bm{c} = (\Refer{T_{g'}})_g \Rightarrow^{\bl{p}} (\Refer{T_{\unk}})_{\unk}
+      \qquad\text{where}~ A = T_{g''}, \bm{c} = (\Refer{T_{g''}})_g \Rightarrow^{\bl{p}} (\Refer{T_{\unk}})_{\unk}
     \end{cases}
     % Assign
     \intertext{Let $L, M$ be well-typed $\Gamma; g' \vdash L : (\Refer{T_{\hat{g}}})_g, \Gamma; g' \vdash M : A$}
@@ -152,6 +152,14 @@ We recursively compile the annotated term and insert one cast, from the term's
 type to the annotation.
 
 \paragraph{Reference Creation.}
+If the current PC, $g'$, is specific, we can statically justify heap policy.
+(Recall that the security level of the newly created memory location is always
+specific, given the syntax of \texttt{ref} in \Surface.) As a result, we
+recursively compile sub-term $M$ and generate a static \texttt{ref}. We only
+need to insert one cast that goes from the type of $M$, $T_g$, to the type of
+the memory location, $T_{\ell}$. Otherwise if $g'$ is \unk, it is analogous
+except that we generate \texttt{ref?}, which incurs NSU checking that enforces
+heap policy at runtime.
 
 \paragraph{Dereferencing.}
 
