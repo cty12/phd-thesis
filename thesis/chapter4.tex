@@ -128,17 +128,28 @@ the domain type of the function. Otherwise, if at least one of the three
 security labels is \unk, we cannot justify the constraint on PC. In this case,
 we recursively compile $L$ and $M$ and generate $\mathtt{app}{\star}$. We insert
 three casts: $\bm{c_1}$ casts both top level labels of the function type, as
-well as the top level label of the co-domain type, to \unk; $\bm{c_2}$ casts
-from $A'$, the type of $M$, to the domain type $A$; $\bm{d}$ casts the result of
+well as the top level label of the co-domain type, to \unk, $\bm{c_2}$ casts
+from $A'$, the type of $M$, to the domain type $A$, and $\bm{d}$ casts the result of
 function application, from $T_{\unk}$ ($T$ is the raw type part of the co-domain
 type $B$) to the result of stamping the co-domain with the label of the function
 type.
 
 \paragraph{If-conditional.}
 If the label of the branch condition, $g$, and the current PC, $g'$, are both
-specific, we recursively compile
+specific, we recursively compile the condition as well as the two branches and
+generate a static \texttt{if}. We insert one cast into each of the compiled
+branches, from the type of that branch to the consistent join of the types of
+the two branches ($A \consisjoin B$). If at least one label is \unk, we
+recursively compile the sub-terms and generate $\mathtt{if}{\star}$. In this
+case, we need to insert four additional casts: $d_1$ casts the branch condition
+from $\Bool_g$ to $\Bool_{\unk}$, $d_2$ and $d_3$ cast the branches to
+$T_{\unk}$ ($T$ is the raw type part of $A \consisjoin B$), and $d_4$ casts the
+type of the if-conditional to the result of stamping $g$ onto $A \consisjoin B$,
+to preserve types.
 
 \paragraph{Annotation.}
+We recursively compile the annotated term and insert one cast, from the term's
+type to the annotation.
 
 \paragraph{Reference Creation.}
 
