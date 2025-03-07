@@ -628,17 +628,18 @@ The rest of this dissertation is organized as follows:
     semantics for \CC.
   \item In Chapter~\ref{ch:compile}, I define a type-preserving compilation from
     \Surface to \CC, so that the semantics of \Surface is given by \CC.
-  \item In Chapter~\ref{ch:mech-metatheory}, I present the Agda mechanization of
-    three major meta-theoretical results, including the gradual guarantee,
-    compilation preserves types, and type safety.
+  \item In Chapter~\ref{ch:type-safety}, I prove type safety for \Surface. The
+    type safety proof is mechanized in the Agda proof assistant.
+  \item In Chapter~\ref{ch:gg}, I prove the gradual guarantee for \Surface. The
+    proof for gradual guarantee is also mechanized in Agda.
   \item In Chapter~\ref{ch:noninterference}, I prove the noninterference theorem
     for \Surface, by simulating its cast calculus \CC with the dynamic extreme
     of \Surface, namely \DynIFC. The noninterference of \DynIFC can be proved
     using the standard erasure technique.
-  \item In Chapter~\ref{ch:alt-design}, I explore the design space of gradual
-    IFC by presenting \SurfaceOld and its cast calculus \CCOld. The semantics of
-    \SurfaceOld differs from that of \Surface in that the former does not
-    support type-guided classification.
+  %% \item In Chapter~\ref{ch:alt-design}, I explore the design space of gradual
+  %%   IFC by presenting \SurfaceOld and its cast calculus \CCOld. The semantics of
+  %%   \SurfaceOld differs from that of \Surface in that the former does not
+  %%   support type-guided classification.
     %% The noninterference of \CCOld can be
     %% proved using the standard erasure technique.
     %% From \SurfaceOld I derive a
