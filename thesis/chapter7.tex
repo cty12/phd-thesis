@@ -1,4 +1,69 @@
 \chapter{Noninterference of \Surface}
 \label{ch:noninterference}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+In this chapter, we first show that security checks can be modeled by reducing
+security coercion sequences to their normal form (Section~\ref{sec:norm-IF}).
+After that, we present the full proof of noninterference for \Surface. The proof
+employs a three-step approach.
+
+First, we adapt an IFC language and noninterference proof from
+\textcite{Chen:2022aa}. In particular, we define a dynamic IFC programming
+language named \DynIFC (Figure~\ref{fig:sem-cc-no-cast}) and prove that it
+satisfies noninterference. This proof (Lemma~\ref{lem:NI-old}) uses a standard
+erasure-based approach~\parencite{LI20101974, stefan2011flexible,
+  stefan2012flexible, Fennell:2013ab, STEFAN:2017ta}, where the high-security
+parts of a program are erased to an opaque value.
+
+Second, we prove a simulation lemma between \CC and \DynIFC
+(Lemma~\ref{lem:sim-leq}).  The main intuition of the simulation
+relation (Figure~\ref{fig:sim-rel}) is that a \CC term always produces
+a value that is as secure as the one produced by its related \DynIFC
+term. We translate \CC terms to \DynIFC by (1) getting rid of all the
+casts and (2) converting static heap enforcement (\texttt{ref}
+and \texttt{assign}) to dynamic enforcement (NSU)
+(Figure~\ref{fig:cast-erase}).  The noninterference property of \CC
+(Lemma~\ref{lem:NI-CC}) follows directly from the multi-step
+simulation lemma (Lemma~\ref{lem:sim-mult}) and the noninterference
+result of \DynIFC (Lemma~\ref{lem:NI-old}).
+
+Third, the noninterference theorem of \Surface
+(Theorem~\ref{thm:NI-Surface}) is a corollary of the noninterference
+property of \CC.
+
+Similar to \GSLRef and GLIO, the statements of noninterference for
+both \DynIFC and \CC are termination-insensitive.  Thus, we only
+consider successful executions that produce values.  In other words,
+we do not consider reduction rules that trigger IFC monitor failures,
+such as NSU errors in \DynIFC and cast errors in \CC.  As we explained
+in Section~\ref{sec:example1}, the programming language runtime can
+force the program to diverge whenever blame is detected, possibly
+sending a private error message to the software developer.
+
+\section{The Normalization of Coercions Checks Information Flow}
+\label{sec:norm-IF}
+
+We show that reducing coercion sequences to normal form models IFC
+checks because the normalization either succeeds or fails: if a
+coercion sequences successfully reduces to normal form, the IFC check
+succeeds and the flow is justified; if it reduces to a failure, then
+an illegal flow is detected and the program errors.
+
+\begin{lemma}[Strong normalization of coercion sequences]
+If $\vdash \bar{c} : g_1 \Rightarrow g_2$, then either
+(1) $\bar{c} \longrightarrow^{*} \bar{d}$ and $\mathbf{NF}\;\bar{d}$ or
+(2) $\bar{c} \longrightarrow^{*} \err{g_1}{g_2}{p}$.
+\end{lemma}
+
+\noindent Normalization of coercion sequences is deterministic:
+
+\begin{lemma}[Reduction of coercion sequences is deterministic]
+If $\bar{c} \longrightarrow \bar{d}_1$ and $\bar{c} \longrightarrow \bar{d}_2$,
+then $\bar{d}_1 = \bar{d}_2$.
+\end{lemma}
+
+\begin{lemma}[Normalization of coercion sequences is deterministic]
+Suppose $\bar{c} \longrightarrow^{*} \bar{d}_1$
+and $\bar{c} \longrightarrow^{*} \bar{d}_2$.
+If $\mathbf{NF}\;\bar{d}_i$ or $\bar{d}_i = \err{g_1}{g_2}{p}$,
+then $\bar{d}_1 = \bar{d}_2$.
+\end{lemma}
