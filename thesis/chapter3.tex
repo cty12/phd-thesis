@@ -251,6 +251,33 @@ sequences are used in the stamping operations of (1) label expressions, which
 are our representation of PC and (2) values in the cast calculus. Those three
 types of stamping together formalize the notion of implicit flow in \Surface.
 
+Coercions capture the notion of gradual security checks. We define of the
+security level of a coercion sequence with the $|{-}|$ operator:
+
+\begin{definition}[Security level of a coercion]
+  \label{def:sec}
+  Given a coercion sequence $\bar{c}$ in normal form with type
+  $\vdash \bar{c} : \ell \Rightarrow g$,
+  then its security is given by the following $|{-}|$ operator:
+  {\small
+    \begin{gather*}
+      | \id{\ell} | = \ell \qquad
+      | \id{\ell} \seq \inj{\ell} | = \ell \qquad
+      | \id{\low} \seq \up \seq \inj{\high} | = \high \qquad
+      | \id{\low} \seq \up | = \high
+    \end{gather*}
+  }
+\end{definition}
+
+\noindent The security level operator can be generalized to a larger lattice.
+The subtype coercion $\up$ would be parameterized by two labels: $\vdash
+(\up_{\ell_1}^{\ell_2}) : \ell_1 \Rightarrow \ell_2$ where $\ell_1 \prec
+\ell_2$. The security would be the greater one: $|\up_{\ell_1}^{\ell_2}| =
+\ell_2$. Here the lattice only consists of \low and \high, so $|\up| =
+|\up_{\low}^{\high}| = \high$. In Chapter~\ref{ch:noninterference}, we will
+formally reason about the security levels of security coercions with respect to
+composition and stamping.
+
 \subsection{Security Label Expressions}
 \label{sec:lexpr}
 

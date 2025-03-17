@@ -1,40 +1,38 @@
 \chapter{Noninterference of \Surface}
 \label{ch:noninterference}
 
-In this chapter, we first show that security checks can be modeled by reducing
+In this chapter, I first show that security checks can be modeled by reducing
 security coercion sequences to their normal form (Section~\ref{sec:norm-IF}).
-After that, we present the full proof of noninterference for \Surface. The proof
+After that, I present the full proof of noninterference for \Surface. The proof
 employs a three-step approach.
 
-First, we adapt an IFC language and noninterference proof from
-\textcite{Chen:2022aa}. In particular, we define a dynamic IFC programming
-language named \DynIFC (Figure~\ref{fig:sem-cc-no-cast}) and prove that it
-satisfies noninterference. This proof (Lemma~\ref{lem:NI-old}) uses a standard
-erasure-based approach~\parencite{LI20101974, stefan2011flexible,
-  stefan2012flexible, Fennell:2013ab, STEFAN:2017ta}, where the high-security
-parts of a program are erased to an opaque value.
+First, I prove that the dynamic extreme of \Surface, \DynIFC, satisfies
+noninterference (Section~\ref{sec:NI-dynifc}). This proof is a straightforward
+adaptation of the noninterference proof from \textcite{Chen:2022aa}. The proof
+(Lemma~\ref{lem:NI-old}) uses a standard erasure-based
+approach~\parencite{LI20101974, stefan2011flexible, stefan2012flexible,
+  Fennell:2013ab, STEFAN:2017ta}, where the high-security parts of a program are
+erased to an opaque value.
 
-Second, we prove a simulation lemma between \CC and \DynIFC
-(Lemma~\ref{lem:sim-leq}).  The main intuition of the simulation
-relation (Figure~\ref{fig:sim-rel}) is that a \CC term always produces
-a value that is as secure as the one produced by its related \DynIFC
-term. We translate \CC terms to \DynIFC by (1) getting rid of all the
-casts and (2) converting static heap enforcement (\texttt{ref}
-and \texttt{assign}) to dynamic enforcement (NSU)
-(Figure~\ref{fig:cast-erase}).  The noninterference property of \CC
-(Lemma~\ref{lem:NI-CC}) follows directly from the multi-step
-simulation lemma (Lemma~\ref{lem:sim-mult}) and the noninterference
-result of \DynIFC (Lemma~\ref{lem:NI-old}).
+Second, I prove a simulation lemma between \CC and \DynIFC
+(Lemma~\ref{lem:sim-leq}). The main intuition of the simulation relation
+(Figure~\ref{fig:sim-rel}) is that a \CC term always produces a value that is as
+secure as the one produced by its related \DynIFC term. I translate \CC terms to
+\DynIFC by (1) getting rid of all the casts and (2) converting static heap
+enforcement (\texttt{ref} and \texttt{assign}) to dynamic enforcement (NSU)
+(Figure~\ref{fig:cast-erase}). The noninterference property of \CC
+(Lemma~\ref{lem:NI-CC}) follows directly from the multi-step simulation lemma
+(Lemma~\ref{lem:sim-mult}) and the noninterference result of \DynIFC
+(Lemma~\ref{lem:NI-old}).
 
-Third, the noninterference theorem of \Surface
-(Theorem~\ref{thm:NI-Surface}) is a corollary of the noninterference
-property of \CC.
+Third, the noninterference theorem of \Surface (Theorem~\ref{thm:NI-Surface}) is
+a corollary of the noninterference property of \CC.
 
 Similar to \GSLRef and GLIO, the statements of noninterference for
-both \DynIFC and \CC are termination-insensitive.  Thus, we only
-consider successful executions that produce values.  In other words,
-we do not consider reduction rules that trigger IFC monitor failures,
-such as NSU errors in \DynIFC and cast errors in \CC.  As we explained
+both \DynIFC and \CC are termination-insensitive.  Thus, I will only
+consider successful executions that produce values. In other words,
+I will not consider reduction rules that trigger IFC monitor failures,
+such as NSU errors in \DynIFC or cast errors in \CC.  As I explained
 in Section~\ref{sec:example1}, the programming language runtime can
 force the program to diverge whenever blame is detected, possibly
 sending a private error message to the software developer.
@@ -42,11 +40,11 @@ sending a private error message to the software developer.
 \section{The Normalization of Coercions Checks Information Flow}
 \label{sec:norm-IF}
 
-We show that reducing coercion sequences to normal form models IFC
-checks because the normalization either succeeds or fails: if a
-coercion sequences successfully reduces to normal form, the IFC check
-succeeds and the flow is justified; if it reduces to a failure, then
-an illegal flow is detected and the program errors.
+In this section, I show that reducing coercion sequences to normal form models
+IFC checks because the normalization either succeeds or fails. If a coercion
+sequences successfully reduces to normal form, the IFC check succeeds and the
+flow is justified. If it reduces to a failure, then an illegal flow is detected
+and the program errors.
 
 \begin{lemma}[Strong normalization of coercion sequences]
 If $\vdash \bar{c} : g_1 \Rightarrow g_2$, then either
@@ -67,3 +65,893 @@ and $\bar{c} \longrightarrow^{*} \bar{d}_2$.
 If $\mathbf{NF}\;\bar{d}_i$ or $\bar{d}_i = \err{g_1}{g_2}{p}$,
 then $\bar{d}_1 = \bar{d}_2$.
 \end{lemma}
+
+Recall that in Section~\ref{sec:cexpr-comp-stamp}, we mention that coercion
+composition models explicit flows, while coercion stamping models implicit flow
+
+We reason about explicit flows first. If we compose one coercion
+sequence with another and then reduce the result to normal form, the
+security of the resulting coercion sequence should be greater than or
+equal to that of the first sequence.
+
+\begin{lemma}[Composition models explicit flow]\ \\
+  \label{lem:comp-explicit}
+  If $\mathbf{NF} \; \bar{c}$
+  and $\bar{c} \mdoubleplus \bar{d} \longrightarrow^{*} \bar{c}'$
+  and $\mathbf{NF} \; \bar{c}'$,
+  then $|\bar{c}| \preccurlyeq |\bar{c}'|$.
+\end{lemma}
+
+Next we show that stamping models implicit flow correctly, promoting
+the security of the stamped coercion by joining it with the stamped
+label:
+
+\begin{lemma}[Stamping models implicit flow]\ \\
+  \label{lem:stamp-implicit}
+  If $\;\mathbf{NF}\; \bar{c}$,
+  then $| \mathit{stamp} \; \bar{c} \; \ell| = |\bar{c}| \curlyvee \ell$
+  and $| \mathit{stamp!} \; \bar{c} \; \ell| = |\bar{c}| \curlyvee \ell$.
+\end{lemma}
+
+\section{Noninterference of \DynIFC}
+\label{sec:NI-dynifc}
+
+\begin{figure}[tbp]
+  \raggedright
+  \fbox{$\reduce{M}{\mu}{\pc}{N}{\mu'}$}
+  {\small
+  \begin{gather*}
+  \xi~
+  \inference
+  {\reduce{M}{\mu}{\pc}{M'}{\mu'}}
+  {\reduce{\mathit{plug}\;M\;F}{\mu}{\pc}{\mathit{plug}\;M'\;F}{\mu'}}
+  \\[1ex]
+  \textit{prot-val}~
+  \inference{}{\reduce{\dynprot{\ell}{V}}{\mu}{\pc}{V \curlyvee \ell}{\mu}}
+  \quad
+  \textit{prot-ctx}~
+  \inference
+  {\reduce{M}{\mu}{\pc \curlyvee \ell}{M'}{\mu'}}
+  {\reduce{\dynprot{\ell}{M}}{\mu}{\pc}{\dynprot{\ell}{M'}}{\mu'}}
+  \\[1ex]
+  \beta~
+  \inference{}{\reduce{\dynlam{x}{N}{\ell} \; V}{\mu}{\pc}{\dynprot{\ell}{(N [x := V])}}{\mu}}
+  \\[1ex]
+  \beta\textit{-if-true}~
+  \inference{}{\reduce{\dynif{\dynconst{\true}{\ell}}{M}{N}}{\mu}{\pc}{\dynprot{\ell}{M}}{\mu}}
+  \\[1ex]
+  \beta\textit{-if-false}~
+  \inference{}{\reduce{\dynif{\dynconst{\false}{\ell}}{M}{N}}{\mu}{\pc}{\dynprot{\ell}{N}}{\mu}}
+  \\[1ex]
+  \textit{ref?-ok}~
+  \inference
+  {\highlightred{\pc \preccurlyeq \ell} & n \; \mathbf{FreshIn} \; \mu(\ell)}
+  {\reduce{\dynref{?}{\ell}{V}}{\mu}{\pc}{\dynaddr{n_{\ell}}{\low}}{(\mu, \ell \mapsto n \mapsto (V \curlyvee \ell))}}
+  \\[1ex]
+  \textit{deref}~
+  \inference
+  {\mathit{\mu(\hat{\ell},n) = V}}
+  {\reduce{\dynderef{\dynaddr{n_{\hat{\ell}}}{\ell}}}{\mu}{\pc}{\dynprot{\ell}{V}}{\mu}}
+  \\[1ex]
+  \textit{assign?-ok}~
+  \inference
+  {\highlightred{\pc \curlyvee \ell \preccurlyeq \hat{\ell}}}
+  {\reduce{\dynassign{\dynaddr{n_{\hat{\ell}}}{\ell}}{?}{V}}{\mu}{\pc}{\dynconst{\unit}{\low}}{[\hat{\ell} \mapsto n \mapsto (V \curlyvee \hat{\ell})] \mu}}
+  \end{gather*}}
+  \caption{Reduction semantics (successful cases) of \DynIFC}
+  \label{fig:sem-cc-no-cast}
+\end{figure}
+
+\begin{lemma}[Noninterference of \DynIFC]
+\label{lem:NI-old}
+If
+$\reducemult{M [ x := \dynconst{b_1}{\high}]}{\emptyset}{\low}{\dynconst{b_3}{\low}}{\mu_1}$
+and
+$\reducemult{M [ x := \dynconst{b_2}{\high}]}{\emptyset}{\low}{\dynconst{b_4}{\low}}{\mu_2}$
+then $b_3 = b_4$.
+\end{lemma}
+\begin{proof}
+The proof is fully mechanized in Agda \footnote{In \texttt{/src/Dyn/Noninterference.agda}.}
+and can be found in the supplementary material.
+The proof follows the noninterference proof of \CCOld~\parencite{Chen:2022aa}.
+\end{proof}
+
+\section{Simulation Between \CC and \DynIFC}
+\label{sec:sim-cc-dynifc}
+
+\begin{figure}[tbp]
+  \raggedright
+  \fbox{$\simrel{\gc}{M}{N}{A}$}
+  \small
+  \begin{gather*}
+    % var
+    {\leq}\textit{-var}~
+    \inference{}{\simrel{\gc}{x}{x}{A}}
+    \qquad
+    % const
+    {\leq}\textit{-const}~
+    \inference{\ell' \preccurlyeq \ell}
+              {\gc \vdash \dynconst{k}{\ell'} \leq \ccconst{k} \Leftarrow \iota_{\ell}}
+    \\[1ex]
+    {\leq}\textit{-wrapped-const}~
+    \inference{\ell' \preccurlyeq |\bar{c}| & \vdash \bar{c} : \ell \Rightarrow g & \mathbf{NF}\;\bar{c} & \ell \neq g}
+    {\gc \vdash \dynconst{k}{\ell'} \leq \cccast{\ccconst{k}}{\coerc{\id{\iota}}{\bar{c}}} \Leftarrow \iota_g}
+    \\[1ex]
+    % lambda
+    {\leq}\textit{-lam}~
+    \inference{\simrel{g}{N'}{N}{B} & \ell' \preccurlyeq \ell}
+              {\simrel{\gc}{\dynlam{x}{N'}{\ell'}}{\cclam{x}{N}}{(\Fun{A}{g}{B})_{\ell}}}
+    \\[1ex]
+    {\leq}\textit{-wrapped-lam}~
+    \inference{\simrel{g_3}{N'}{N}{D} & \ell \preccurlyeq |\bar{c}| & \vdash \bar{d} : g_1 \Rightarrow g_3 & \vdash \bm{c} : A \Rightarrow C & \vdash \bm{d} : D \Rightarrow B & \mathbf{NF}\;\bar{c}}
+              {\simrel{\gc}{\dynlam{x}{N'}{\ell}}{\cccast{(\cclam{x}{N})}{\coerc{\funco{\bar{d}}{\bm{c}}{\bm{d}}}{\bar{c}}}}{(\Fun{A}{g_1}{B})_{g_2}}}
+    \\[1ex]
+    % addr
+    {\leq}\textit{-addr}~
+    \inference{\ell' \preccurlyeq \ell}
+              {\simrel{\gc}{\dynaddr{n_{\hat{\ell}}}{\ell'}}{\ccaddr{n}}{\Refer{(T_{\hat{\ell}})}_{\ell}}}
+    \\[1ex]
+    {\leq}\textit{-wrapped-addr}~
+    \inference{\ell \preccurlyeq |\bar{c}| & \vdash \bm{c} : T_{g_1} \Rightarrow S_{\hat{\ell}} & \vdash \bm{d} : S_{\hat{\ell}} \Rightarrow T_{g_1} & \mathbf{NF}\;\bar{c}}
+              {\simrel{\gc}{\dynaddr{n_{\hat{\ell}}}{\ell}}{\cccast{(\ccaddr{n})}{\coerc{\refco{\bm{c}}{\bm{d}}}{\bar{c}}}}{(\Refer{(T_{g_1})})_{g_2}}}
+    \\[1ex]
+    % app
+    {\leq}\textit{-app}~
+    \inference{\simrel{\ell^c}{M'}{M}{(\Fun{A}{\ell^c \curlyvee \ell}{B})_\ell} & \simrel{\ell^c}{N'}{N}{A}}
+              {\simrel{\ell^c}{M'\;N'}{\ccapp{M}{N}{A}{B}{\ell}}{C}}
+    \\[1ex]
+    % app*
+    {\leq}\textit{-app}\star~
+    \inference{\simrel{\gc}{M'}{M}{(\Fun{A}{\unk}{T_{\unk}})_{\unk}} & \simrel{\gc}{N'}{N}{A}}
+              {\simrel{\gc}{M'\;N'}{\ccappstar{M}{N}{A}{T}{}}{T_{\unk}}}
+    \\[1ex]
+    % if
+    {\leq}\textit{-if}~
+    \inference{\simrel{\ell^c}{L'}{L}{\Bool_\ell} & \simrel{\ell^c \curlyvee \ell}{M'}{M}{A} & \simrel{\ell^c \curlyvee \ell}{N'}{N}{A}}
+              {\simrel{\ell^c}{\dynif{L'}{M'}{N'}}{\ccif{L}{A}{\ell}{M}{N}}{B}}
+    \\[1ex]
+    % if*
+    {\leq}\textit{-if}\star~
+    \inference{\simrel{\gc}{L'}{L}{\Bool_{\unk}} & \simrel{\unk}{M'}{M}{T_{\unk}} & \simrel{\unk}{N'}{N}{T_{\unk}}}
+              {\simrel{\gc}{\dynif{L'}{M'}{N'}}{\ccifstar{L}{T}{M}{N}}{T_{\unk}}}
+    \\[1ex]
+    % ref
+    {\leq}\textit{-ref}~
+    \inference{\simrel{\ell^c}{M'}{M}{T_\ell}}
+              {\simrel{\ell^c}{\dynref{?}{\ell}{M'}}{\ccref{\ell}{M}}{(\Refer{T_\ell})_{\low}}}
+    \quad
+    % ref?
+    {\leq}\textit{-ref?}~
+    \inference{\simrel{\unk}{M'}{M}{T_\ell}}
+              {\simrel{\unk}{\dynref{?}{\ell}{M'}}{\ccrefproj{\ell}{M}{p}}{(\Refer{T_\ell})_{\low}}}
+    \\[1ex]
+    % deref
+    {\leq}\textit{-deref}~
+    \inference{\simrel{\gc}{M'}{M}{(\Refer{A})_\ell}}
+              {\simrel{\gc}{\dynderef{M'}}{\ccderef{M}{A}{\ell}}{B}}
+    \qquad
+    % deref*
+    {\leq}\textit{-deref}\star~
+    \inference{\simrel{\gc}{M'}{M}{(\Refer{T_{\unk}})_{\unk}}}
+              {\simrel{\gc}{\dynderef{M'}}{\ccderefstar{M}{T}}{T_{\unk}}}
+    \\[1ex]
+    % assign
+    {\leq}\textit{-assign}~
+    \inference{\simrel{\ell^c}{L'}{L}{(\Refer{T_{\hat{\ell}}})_{\ell}} & \simrel{\ell^c}{M'}{M}{T_{\hat{\ell}}}}
+              {\simrel{\ell^c}{\dynassign{L'}{?}{M'}}{\ccassign{L}{M}{T}{\hat{\ell}}{\ell}}{\Unit_{\low}}}
+    \\[1ex]
+    {\leq}\textit{-assign?}~
+    \inference{\simrel{\gc}{L'}{L}{(\Refer{T_g})_{\unk}} & \simrel{\gc}{M'}{M}{T_g}}
+              {\simrel{\gc}{\dynassign{L'}{?}{M'}}{\ccassignproj{L}{M}{T}{g}{p}}{\Unit_{\low}}}
+    \\[1ex]
+    % cast
+    {\leq}\textit{-cast}~
+    \inference{\simrel{\gc}{M}{N}{A} & \vdash \bm{c} : A \Rightarrow B}
+              {\simrel{\gc}{M}{\cccast{N}{\bm{c}}}{B}}
+    \\[1ex]
+    % prot
+    {\leq}\textit{-prot}~
+    \inference{\ell' \preccurlyeq \ell & g_2 \vdash M' \leq M \Leftarrow A & \vdash PC \Leftarrow g_2}
+    {g_1 \vdash \dynprot{\ell'}{M'} \leq \ccprot{\PC}{\ell}{M}{A} \Leftarrow B}
+  \end{gather*}
+  \caption{Simulation relation between \CC and \DynIFC}
+  \label{fig:sim-rel}
+\end{figure}
+
+\begin{definition}[Simulation between heaps]
+\label{def:sim-heap}
+$\Sigma \vdash \mu' \leq \mu \triangleq \forall \ell, n.$ if $\mu(\ell,n) = V$, then there exists
+$V'$ s.t $\mu'(\ell,n) = V'$ and $\simrel{\low}{V'}{V}{T_{\ell}}$ where $T = \Sigma(\ell,n)$.
+\end{definition}
+
+\begin{lemma}[Casting preserves simulation]
+  \label{lem:cast-sim}
+  If $\simrel{\gc}{W'}{V}{A}$, $\vdash \bm{c} : A \Rightarrow B$, \\
+  and $\cccast{V}{\bm{c}} \longrightarrow^{*} W$, then $\simrel{\gc}{W'}{W}{B}$.
+\end{lemma}
+\begin{proof}
+By induction on the multi-step cast reduction.
+\begin{description}
+\item[Zero step] Directly proved by applying rule ${\leq}\textit{-cast}$.
+\item[One or more steps] Casing on the first reduction step yields three sub-cases:
+\begin{description}
+\item[\textit{cast}]
+\begin{align}
+\simrel{\gc}{W'}{V_r}{A} \\
+\cccast{V_r}{\coerc{c_r}{\bar{c}}} \longrightarrow \cccast{V_r}{\coerc{c_r}{\bar{d}}} \longrightarrow^{*} W
+\end{align}
+By induction hypothesis, \simrel{\gc}{W'}{W}{B}.
+\item[\textit{cast-id}]
+\begin{align}
+\simrel{\gc}{W'}{V_r}{A} \\
+\cccast{V_r}{\coerc{\id{\iota}}{\id{g}}} \longrightarrow V_r
+\end{align}
+The goal is proved directly.
+\item[\textit{cast-comp}]
+\begin{align}
+\simrel{\gc}{W'}{\cccast{V_r}{\bm{c}}}{A} \\
+\cccast{\cccast{V_r}{\bm{c}}}{\bm{d}} \longrightarrow \cccast{V_r}{\bm{c} \mdoubleplus \bm{d}} \longrightarrow^{*} W
+\end{align}
+We further reason about $\cccast{V_r}{\bm{c} \mdoubleplus \bm{d}} \longrightarrow^{*} W$. The coercion
+after composition $\bm{c} \mdoubleplus \bm{d}$ is reducible and not identity, so the reduction must
+take one step by \textit{cast} and reduce the top-level coercion sequence to its normal form $\bar{c}_n$:
+\[
+\cccast{\cccast{V_r}{\coerc{c_{r1}}{\bar{c}}}}{\coerc{c_{r2}}{\bar{d}}} \longrightarrow \cccast{V_r}{\coerc{c_r}{\bar{c} \mdoubleplus \bar{d}}}
+\longrightarrow \cccast{V_r}{\coerc{c_r}{\bar{c}_n}} \longrightarrow^{*} W
+\]
+We know $|\bar{c}| \preccurlyeq |\bar{c}_n|$ because composition models explicit flow (Lemma~\ref{lem:comp-explicit}).
+\begin{itemize}
+\item If $V_r = \ccconst{k}$ and $\bar{c}_n = \id{\ell}$. $W' = \dynconst{k}{\ell'}$
+and $\ell' \preccurlyeq |\bar{c}|$ (Lemma~\ref{lem:sim-wrapped-const}).
+We know $\simrel{\gc}{\dynconst{k}{\ell'}}{\ccconst{k}}{\iota_\ell}$ by rule ${\leq}\textit{-const}$,
+because $\ell' \preccurlyeq |\bar{c}| \preccurlyeq |\bar{c}_n| = |\id{\ell}| = \ell$.
+\item Otherwise, \cccast{V_r}{\coerc{c_r}{\bar{c}_n}} is already a value.
+Apply rule ${\leq}\textit{-wrapped-const}$, ${\leq}\textit{-wrapped-lam}$, or ${\leq}\textit{-wrapped-addr}$
+depending on whether $V_r$ is a constant, a $\lambda$, or an address.
+\end{itemize}
+\end{description}
+\end{description}
+\end{proof}
+
+\begin{lemma}[Substitution preserves simulation]
+  \label{lem:subst-sim}
+  If $\simrel{g}{N'}{N}{A}$, $(\Gamma, x:B);\Sigma;g;\ell \vdash N \Leftarrow A$, and $\forall g. \simrel{g}{M'}{M}{B}$, then $\simrel{g}{N'[x:=M']}{N[x:=M]}{A}$.
+\end{lemma}
+\begin{proof}
+The proof is fully mechanized in Agda
+\footnote{In \texttt{substitution-pres-${\leq}$} of \texttt{/src/Security/SubstPres.agda}.
+The simulation relation is in \texttt{/src/Security/SimRel.agda}.} and can be found in the
+supplementary material.
+\end{proof}
+
+\begin{lemma}[Simulation with wrapped constant]
+\label{lem:sim-wrapped-const}
+If $\simrel{\gc}{M}{\cccast{(\ccconst{k})}{\coerc{\id{\iota}}{\bar{c}}}}{\iota_g}$
+and $(\coerc{\id{\iota}}{\bar{c}})$ is irreducible,
+then there exists $\ell$ s.t $M = \dynconst{k}{\ell}$, and $\ell \preccurlyeq |\bar{c}|$.
+\end{lemma}
+\begin{proof}
+Inversion on the simulation relation:
+\begin{description}
+\item[Related by ${\leq}\textit{-wrapped-const}$] The goal is proved directly.
+\item[Related by ${\leq}\textit{-cast}$] We know \simrel{\gc}{M}{\ccconst{k}}{\iota_\ell}
+              and $\bar{c} : \ell \Rightarrow g$. Note that $(\coerc{\id{\iota}}{\bar{c}})$ is irreducible,
+              so $\bar{c}$ can be \up, $\inj{\ell}$, or $\up\seq\inj{\high}$, so $\ell \preccurlyeq |\bar{c}|$.
+              By rule ${\leq}\textit{-const}$, we know $M = \dynconst{k}{\ell'}$ for some $\ell'$
+              and $\ell' \preccurlyeq \ell$.
+              Thus $\ell' \preccurlyeq \ell \preccurlyeq |\bar{c}|$.
+\end{description}
+\end{proof}
+
+\begin{lemma}[Simulation with reference proxy]
+\label{lem:sim-ref-proxy}
+If $\simrel{\gc}{M}{\cccast{(\ccaddr{n})}{\coerc{\refco{\bm{c}}{\bm{d}}}{\bar{c}}}}{(\Refer{T_{g_1}})_{g_2}}$
+$\vdash \bm{c} : T_{g_1} \Rightarrow S_{\hat{\ell}}$, $\vdash \bm{d} : S_{\hat{\ell}} \Rightarrow T_{g_1}$,
+and $\mathbf{NF}\;\bar{c}$, then there exists $\ell$ s.t $M = \dynaddr{n_{\hat{\ell}}}{\ell}$,
+and $\ell \preccurlyeq |\bar{c}|$.
+\end{lemma}
+\begin{proof}
+Analogous to Lemma~\ref{lem:sim-wrapped-const}. The only extra case to consider
+is $\bar{c} = \id{\ell}$, which also satisfies $\ell \preccurlyeq |\bar{c}|$.
+\end{proof}
+
+\begin{lemma}[Simulation with function proxy]
+\label{lem:sim-func-proxy}
+If $\simrel{\gc}{M}{\cccast{(\cclam{x}{N})}{\coerc{\funco{\bar{d}}{\bm{c}}{\bm{d}}}{\bar{c}}}}{(\Fun{A}{g_1}{B})_{g_2}}$,
+$\vdash \bar{d} : g_1 \Rightarrow g_3$,
+and $\mathbf{NF}\;\bar{c}$, then there exists $N', \ell$ s.t $M = \dynlam{x}{N'}{\ell}$,
+$\simrel{g_3}{N'}{N}{B}$, and $\ell \preccurlyeq |\bar{c}|$.
+\end{lemma}
+\begin{proof}
+Analogous to Lemma~\ref{lem:sim-wrapped-const} and Lemma~\ref{lem:sim-ref-proxy}.
+\end{proof}
+
+\begin{lemma}[Simulation with \CC value]
+\label{lem:sim-val}
+If $\simrel{\gc}{M}{V}{A}$, then $M$ is a value.
+\end{lemma}
+\begin{proof}
+Inversion on the value $V$ and the simulation relation $\simrel{\gc}{M}{V}{A}$ yields 6 cases.
+We consider the two cases for constants; the cases for $\lambda$s and addresses are analogous.
+\begin{description}
+\item[Related by ${\leq}\textit{-const}$] We know $M = \dynconst{k}{\ell}$ for some $k, \ell$,
+so $M$ is a value.
+\item[Related by ${\leq}\textit{-wrapped-const}$] By Lemma~\ref{lem:sim-wrapped-const},
+$M = \dynconst{k}{\ell}$ for some $k, \ell$, so $M$ is a value.
+\end{description}
+\end{proof}
+
+\begin{lemma}[Stamping preserves simulation]
+\label{lem:sim-stamp}
+If $\simrel{\gc}{V}{W}{A}$ and $\ell' \preccurlyeq \ell$, then
+$\simrel{\gc}{V \curlyvee \ell'}{\mathit{stamp}\;W\;\ell}{\mathit{stamp}\;A\;\ell}$.
+\end{lemma}
+\begin{proof}
+Casing on $\ell' \preccurlyeq \ell$:
+\begin{description}
+\item[Case 1] $\ell'=\low, \ell=\low$: Straightforward because stamping low returns the same value.
+\item[Case 2] $\ell'=\low, \ell=\high$: Casing on value $W$ and the simulation relation $\simrel{\gc}{V}{W}{A}$
+produces 6 sub-cases. We consider the two cases for constants below (corresponding to ${\leq}\textit{-const}$ and
+${\leq}\textit{-wrapped-const}$), because the cases for $\lambda$s and addresses are analogous:
+\begin{itemize}
+\item $\simrel{\gc}{\dynconst{k}{\ell_1'}}{\ccconst{k}}{\iota_{\ell_1}}$
+      \begin{itemize}
+      \item[-] If $\ell_1 = \low$, $\simrel{\gc}{\dynconst{k}{\ell_1'}}{\cccast{\ccconst{k}}{\coerc{\id{\iota}}{\up}}}{\iota_{\high}}$
+      because $\ell_1' \preccurlyeq |\up| = \high$ (rule ${\leq}\textit{-wrapped-const}$).
+      \item[-] If $\ell_1 = \high$, $\simrel{\gc}{\dynconst{k}{\ell_1'}}{\ccconst{k}}{\iota_{\high}}$
+      because $\ell_1' \preccurlyeq \high$ (rule ${\leq}\textit{-const}$).
+      \end{itemize}
+\item $\simrel{\gc}{\dynconst{k}{\ell_1'}}{\cccast{\ccconst{k}}{\coerc{\id{\iota}}{\bar{c}}}}{-}$
+      \begin{itemize}
+      \item[-] $\simrel{\gc}{\dynconst{k}{\ell_1'}}{\cccast{k}{\coerc{\id{\iota}}{\mathit{stamp}\;\bar{c}\;\high}}}{-}$
+               because $\ell_1' \preccurlyeq |\mathit{stamp}\;\bar{c}\;\high| = |\bar{c}| \curlyvee \high = \high$
+               (Lemma~\ref{lem:stamp-implicit} (Stamping models implicit flow)
+               and rule ${\leq}\textit{-wrapped-const}$).
+      \end{itemize}
+\end{itemize}
+\item[Case 3] $\ell'=\high, \ell=\high$: Analogous to Case 2; the only difference is that
+           instead of $\dynconst{k}{\ell_1'}$, the left side is always $\dynconst{k}{\high}$
+           because it is stamped with $\ell' = \high$.
+\end{description}
+\end{proof}
+
+\begin{lemma}[Casting a label expression models explicit flow]
+\label{lem:cast-lexpr-explicit}
+If $\mathbf{NF}\;e_1$ and $\cccast{e_1}{\bar{c}} \longrightarrow^{*} e_2$ and $\mathbf{NF}\;e_2$,
+$|e_1| \preccurlyeq |e_2|$.
+\end{lemma}
+\begin{proof}
+The proof is fully mechanized in Agda \footnote{In \texttt{cast-security} of \texttt{/src/LabelExpr/Security.agda}.}
+and can be found in the supplementary material. The proof is by inversion on the multi-step reduction.
+\end{proof}
+
+\begin{lemma}[Stamping a label expression models implicit flow]
+\label{lem:stamp-lexpr-implicit}
+If $\mathbf{NF}\;e$, $|\mathit{stamp}\;e\;\ell| = |e| \curlyvee \ell$ and
+$|\mathit{stamp!}\;e\;\ell| = |e| \curlyvee \ell$.
+\end{lemma}
+\begin{proof}
+The proof is fully mechanized in Agda \footnote{In $\mathtt{stamp_e\texttt{-}security}$ and $\mathtt{stamp!_e\texttt{-}security}$ of
+\texttt{/src/LabelExpr/Security.agda}.}
+and can be found in the supplementary material. The proof is by casing on $\mathbf{NF}\;e$.
+\end{proof}
+
+\begin{lemma}
+\label{lem:cast-leq}
+Suppose $\Gamma ; \Sigma ; g ; \ell \vdash V \Leftarrow S_{\ell_1}$ and
+$\vdash \bm{c} : S_{\ell_1} \Rightarrow T_{\ell_2}$. If $\cccast{V}{\bm{c}} \longrightarrow^{*} W$,
+then $\ell_1 \preccurlyeq \ell_2$.
+\end{lemma}
+\begin{proof}
+By induction on the multi-step reduction.
+\begin{description}
+\item[Zero step] $\bm{c} = (\coerc{c_r}{\bar{c}})$ is irreducible, so
+$\bar{c} : \ell_1 \Rightarrow \ell_2$ is in its normal form. Thus $\ell_1 \preccurlyeq \ell_2$.
+\item[One or more steps] Case on the first reduction step:
+\begin{itemize}
+\item Rule \textit{cast}: $\cccast{V_r}{\coerc{c_r}{\bar{c}}} \longrightarrow \cccast{V_r}{\coerc{c_r}{\bar{d}}} \longrightarrow^{*} W$.
+  By preservation of coercion sequences, $\bar{d} : \ell_1 \Rightarrow \ell_2$. By induction hypothesis, $\ell_1 \preccurlyeq \ell_2$.
+\item Rule \textit{cast-id}: $\cccast{V_r}{\coerc{\id{\iota}}{\id{g}}} \longrightarrow V_r$. We directly know $\ell_1 = g = \ell_2$.
+\item Rule \textit{cast-comp}: $\cccast{\cccast{V_r}{\bm{c}}}{\bm{d}} \longrightarrow \cccast{V_r}{\bm{c} \mdoubleplus \bm{d}} \longrightarrow^{*} W$.
+      Suppose $\bm{c} = (\coerc{-}{\bar{c}}), \bar{c} : \ell_0 \Rightarrow \ell_1$ and
+      $\bm{d} = (\coerc{-}{\bar{d}}), \bar{d} : \ell_1 \Rightarrow \ell_2$.
+      We know $\cccast{V_r}{\coerc{-}{\bar{c} \mdoubleplus \bar{d}}} \longrightarrow \cccast{V_r}{\bar{c}_n} \longrightarrow^{*} W$.
+      By Lemma~\ref{lem:comp-explicit} (Composition models explicit flow),
+      $\ell_1 = |\bar{c}| \preccurlyeq |\bar{c}_n| = \ell_2$.
+\end{itemize}
+\end{description}
+\end{proof}
+
+\begin{lemma}
+\label{lem:leq-value-pc}
+If $\simrel{g_1}{M}{V}{A}$ then $\simrel{g_2}{M}{V}{A}$.
+\end{lemma}
+\begin{proof}
+The proof is fully mechanized in Agda and can be found in the
+supplementary material. The proof is by casing on value and the
+simulation relation.
+\end{proof}
+
+
+\begin{lemma}[Simulation between \CC and \DynIFC]
+  \label{lem:sim-leq}
+  Suppose $M_1$ is a well-typed \CC term: $\Gamma ; \Sigma_1 ; \gc ; |\PC| \vdash M_1 \Leftarrow A$,
+  $PC$ is a well-typed label expression: $\vdash \PC \Leftarrow \gc$, and $\mu_1$ is a well-typed
+  heap: $\Sigma_1 \vdash \mu_1$.
+  Suppose $\gc \vdash M_1' \leq M_1 \Leftarrow A$, $\Sigma_1 \vdash \mu_1' \leq \mu_1$, and $\ell \preccurlyeq |\PC|$.
+  If $\reduce{M_1}{\mu_1}{\PC}{M_2}{\mu_2}$, then there exists $M_3, \mu_3, M_2', \mu_2'$ s.t
+  $\reducemult{M_2}{\mu_2}{\PC}{M_3}{\mu_3}$,
+  $\reducemult{M_1'}{\mu_1'}{\ell}{M_2'}{\mu_2'}$,
+  $\gc \vdash M_2' \leq M_3 \Leftarrow A$,
+  and $\Sigma_2 \vdash \mu_2' \leq \mu_3$ for some $\Sigma_2$.
+\end{lemma}
+\begin{proof}
+  The proof is by induction on the reduction relation
+  $\reduce{M_1}{\mu_1}{\PC}{M_2}{\mu_2}$
+  and inversion on the simulation relation
+  $\vdash M_1' \leq M_1 \Leftarrow A$.
+  We only consider successful cases of the reduction (which do not produce errors),
+  because the theorem statement of noninterference (Theorem~\ref{thm:NI-Surface})
+  for \Surface
+  is termination-insensitive.
+  \begin{description}
+    \item[Case~$\xi$:]
+      \begin{align}
+      \reduce{N_1}{\mu_1}{\PC}{N_2}{\mu_2} \\
+      \mathit{plug}\;N_1\;F = M_1 \\
+      \mathit{plug}\;N_2\;F = M_2
+      \end{align}
+      We case on the frame $F$. We consider $F=\ccapp{\Box}{M}{A}{B}{\ell}$ below;
+      the cases for other frames all follow the same pattern.
+      By inversion of the simulation relation, the left side must be a function application:
+      \[
+      \simrel{\ell^c}{N_1'\;M'}{\ccapp{N_1}{M}{A}{B}{\ell}}{C}
+      \]
+      We know $\simrel{\ell^c}{N_1'}{N_1}{(\Fun{A}{\ell^c \curlyvee \ell}{B})_\ell}$ and $\simrel{\ell^c}{M'}{M}{A}$.
+      By the induction hypothesis, there exists $N_3, \mu_3, N_2', \mu_2'$ such that
+      $\reducemult{N_2}{\mu_2}{\PC}{N_3}{\mu_3}$, $\reducemult{N_1'}{\mu_1'}{\ell}{N_2'}{\mu_2'}$,
+      $\simrel{\ell^c}{N_2'}{N_3}{(\Fun{A}{\ell^c \curlyvee \ell}{B})_\ell}$, and $\Sigma_2 \vdash \mu_2' \leq \mu_3$ for some $\Sigma_2$.
+      Choose $M_3 = \mathit{plug}\;N_3\;F = \ccapp{N_3}{M}{A}{B}{\ell}$, $\mu_3 = \mu_3$, $M_2' = N_2'\;M'$,
+      and $\mu_2' = \mu_2'$.
+      We know $\reducemult{\ccapp{N_2}{M}{A}{B}{\ell}}{\mu_2}{\PC}{\ccapp{N_3}{M}{A}{B}{\ell}}{\mu_3}$,
+      $\reducemult{N_1'\;M'}{\mu_1'}{\ell}{N_2'\;M'}{\mu_2'}$, and $\Sigma_2 \vdash \mu_2' \leq \mu_3$.
+      We still need to show $\simrel{\ell^c}{N_2'\;M'}{\ccapp{N_3}{M}{A}{B}{\ell}}{C}$, which is proved by applying
+      rule ${\leq}\mathit{-app}$.
+  \item[Case~\textit{prot-val}:]
+    By inversion on the simulation relation, the left side must be a protection term.
+    By Lemma~\ref{lem:sim-val}, the body $V'$ must be a value:
+    \begin{align}
+    g_1 \vdash \dynprot{\ell'}{V'} &\leq \ccprot{\PC}{\ell}{V}{A} \Leftarrow B  \\
+    g_2 \vdash V' &\leq V \Leftarrow A \label{eqn:117} \\
+    \ell' &\preccurlyeq \ell \label{eqn:118} \\
+    \vdash \PC &\Leftarrow g_2
+    \end{align}
+    We take a step by \textit{prot-val} on the left side, we need to relate:
+    \[
+    \simrel{g_1}{V' \curlyvee \ell'}{\mathit{stamp}\;V\;\ell}{B}
+    \]
+    which is proved by applying Lemma~\ref{lem:sim-stamp} on~\eqref{eqn:117} (with Lemma~\ref{lem:leq-value-pc} applied)
+    and~\eqref{eqn:118}.
+  \item[Case~\textit{prot-ctx}:]
+  \[
+  \reduce{M}{\mu_1}{\PC_2}{N}{\mu_2}
+  \]
+  By inversion on the simulation relation, the left side must be protection:
+  \begin{align}
+    g_1 \vdash \dynprot{\ell'}{M'} &\leq \ccprot{\PC_2}{\ell}{M}{A} \Leftarrow B  \\
+    g_2 \vdash M' &\leq M \Leftarrow A \\
+    \ell' &\preccurlyeq \ell \\
+    \vdash \PC_2 &\Leftarrow g_2
+  \end{align}
+  By inversion on the typing of the protection term on the right:
+  \begin{equation}
+  \label{eqn:119}
+  |\PC_1| \curlyvee \ell \preccurlyeq |\PC_2|
+  \end{equation}
+  where $\PC_1$ is the original PC to reduce the protection term on the right.
+  To get the induction hypothesis, we need to show $\ell'' \curlyvee \ell' \preccurlyeq |PC_2|$
+  where $\ell''$ is the PC to reduce the protection term on the left.
+  We know $\ell'' \preccurlyeq |PC_1|$, thus:
+  \[
+  \ell'' \curlyvee \ell' \preccurlyeq \ell' \curlyvee \ell \preccurlyeq |\PC_1| \curlyvee \ell \preccurlyeq |\PC_2|
+  \]
+  The induction hypothesis shows that there exists $L, \mu_3, N', \mu_2'$ s.t
+  $\reducemult{N}{\mu_2}{\PC_2}{L}{\mu_3}$,
+  $\reducemult{M'}{\mu_1'}{\ell'' \curlyvee \ell'}{N'}{\mu_2'}$,
+  $\simrel{g_2}{N'}{L}{A}$, and $\Sigma_2 \vdash \mu_2' \leq \mu_3$ for some $\Sigma_2$.
+  We step the left side to $\dynprot{\ell'}{N'}$ and step the right side to
+  $\ccprot{\PC_2}{\ell}{L}{A}$ using the congruence of \textit{prot-ctx}.
+  We then relate the protection terms on both sides using rule ${\leq}\mathit{-prot}$.
+  \item[Case~\textit{cast}:] There are three sub-cases: \textit{cast}, \textit{cast-id},
+  and \textit{cast-comp}.
+    \begin{description}
+    \item[Sub-case~\textit{cast}:]
+    We know $\simrel{\gc}{M'}{\cccast{V_r}{\coerc{c_r}{\bar{c}}}}{B}$. \cccast{V_r}{\coerc{c_r}{\bar{c}}}
+    is not a value, so $\simrel{\gc}{M'}{V_r}{A}$. We need to relate
+    $\simrel{\gc}{M'}{\cccast{V_r}{\coerc{c_r}{\bar{d}}}}{B}$, which is directly proved by applying
+    ${\leq}\textit{-cast}$.
+    \item[Sub-case~\textit{cast-id}:]
+    We know $\simrel{\gc}{M'}{\cccast{V_r}{\coerc{\id{\iota}}{\id{g}}}}{A}$. Again, note that
+    \cccast{V_r}{\coerc{\id{\iota}}{\id{g}}} is not a value, so $\simrel{\gc}{M'}{V_r}{A}$.
+    \item[Sub-case~\textit{cast-comp}:]
+    We know $\simrel{\gc}{M'}{\cccast{\cccast{V_r}{\bm{c}}}{\bm{d}}}{B}$. By inversion using
+    rule ${\leq}\mathit{-cast}$, $\simrel{\gc}{M'}{\cccast{V_r}{\bm{c}}}{A}$; $\bm{c}$ is irreducible,
+    by Lemma~\ref{lem:sim-val} $M'$ is a value. We need to show there exists $M$ such that
+    $\reducemult{\cccast{V_r}{\bm{c}\mdoubleplus\bm{d}}}{\mu_1}{\PC}{M}{\mu_1}$ and $\simrel{\gc}{M'}{M}{B}$.
+    Casing on $V_r$:
+    \begin{itemize}
+    \item \textbf{If $V_r = \ccconst{k}$.} Suppose
+    $\bm{c}\mdoubleplus\bm{d} = \coerc{d_r}{\bar{c} \mdoubleplus \bar{d}}$ for some $d_r$.
+    We take a step using \textit{cast} by reducing the composed coercion sequence to its
+    normal form: $\bar{c} \mdoubleplus \bar{d} \longrightarrow^{+} \bar{c}_n$.
+    By Lemma~\ref{lem:comp-explicit} (Composition models explicit flow), $|\bar{c}| \preccurlyeq |\bar{c}_n|$.
+    By Lemma~\ref{lem:sim-wrapped-const}, we know $M' = \dynconst{k}{\ell'}$ and $\ell' \preccurlyeq |\bar{c}|$.
+    By transitivity, $\ell' \preccurlyeq |\bar{c}_n|$.
+    (1) If $\bar{c}_n$ is not an identity coercion, we relate
+    $\simrel{\gc}{\dynconst{k}{\ell'}}{\cccast{\ccconst{k}}{\coerc{d_r}{\bar{c}_n}}}{B}$ directly using
+    rule ${\leq}\textit{-wrapped-const}$. (2) If $\bar{c}_n = \id{\ell}$, we take one additional step by
+    \textit{cast-id}. We know $\ell' \preccurlyeq |\id{\ell}| = \ell$,
+    thus $\simrel{\gc}{\dynconst{k}{\ell'}}{\ccconst{k}}{\iota_\ell}$
+    by rule ${\leq}\textit{-const}$.
+    \item If $V_r = \cclam{x}{N}$. Similar to the constant case above.
+    The only difference is that we do not need to specially handle $\bar{c}_n=\id{\ell}$,
+    because the function coercion $(\coerc{\funco{\bar{d}}{\bm{c}}{\bm{d}}}{\id{\ell}})$
+    is already irreducible.
+    \item If $V_r = \ccaddr{n}$. Same as the lambda case above.
+    \end{itemize}
+    \end{description}
+  \item[Case~$\beta$:]
+      By inversion on the simulation relation, the left side must be a function application:
+      \[
+      \simrel{\ell^c}{L\;M}{\ccapp{(\cclam{x}{N})}{V}{A}{B}{\ell}}{C}
+      \]
+      where $C=\textit{stamp}\;B\;\ell$.
+      We know that $L$ must be a $\lambda$ by rule ${\leq}\textit{-lam}$ and
+      $M$ must be a value by Lemma~\ref{lem:sim-val}:
+      \begin{align}
+      \ell^c \vdash (\dynlam{x}{N'}{\ell'})\;V' &\leq \ccapp{(\cclam{x}{N})}{V}{A}{B}{\ell}
+      \Leftarrow C \\
+      \ell' &\preccurlyeq \ell       \label{eqn:105} \\
+      \ell^c \curlyvee \ell \vdash N' &\leq N \Leftarrow B \label{eqn:106} \\
+      \ell^c \vdash V' &\leq V \Leftarrow A \label{eqn:107}
+      \end{align}
+      We take one step by $\beta$ on the left side of the simulation relation:
+      \[
+        \reduce{(\dynlam{x}{N'}{\ell'})\;V'}{\mu'}{\ell''}{\dynprot{\ell'}{(N'[x:=V'])}}{\mu'}
+      \]
+      Now we need to show
+      \[
+      \ell^c \vdash \dynprot{\ell'}{(N'[x:=V'])} \leq \ccprot{(\mathit{stamp}\;\PC\;\ell)}{\ell}{(N[x:=V])}{B}
+      \Leftarrow C
+      \]
+      Applying ${\leq}\textit{-prot}$ yields three sub-goals:
+      (1) $\ell' \preccurlyeq \ell$ is directly proved by~\eqref{eqn:105}
+      (2) $\simrel{\ell^c \curlyvee \ell}{N'[x:=V']}{N[x:=V]}{B}$ is proved by applying Lemma~\ref{lem:subst-sim}
+          on~\eqref{eqn:106} and~\eqref{eqn:107}.
+      (3) $\vdash \mathit{stamp}\;\PC\;\ell \Leftarrow \ell^c \curlyvee \ell$ because stamping is well-typed.
+  \item[Case~\textit{app-cast}:]
+      \begin{align}
+      \cccast{(\mathit{stamp}\;\PC_1\;\ell)}{\bar{d}} &\longrightarrow^{*} \PC_2  \label{eqn:108} \\
+      \cccast{V}{\bm{c}} &\longrightarrow^{*} W  \label{eqn:109}
+      \end{align}
+      By inversion on the simulation relation, the left side must be a function application:
+      \[
+      \ell^c \vdash L\;M \leq \ccapp{(\cccast{\cclam{x}{N}}{\coerc{\funco{\bar{d}}{\bm{c}}{\bm{d}}}{\bar{c}}})}{V}{C}{D}{\ell}
+      \Leftarrow E
+      \]
+      where $E = \textit{stamp}\;D\;\ell$, $\vdash \bar{d} : \ell^c \curlyvee \ell \Rightarrow \gc$,
+      $\vdash \bm{c} : C \Rightarrow A$, and $\vdash \bm{d} : B \Rightarrow D$.
+
+      We know that $L$ must be a $\lambda$ by Lemma~\ref{lem:sim-func-proxy} and
+      $M$ must be a value by Lemma~\ref{lem:sim-val}:
+      \begin{align}
+      \ell^c \vdash (\dynlam{x}{N'}{\ell'})\;V' &\leq \ccapp{(\cccast{\cclam{x}{N}}{\coerc{\funco{\bar{d}}{\bm{c}}{\bm{d}}}{\bar{c}}})}{V}{C}{D}{\ell}
+      \Leftarrow E \\
+      \ell' &\preccurlyeq |\bar{c}| \label{eqn:110} \\
+      \gc \vdash N' &\leq N \Leftarrow B \label{eqn:111} \\
+      \ell^c \vdash V' &\leq V \Leftarrow C \label{eqn:112}
+      \end{align}
+      We take a step by $\beta$ on the left side of simulation relation:
+      \[
+        \reduce{(\dynlam{x}{N'}{\ell'})\;V'}{\mu'}{\ell''}{\dynprot{\ell'}{(N'[x:=V'])}}{\mu'}
+      \]
+      Now we need to show
+      \[
+      \ell^c \vdash \dynprot{\ell'}{(N'[x:=V'])} \leq \ccprot{\PC_2}{\ell}{(\cccast{(N[x:=W])}{\bm{d}})}{D}
+      \Leftarrow E
+      \]
+      By rule ${\leq}$\textit{-prot}, it is equivalent to showing:
+      \begin{align}
+      \ell' &\preccurlyeq \ell \label{eqn:115} \\
+      \gc \vdash N'[x:=V'] &\leq \cccast{(N[x:=W])}{\bm{d}} \Leftarrow D \label{eqn:116} \\
+      \vdash \PC_2 &\Leftarrow \gc
+      \end{align}
+      We know $\vdash \PC_2 \Leftarrow \gc$ because reducing label expressions preserves types.
+      By~\eqref{eqn:110} and $|\bar{c}| = \ell$ we prove \eqref{eqn:115}.
+      Apply Lemma~\ref{lem:cast-sim} on~\eqref{eqn:112} and~\eqref{eqn:109}, we get
+      $\simrel{\ell^c}{V'}{W}{A}$.
+      By Lemma~\ref{lem:subst-sim}, Lemma~\ref{lem:leq-value-pc}, and~\eqref{eqn:111},
+      $\simrel{\gc}{N'[x:=V']}{N[x:=W]}{B}$.
+      Apply rule ${\leq}$\textit{-cast} and we prove~\eqref{eqn:116}.
+  \item[Case~\textit{app$\star$-cast}:] Similar to \textit{app-cast}.
+  The only noteworthy difference is that on the right side, we use $|\bar{c}|$ instead of the
+  $\ell$ from the syntax of the function application, both in the protection term
+  and when stamping the PC.
+  \item[Cases~$\beta$\textit{-if-true} and~$\beta$\textit{-if-false}:]
+  By inversion on the simulation relation, the left side must also
+  be an if-conditional:
+  \[
+  \simrel{\ell^c}{\dynif{\dynconst{\true}{\ell'}}{M'}{N'}}{\ccif{\ccconst{\true}}{A}{\ell}{M}{N}}{B}
+  \]
+  We know:
+  \begin{align}
+  \ell' &\preccurlyeq \ell \\
+  \ell^c \curlyvee \ell \vdash M' &\leq M \Leftarrow A \\
+  \ell^c \curlyvee \ell \vdash N' &\leq N \Leftarrow A
+  \end{align}
+  Take one step on the left side. We need to relate
+  $\simrel{\ell^c}{\dynprot{\ell'}{M'}}{\ccprot{(\mathit{stamp}\;\PC\;\ell)}{\ell}{M}{A}}{B}$.
+  The goal is directly proved by applying rule ${\leq}\textit{-prot}$.
+  The case for $\beta$\textit{-if-false} is analogous.
+  \item[Cases \textit{if-true-cast} and \textit{if-false-cast}:]
+  Note that the label partial order trivially holds because $\ell' \preccurlyeq \high$
+  for any $\ell'$. The rest is analogous to $\beta$\textit{-if-true} and~$\beta$\textit{-if-false}.
+  \item[Cases \textit{if$\star$-true-cast} and \textit{if$\star$-false-cast}:]
+  By Lemma~\ref{lem:sim-wrapped-const} we know $\ell' \preccurlyeq |\bar{c}|$.
+  The rest is analogous to $\beta$\textit{-if-true} and~$\beta$\textit{-if-false}.
+  \item[Case~\textit{ref}:]
+  %% \[
+  %% n\;\mathbf{FreshIn}\;\mu(\ell)
+  %% \]
+  From the typing derivation (rule ${\vdash}\textit{-ref}$), we also know:
+  \begin{align}
+  \vdash \PC &\Leftarrow \ell^c \\
+  \ell^c &\preccurlyeq \ell
+  \end{align}
+  which implies
+  \begin{equation}
+  |\PC| \preccurlyeq \ell
+  \end{equation}
+  We know $\ell' \preccurlyeq |\PC| \preccurlyeq \ell$, where $\ell'$ is the PC that the left side is reduced with.
+  We take a step by \textit{ref?-ok} on the left side by choosing the same fresh address $n$. We need to show:
+  \begin{align}
+  \simrel{\ell^c}{\dynaddr{n_\ell}{\low}}{\ccaddr{n}}{(\Refer{T_\ell})_{\low}}  \label{eqn:120} \\
+  (\Sigma_1, \ell \mapsto n \mapsto T) \vdash (\mu', \ell \mapsto n \mapsto (V' \curlyvee \ell)) \leq (\mu, \ell \mapsto n \mapsto V)  \label{eqn:121}
+  \end{align}
+
+  \eqref{eqn:120} is proved directly by ${\leq}\textit{-addr}$.
+  To prove \eqref{eqn:121} we need to show:
+  \begin{equation}
+  \label{eqn:122}
+  \simrel{\low}{V' \curlyvee \ell}{V}{T_\ell}
+  \end{equation}
+  By inversion on the simulation relation and Lemma~\ref{lem:leq-value-pc},
+  we know $\simrel{\low}{V'}{V}{T_\ell}$.
+  From the definition of stamping we know $\textit{stamp}\;V\;\ell = V$
+  if $V \Leftarrow T_\ell$;
+  \eqref{eqn:122} is thus proved by Lemma~\ref{lem:sim-stamp}.
+  \item[Case~\textit{ref?}:]
+  \[
+  \cccast{\PC_1}{\unk \Rightarrow^{\bl{p}} \ell} \longrightarrow^{*} \PC_2
+  \]
+  Reducing label expressions preserves types, so $\vdash \PC_2 \Leftarrow \ell$.
+  We know $|\PC_2| = \ell$ and $\ell' \preccurlyeq |\PC_1|$, where $\ell'$ is the
+  PC that the left side is reduced with. Casting models explicit flow
+  (Lemma~\ref{lem:cast-lexpr-explicit}), so $|\PC_1| \preccurlyeq |\PC_2|$.
+  We thus have $\ell' \preccurlyeq |\PC_1| \preccurlyeq |\PC_2| = \ell$. Take one step
+  by \textit{ref?-ok} on the left side by choosing the same fresh address $n$.
+  The rest of the proof follows that of \textit{ref}.
+  %% We need to show:
+  %% \begin{align}
+  %% \simrel{\dynaddr{n_\ell}{\low}}{\ccaddr{n}}{(\Refer{T_\ell})_{\low}}  \\
+  %% (\mu', \ell \mapsto n \mapsto (V' \curlyvee \ell)) \leq (\mu, \ell \mapsto n \mapsto V)
+  %% \end{align}
+  \item[Case~\textit{deref}:]
+  \[
+  \mu(\hat{\ell},n) = V
+  \]
+  By $\Sigma \vdash \mu' \leq \mu$ and Definition~\ref{def:sim-heap},
+  there exists $V'$ s.t $\mu'(\hat{\ell}, n) = V'$ and $\simrel{\low}{V'}{V}{T_{\hat{\ell}}}$
+  where $T = \Sigma(\hat{\ell}, n)$.
+  By inversion on the simulation relation, the left side must be a dereference:
+  \[
+  \simrel{\gc}{\dynderef{\dynaddr{n_{\hat{\ell}}}{\ell'}}}{\ccderef{(\ccaddr{n})}{T_{\hat{\ell}}}{\ell}}{B}
+  \]
+  where $\ell' \preccurlyeq \ell$. Take one step on the left using rule \textit{deref},
+  we need to relate:
+  \[
+  \simrel{\gc}{\dynprot{\ell'}{V'}}{\ccprot{\high}{\ell}{V}{T_{\hat{\ell}}}}{B}
+  \]
+  which is directly proved by rule ${\leq}\textit{-prot}$ and Lemma~\ref{lem:leq-value-pc}.
+  \item[Case~\textit{deref$\star$-cast}:]
+  \[
+  \mu(\hat{\ell}, n) = V
+  \]
+  By $\Sigma \vdash \mu' \leq \mu$ and Definition~\ref{def:sim-heap},
+  there exists $V'$ s.t $\mu'(\hat{\ell}, n) = V'$ and $\simrel{\low}{V'}{V}{S_{\hat{\ell}}}$
+  where $S = \Sigma(\hat{\ell}, n)$.
+  By inversion on the simulation relation, the left side must be a dereference:
+  \[
+  \simrel{\gc}{\dynderef{\dynaddr{n_{\hat{\ell}}}{\ell}}}{\ccderefstar{(\cccast{\ccaddr{n}}{\coerc{\refco{\bm{c}}{\bm{d}}}{\bar{c}}})}{T}}{T_{\unk}}
+  \]
+  where $\vdash \bm{c} : T_{\unk} \Rightarrow S_{\hat{\ell}} , \vdash \bm{d} : S_{\hat{\ell}} \Rightarrow T_{\unk}$.
+  By Lemma~\ref{lem:sim-ref-proxy}, $\ell \preccurlyeq |\bar{c}|$.
+  We take a step on the left side using \textit{deref}. We need to relate:
+  \[
+  \simrel{\gc}{\dynprot{\ell}{V'}}{\ccprot{\high}{|\bar{c}|}{(\cccast{V}{\bm{d}})}{T_{\unk}}}{B}
+  \]
+  which is proved directly by applying Lemma~\ref{lem:leq-value-pc}, ${\leq}\textit{-prot}$,
+  and then ${\leq}\textit{-cast}$.
+  \item[Case~\textit{deref-cast}:] Analogous to \textit{deref$\star$-cast}.
+  \item[Case~\textit{$\beta$-assign}:]
+  By inversion on the simulation relation, the left side is also an assignment:
+  \[
+  \simrel{\ell^c}{\dynassign{\dynaddr{n_{\hat{\ell}}}{\ell'}}{?}{V'}}{\ccassign{(\ccaddr{n})}{V}{T}{\hat{\ell}}{\ell}}{\Unit_{\low}}
+  \]
+  where $\ell' \preccurlyeq \ell$. From the typing derivation we know $\ell^c \curlyvee \ell \preccurlyeq \hat{\ell}$,
+  $\vdash \PC \Leftarrow \ell^c$. We know $\ell'' \preccurlyeq |\PC| = \ell^c$ where $\ell''$ is the PC on the left,
+  thus $\ell'' \curlyvee \ell' \preccurlyeq \hat{\ell}$. We take one step on the left side using \textit{assign?-ok}.
+  The \texttt{unit}s on both sides relate straightforwardly. We need to relate:
+  \[
+  \Sigma \vdash [\hat{\ell} \mapsto n \mapsto (V' \curlyvee \hat{\ell})] \mu' \leq [\hat{\ell} \mapsto n \mapsto V] \mu
+  \]
+  Given $\Sigma(\hat{\ell}, n) = T$, we need to show:
+  \[
+  \simrel{\low}{V' \curlyvee \hat{\ell}}{V}{T_{\hat{\ell}}}
+  \]
+  which can be proved similar to~\eqref{eqn:122} because $\vdash V \Leftarrow T_{\hat{\ell}}$.
+  \item[Case~\textit{assign-cast}:]
+  \[
+  \cccast{V}{\bm{c}} \longrightarrow^{*} W
+  \]
+  where $\vdash \bm{c} : T_{\hat{\ell}_2} \Rightarrow S_{\hat{\ell}_1}$. By Lemma~\ref{lem:cast-leq},
+  $\hat{\ell}_2 \preccurlyeq \hat{\ell}_1$. From the typing derivation, $\vdash \PC \Leftarrow \ell^c$ and
+  $\ell^c \curlyvee \ell \preccurlyeq \hat{\ell}_2$. By inversion on the simulation relation,
+  the left side is also an assignment:
+  \[
+  \simrel{\ell^c}{\dynassign{\dynaddr{n_{\hat{\ell}_1}}{\ell'}}{?}{V'}}{\ccassign{(\cccast{\ccaddr{n}}{\coerc{\refco{\bm{c}}{\bm{d}}}{\bar{c}}})}{V}{T}{\hat{\ell}_2}{\ell}}{\Unit_{\low}}
+  \]
+  We know $\ell' \preccurlyeq |\bar{c}| = \ell$. $\ell'' \preccurlyeq |\PC| = \ell^c$ where $\ell''$
+  is the PC that the left side is reduced with. Thus we have
+  $\ell'' \curlyvee \ell' \preccurlyeq \hat{\ell}_2 \preccurlyeq \hat{\ell}_1$.
+  The check succeeds so we take one step on the left side by \textit{assign?-ok}.
+  The \texttt{unit}s on both sides relate straightforwardly. We need to relate:
+  \[
+  \Sigma \vdash [\hat{\ell}_1 \mapsto n \mapsto (V' \curlyvee \hat{\ell}_1)] \mu' \leq [\hat{\ell}_1 \mapsto n \mapsto W] \mu
+  \]
+  Need to show:
+  \[
+  \simrel{\low}{V' \curlyvee \hat{\ell}_1}{W}{S_{\hat{\ell}_1}}
+  \]
+  which can be proved similar to~\eqref{eqn:122}.
+
+  \item[Case~\textit{assign?-cast}:]
+  \begin{align}
+  \cccast{(\mathit{stamp!}\;\PC_1\;|\bar{c}|)}{\unk \Rightarrow^{\bl{p}} \hat{\ell}} &\longrightarrow^{*} \PC_2 \\
+  \cccast{V}{\bm{c}} &\longrightarrow^{*} W
+  \end{align}
+
+  By inversion on the simulation relation, the left side is also an assignment:
+  \[
+  \simrel{\gc}{\dynassign{\dynaddr{n_{\hat{\ell}}}{\ell}}{?}{V'}}{\ccassignproj{\left(\cccast{\ccaddr{n}}{\coerc{\refco{\bm{c}}{\bm{d}}}{\bar{c}}}\right)}{V}{T}{g}{p}}{\Unit_{\low}}
+  \]
+  where $\vdash \bm{c} : T_g \Rightarrow S_{\hat{\ell}}, \vdash \bm{d} : S_{\hat{\ell}} \Rightarrow T_g$.
+  By Lemma~\ref{lem:sim-ref-proxy}, $\ell \preccurlyeq |\bar{c}|$.
+  Stamping models implicit flow (Lemma~\ref{lem:stamp-lexpr-implicit}),
+  so $|\mathit{stamp}\;\PC_1\;|\bar{c}|| = |\PC_1| \curlyvee |\bar{c}|$;
+  casting models explicit flow (Lemma~\ref{lem:cast-lexpr-explicit}), so
+  $|\PC_1| \curlyvee |\bar{c}| \preccurlyeq |\PC_2|$.
+  Reduction of label expressions preserves types, so $\vdash \PC_2 \Leftarrow \hat{\ell}$.
+  Thus $|\PC_2| = \hat{\ell}$, $|\PC_1| \curlyvee |\bar{c}| \preccurlyeq \hat{\ell}$.
+  We know $\ell' \preccurlyeq |\PC_1|$ where $\ell'$ is the PC the left side reduces with.
+  Thus $\ell' \curlyvee \ell \preccurlyeq \hat{\ell}$; the check succeeds so we take one
+  step on the left side by \textit{assign?-ok}.
+  The \texttt{unit}s on both sides relate straightforwardly. We need to relate:
+  \[
+  \Sigma \vdash [\hat{\ell} \mapsto n \mapsto (V' \curlyvee \hat{\ell})] \mu' \leq [\hat{\ell} \mapsto n \mapsto W] \mu
+  \]
+  Need to show:
+  \[
+  \simrel{\low}{V' \curlyvee \hat{\ell}}{W}{S_{\hat{\ell}}}
+  \]
+  which again can be proved similar to~\eqref{eqn:122}.
+
+  \end{description}
+\end{proof}
+
+\begin{lemma}[Multi-step simulation]
+\label{lem:sim-mult}
+Suppose $M$ is a well-typed \CC term $\Gamma ; \Sigma ; \gc ; |\PC| \vdash M \Leftarrow A$,
+$PC$ is a well-typed label expression: $\vdash \PC \Leftarrow \gc$, and $\mu_1$ is a well-typed
+heap: $\Sigma \vdash \mu_1$.
+Suppose $\simrel{\gc}{M'}{M}{A}$, $\Sigma \vdash \mu_1' \leq \mu_1$ ,and $\ell \preccurlyeq |\PC|$.
+If $\reducemult{M}{\mu_1}{\PC}{V}{\mu_2}$, then there exists $V',\mu_2'$ such that
+$\reducemult{M'}{\mu_1'}{\ell}{V'}{\mu_2'}$
+and $\simrel{\gc}{V'}{V}{A}$.
+\end{lemma}
+\begin{proof}
+By induction on multi-step reduction $\reducemult{M}{\mu_1}{\PC}{V}{\mu_2}$.
+\begin{description}
+\item[Zero step] If $M$ is already a value, choose $V'$ to be $M'$.
+By Lemma~\ref{lem:sim-val}, $M'$ is also a value.
+The values are in sync because $\simrel{\gc}{M'}{M}{A}$.
+\item[One or more steps]
+\begin{align}
+\reduce{M}{\mu_1}{\PC}{N}{\mu_3} \\
+\reducemult{N}{\mu_3}{\PC}{V}{\mu_2}
+\end{align}
+Apply Lemma~\ref{lem:sim-leq} and then use the induction hypothesis.
+\end{description}
+\end{proof}
+
+\section{Noninterference of \Surface}
+\label{sec:NI}
+
+\begin{figure}[tbp]
+  \raggedright
+  \fbox{$\epsilon\;M\;A = M'$}
+  {\small
+  \begin{align*}
+  \epsilon\;x\;{-} &= x \\
+  \epsilon\;(\ccconst{k})\;(\iota_\ell) &= \dynconst{k}{\ell} \\
+  \epsilon\;(\cclam{x}{N})\;((\Fun{A}{-}{B})_{\ell}) &= \dynlam{x}{\epsilon\;N\;B}{\ell} \\
+  \epsilon\;(\ccaddr{n})\;(\Refer{(T_{\hat{\ell}})}_{\ell}) &= \dynaddr{n_{\hat{\ell}}}{\ell} \\
+  \epsilon\;(\ccapp{M}{N}{A}{B}{\ell})\;{-} &= (\epsilon\;M\;(\Fun{A}{\unk}{B})_\ell)\;(\epsilon\;N\;A) \\
+  \epsilon\;(\ccappstar{M}{N}{A}{T}{})\;{-} &= (\epsilon\;M\;(\Fun{A}{\unk}{T_{\unk}})_{\unk})\;(\epsilon\;N\;A) \\
+  \epsilon\;(\ccif{L}{A}{\ell}{M}{N})\;{-} &= \dynif{(\epsilon\;L\;\Bool_\ell)}{(\epsilon\;M\;A)}{(\epsilon\;N\;A)} \\
+  \epsilon\;(\ccifstar{L}{T}{M}{N})\;{-} &= \dynif{(\epsilon\;L\;\Bool_{\unk})}{(\epsilon\;M\;T_{\unk})}{(\epsilon\;N\;T_{\unk})} \\
+  \epsilon\;(\ccref{\ell}{M})\;(\Refer{T_\ell})_{\low} &= \dynref{?}{\ell}{(\epsilon\;M\;T_\ell)} \\
+  \epsilon\;(\ccrefproj{\ell}{M}{p})\;(\Refer{T_\ell})_{\low} &= \dynref{?}{\ell}{(\epsilon\;M\;T_\ell)} \\
+  \epsilon\;(\ccderef{M}{A}{\ell})\;{-} &= \dynderef{(\epsilon\;M\;(\Refer{A})_\ell)} \\
+  \epsilon\;(\ccderefstar{M}{T})\;{-} &= \dynderef{(\epsilon\;M\;(\Refer{T_{\unk}})_{\unk})} \\
+  \epsilon\;(\ccassign{L}{M}{T}{\hat{\ell}}{\ell})\;{-} &= \dynassign{(\epsilon\;L\;(\Refer{T_{\hat{\ell}}})_\ell)}{?}{(\epsilon\;M\;T_{\hat{\ell}})} \\
+  \epsilon\;(\ccassignproj{L}{M}{T}{\hat{g}}{p})\;{-} &= \dynassign{(\epsilon\;L\;(\Refer{T_{\hat{g}}})_{\unk})}{?}{(\epsilon\;M\;T_{\hat{g}})} \\
+  \epsilon\;(\cccast{N}{\bm{c}})\;{-} &= \epsilon\;N\;A \quad \text{, where }\vdash c : A \Rightarrow B \\
+  \epsilon\;(\ccprot{\PC}{\ell}{M}{A})\;{-} &= \dynprot{\ell}{(\epsilon\;M\;A)}
+  \end{align*}}
+  \caption{Erasure from \CC to \DynIFC}
+  \label{fig:cast-erase}
+\end{figure}
+
+\begin{lemma}[Noninterference for \CC]
+\label{lem:NI-CC}
+If $M$ is well-typed:
+$(x{:}\Bool_{\high}) ; \emptyset ; \low ; \low \vdash M \Leftarrow \Bool_{\low}$
+and
+{\normalfont
+\begin{equation*}
+\reducemult{M [ x := \ccconst{b_1}]}{\emptyset}{\low}{V_1}{\mu_1}
+\quad\text{ and }\quad
+\reducemult{M [ x := \ccconst{b_2}]}{\emptyset}{\low}{V_2}{\mu_2}
+\end{equation*}}
+then $V_1 = V_2$.
+\end{lemma}
+\begin{proof}
+From the definition of $\epsilon$ (Figure~\ref{fig:cast-erase}),
+we know $\simrel{\low}{\epsilon(M)[x:= \dynconst{b_i}{\high}]}{M [ x := \ccconst{b_i}]}{\Bool_{\low}}$.
+By Lemma~\ref{lem:sim-mult}, there exists $V_i', \mu_i'$ s.t
+$\reducemult{\epsilon(M)[x:= \dynconst{b_i}{\high}]}{\emptyset}{\low}{V_i'}{\mu_i'}$ and
+$\simrel{\low}{V_i'}{V_i}{\Bool_{\low}}$.
+The simulation relation must be of form $\simrel{\low}{\dynconst{a_i}{\low}}{\ccconst{a_i}}{\Bool_{\low}}$
+where $a_i$ is the output boolean. By Lemma~\ref{lem:NI-old}, $a_1 = a_2$,
+thus $V_1 = \ccconst{a_1} = \ccconst{a_2} = V_2$.
+\end{proof}
+
+\begin{theorem}[Noninterference for \Surface]
+\label{thm:NI-Surface}
+Suppose a \Surface program $M$ is well-typed:
+$(x{:}\Bool_{\high}) ; \low \vdash M : \Bool_{\low}$.
+If for any boolean inputs $b_1,b_2$
+{\normalfont
+\begin{equation*}
+\reducemult{(\compile{M}) [ x := \ccconst{b_1}]}{\emptyset}{\low}{V_1}{\mu_1}
+\quad\text{ and }\quad
+\reducemult{(\compile{M}) [ x := \ccconst{b_2}]}{\emptyset}{\low}{V_2}{\mu_2}
+\end{equation*}}
+then the resulting values $V_1 = V_2$.
+\end{theorem}
+\begin{proof}
+By Theorem~\ref{thm:compile-pres} (Compilation preserves types),
+$(x{:}\Bool_{\high}) ; \emptyset ; \low ; \low \vdash M' \Leftarrow \Bool_{\low}$.
+By Lemma~\ref{lem:NI-CC} (Noninterference for \CC), $V_1 = V_2$.
+\end{proof}

@@ -14,6 +14,7 @@
 \usepackage[page]{appendix}  %for appendices
 \usepackage{rotating}  %for rotated, landscape images
 \usepackage{amsmath}
+\usepackage{amsthm}
 \usepackage{mathabx}
 \usepackage[dvipsnames]{xcolor}
 \usepackage{listings}
@@ -191,6 +192,9 @@
 \newcommand{\dynderef}[1]{\ensuremath{\ccsyntax{!}\;{#1}}}
 \newcommand{\dynassign}[3]{\ensuremath{{#1}\;\ccsyntax{:=}^{\ccsyntax{#2}}\;{#3}}}
 \newcommand{\dynprot}[2]{\ensuremath{\ccsyntax{prot}\;{#1}\;{#2}}}
+
+% simulation
+\newcommand{\simrel}[4]{\ensuremath{{#1}\vdash{#2}\leq{#3}\Leftarrow{#4}}}
 
 \newcommand{\highlight}[2]{\colorbox{#1}{\ensuremath{#2}}}
 \newcommand{\highlightblue}[1]{\highlight{White!90!NavyBlue}{#1}}
