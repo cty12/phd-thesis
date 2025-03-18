@@ -40,11 +40,10 @@ sending a private error message to the software developer.
 \section{The Normalization of Coercions Checks Information Flow}
 \label{sec:norm-IF}
 
-In this section, I show that reducing coercion sequences to normal form models
-IFC checks because the normalization either succeeds or fails. If a coercion
-sequences successfully reduces to normal form, the IFC check succeeds and the
-flow is justified. If it reduces to a failure, then an illegal flow is detected
-and the program errors.
+I show that reducing coercion sequences to normal form models IFC checks because
+the normalization either succeeds or fails. If a coercion sequences successfully
+reduces to normal form, the IFC check succeeds and the flow is justified. If it
+reduces to a failure, then an illegal flow is detected and the program errors.
 
 \begin{lemma}[Strong normalization of coercion sequences]
 If $\vdash \bar{c} : g_1 \Rightarrow g_2$, then either
@@ -67,12 +66,13 @@ then $\bar{d}_1 = \bar{d}_2$.
 \end{lemma}
 
 Recall that in Section~\ref{sec:cexpr-comp-stamp}, we mention that coercion
-composition models explicit flows, while coercion stamping models implicit flow
+composition models explicit flows, while coercion stamping models implicit flow.
+Here we prove lemmas that formalize that intuition.
 
 We reason about explicit flows first. If we compose one coercion
 sequence with another and then reduce the result to normal form, the
 security of the resulting coercion sequence should be greater than or
-equal to that of the first sequence.
+equal to that of the first sequence:
 
 \begin{lemma}[Composition models explicit flow]\ \\
   \label{lem:comp-explicit}
@@ -98,62 +98,128 @@ label:
 
 \begin{figure}[tbp]
   \raggedright
-  \fbox{$\reduce{M}{\mu}{\pc}{N}{\mu'}$}
+  \fbox{\bigstep{\mu}{\pc}{M}{V}{\mu'}}
   {\small
   \begin{gather*}
-  \xi~
+  {\Downarrow}\textit{-val}~
+  \inference{}{\bigstep{\mu}{\pc}{V}{V}{\mu}}
+  \qquad
+  {\Downarrow}\textit{-app}~
   \inference
-  {\reduce{M}{\mu}{\pc}{M'}{\mu'}}
-  {\reduce{\mathit{plug}\;M\;F}{\mu}{\pc}{\mathit{plug}\;M'\;F}{\mu'}}
-  \\[1ex]
-  \textit{prot-val}~
-  \inference{}{\reduce{\dynprot{\ell}{V}}{\mu}{\pc}{V \curlyvee \ell}{\mu}}
+  {\bigstep{\mu}{\pc}{L}{\dynlam{x}{N}{\ell}}{\mu_1} \\
+   \bigstep{\mu_1}{\pc}{M}{V}{\mu_2} \\
+   \bigstep{\mu_2}{\pc \curlyvee \ell}{N[ x := V ]}{W}{\mu_3}}
+  {\bigstep{\mu}{\pc}{L \; M}{W \curlyvee \ell}{\mu_3}}
+  \\[2ex]
+  {\Downarrow}\textit{-if-true}~
+  \inference
+  {\bigstep{\mu}{\pc}{L}{\dynconst{\true}{\ell}}{\mu_1} \\
+   \bigstep{\mu_1}{\pc \curlyvee \ell}{M}{V}{\mu_2}}
+  {\bigstep{\mu}{\pc}{\dynif{L}{M}{N}}{V \curlyvee \ell}{\mu_2}}
   \quad
-  \textit{prot-ctx}~
+  {\Downarrow}\textit{-if-false}~
   \inference
-  {\reduce{M}{\mu}{\pc \curlyvee \ell}{M'}{\mu'}}
-  {\reduce{\dynprot{\ell}{M}}{\mu}{\pc}{\dynprot{\ell}{M'}}{\mu'}}
-  \\[1ex]
-  \beta~
-  \inference{}{\reduce{\dynlam{x}{N}{\ell} \; V}{\mu}{\pc}{\dynprot{\ell}{(N [x := V])}}{\mu}}
-  \\[1ex]
-  \beta\textit{-if-true}~
-  \inference{}{\reduce{\dynif{\dynconst{\true}{\ell}}{M}{N}}{\mu}{\pc}{\dynprot{\ell}{M}}{\mu}}
-  \\[1ex]
-  \beta\textit{-if-false}~
-  \inference{}{\reduce{\dynif{\dynconst{\false}{\ell}}{M}{N}}{\mu}{\pc}{\dynprot{\ell}{N}}{\mu}}
-  \\[1ex]
-  \textit{ref?-ok}~
+  {\bigstep{\mu}{\pc}{L}{\dynconst{\false}{\ell}}{\mu_1} \\
+   \bigstep{\mu_1}{\pc \curlyvee \ell}{N}{V}{\mu_2}}
+  {\bigstep{\mu}{\pc}{\dynif{L}{M}{N}}{V \curlyvee \ell}{\mu_2}}
+  \\[2ex]
+    {\Downarrow}\textit{-ref?}~
+    \inference
+        {\bigstep{\mu}{\pc}{M}{V}{\mu_1} \\
+          n \; \mathbf{FreshIn} \; \mu_1(\ell) & \highlightred{\pc \preccurlyeq \ell}}
+        {\bigstep{\mu}{\pc}{\dynref{?}{\ell}{M}}{\dynaddr{n_{\ell}}{\low}}{(\mu_1, \ell \mapsto n \mapsto (V \curlyvee \ell))}}
+  \\[2ex]
+  {\Downarrow}\textit{-deref}~
   \inference
-  {\highlightred{\pc \preccurlyeq \ell} & n \; \mathbf{FreshIn} \; \mu(\ell)}
-  {\reduce{\dynref{?}{\ell}{V}}{\mu}{\pc}{\dynaddr{n_{\ell}}{\low}}{(\mu, \ell \mapsto n \mapsto (V \curlyvee \ell))}}
-  \\[1ex]
-  \textit{deref}~
+  {\bigstep{\mu}{\pc}{M}{\dynaddr{n_{\hat{\ell}}}{\ell}}{\mu_1} \\
+    \mathit{\mu_1(\hat{\ell},n) = V}}
+  {\bigstep{\mu}{\pc}{\dynderef{M}}{V \curlyvee \ell}{\mu_1}}
+  \\[2ex]
+  {\Downarrow}\textit{-assign?}~
   \inference
-  {\mathit{\mu(\hat{\ell},n) = V}}
-  {\reduce{\dynderef{\dynaddr{n_{\hat{\ell}}}{\ell}}}{\mu}{\pc}{\dynprot{\ell}{V}}{\mu}}
-  \\[1ex]
-  \textit{assign?-ok}~
-  \inference
-  {\highlightred{\pc \curlyvee \ell \preccurlyeq \hat{\ell}}}
-  {\reduce{\dynassign{\dynaddr{n_{\hat{\ell}}}{\ell}}{?}{V}}{\mu}{\pc}{\dynconst{\unit}{\low}}{[\hat{\ell} \mapsto n \mapsto (V \curlyvee \hat{\ell})] \mu}}
-  \end{gather*}}
-  \caption{Reduction semantics (successful cases) of \DynIFC}
-  \label{fig:sem-cc-no-cast}
+  {\bigstep{\mu}{\pc}{L}{\dynaddr{n_{\hat{\ell}}}{\ell}}{\mu_1} \\
+   \bigstep{\mu_1}{\pc}{M}{V}{\mu_2} &
+   \highlightred{\pc \curlyvee \ell \preccurlyeq \hat{\ell}}}
+  {\bigstep{\mu}{\pc}{\dynassign{L}{?}{M}}{\dynconst{\unit}{\low}}{[\hat{\ell} \mapsto n \mapsto (V \curlyvee \hat{\ell})] \mu_2}}
+  \end{gather*} }
+  \caption{Big-step operational semantics (successful cases) of \DynIFC}
+  \label{fig:big-step-dyn}
 \end{figure}
+
+
+%% \begin{figure}[tbp]
+%%   \raggedright
+%%   \fbox{$\reduce{M}{\mu}{\pc}{N}{\mu'}$}
+%%   {\small
+%%   \begin{gather*}
+%%   \xi~
+%%   \inference
+%%   {\reduce{M}{\mu}{\pc}{M'}{\mu'}}
+%%   {\reduce{\mathit{plug}\;M\;F}{\mu}{\pc}{\mathit{plug}\;M'\;F}{\mu'}}
+%%   \\[1ex]
+%%   \textit{prot-val}~
+%%   \inference{}{\reduce{\dynprot{\ell}{V}}{\mu}{\pc}{V \curlyvee \ell}{\mu}}
+%%   \quad
+%%   \textit{prot-ctx}~
+%%   \inference
+%%   {\reduce{M}{\mu}{\pc \curlyvee \ell}{M'}{\mu'}}
+%%   {\reduce{\dynprot{\ell}{M}}{\mu}{\pc}{\dynprot{\ell}{M'}}{\mu'}}
+%%   \\[1ex]
+%%   \beta~
+%%   \inference{}{\reduce{\dynlam{x}{N}{\ell} \; V}{\mu}{\pc}{\dynprot{\ell}{(N [x := V])}}{\mu}}
+%%   \\[1ex]
+%%   \beta\textit{-if-true}~
+%%   \inference{}{\reduce{\dynif{\dynconst{\true}{\ell}}{M}{N}}{\mu}{\pc}{\dynprot{\ell}{M}}{\mu}}
+%%   \\[1ex]
+%%   \beta\textit{-if-false}~
+%%   \inference{}{\reduce{\dynif{\dynconst{\false}{\ell}}{M}{N}}{\mu}{\pc}{\dynprot{\ell}{N}}{\mu}}
+%%   \\[1ex]
+%%   \textit{ref?-ok}~
+%%   \inference
+%%   {\highlightred{\pc \preccurlyeq \ell} & n \; \mathbf{FreshIn} \; \mu(\ell)}
+%%   {\reduce{\dynref{?}{\ell}{V}}{\mu}{\pc}{\dynaddr{n_{\ell}}{\low}}{(\mu, \ell \mapsto n \mapsto (V \curlyvee \ell))}}
+%%   \\[1ex]
+%%   \textit{deref}~
+%%   \inference
+%%   {\mathit{\mu(\hat{\ell},n) = V}}
+%%   {\reduce{\dynderef{\dynaddr{n_{\hat{\ell}}}{\ell}}}{\mu}{\pc}{\dynprot{\ell}{V}}{\mu}}
+%%   \\[1ex]
+%%   \textit{assign?-ok}~
+%%   \inference
+%%   {\highlightred{\pc \curlyvee \ell \preccurlyeq \hat{\ell}}}
+%%   {\reduce{\dynassign{\dynaddr{n_{\hat{\ell}}}{\ell}}{?}{V}}{\mu}{\pc}{\dynconst{\unit}{\low}}{[\hat{\ell} \mapsto n \mapsto (V \curlyvee \hat{\ell})] \mu}}
+%%   \end{gather*}}
+%%   \caption{Small-step operational semantics (successful cases) of \DynIFC}
+%%   \label{fig:sem-succ-dyn}
+%% \end{figure}
+
+We obtain the big-step semantics in Figure~\ref{fig:big-step-dyn} by a
+mechanical conversion from the successful (non-erroring) cases of the
+small-step semantics of \DynIFC in Figure~\ref{fig:dyn-ifc}. I conjecture that
+the two presentations of the semantics for \DynIFC are equivalent; in
+particular, multi-step reduction should imply big-step:
+
+\begin{lemma}
+  \label{lem:small-step-impl-big-step}
+  If $\reducemult{M}{\mu}{\pc}{V}{\mu'}$, then $\bigstep{\mu}{\pc}{M}{V}{\mu'}$
+\end{lemma}
+
+\noindent The proof technique would be standard. We could define a denotational
+semantics for \DynIFC and prove Lemma~\ref{lem:small-step-impl-big-step} by
+soundness and adequacy~\parencite{Wadler:2020aa}.
 
 \begin{lemma}[Noninterference of \DynIFC]
 \label{lem:NI-old}
 If
-$\reducemult{M [ x := \dynconst{b_1}{\high}]}{\emptyset}{\low}{\dynconst{b_3}{\low}}{\mu_1}$
+$\bigstep{\emptyset}{\low}{M [ x := \dynconst{b_1}{\high}]}{\dynconst{b_3}{\low}}{\mu_1}$
 and
-$\reducemult{M [ x := \dynconst{b_2}{\high}]}{\emptyset}{\low}{\dynconst{b_4}{\low}}{\mu_2}$
+$\bigstep{\emptyset}{\low}{M [ x := \dynconst{b_2}{\high}]}{\dynconst{b_4}{\low}}{\mu_2}$
 then $b_3 = b_4$.
 \end{lemma}
 \begin{proof}
-The proof is fully mechanized in Agda \footnote{In \texttt{/src/Dyn/Noninterference.agda}.}
-and can be found in the supplementary material.
-The proof follows the noninterference proof of \CCOld~\parencite{Chen:2022aa}.
+The proof is fully mechanized in \texttt{/src/Dyn/Noninterference.agda}. The
+structure of the proof directly follows the noninterference proof of
+\CCOld~\parencite{Chen:2022aa}.
 \end{proof}
 
 \section{Simulation Between \CC and \DynIFC}
