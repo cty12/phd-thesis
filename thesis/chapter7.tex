@@ -16,14 +16,14 @@ erased to an opaque value.
 
 Second, I prove a simulation lemma between \CC and \DynIFC
 (Lemma~\ref{lem:sim-leq}). The main intuition of the simulation relation
-(Figure~\ref{fig:sim-rel}) is that a \CC term always produces a value that is as
-secure as the one produced by its related \DynIFC term. I translate \CC terms to
-\DynIFC by (1) getting rid of all the casts and (2) converting static heap
-enforcement (\texttt{ref} and \texttt{assign}) to dynamic enforcement (NSU)
-(Figure~\ref{fig:cast-erase}). The noninterference property of \CC
-(Lemma~\ref{lem:NI-CC}) follows directly from the multi-step simulation lemma
-(Lemma~\ref{lem:sim-mult}) and the noninterference result of \DynIFC
-(Lemma~\ref{lem:NI-old}).
+(Figure~\ref{fig:sim-rel-1} and~\ref{fig:sim-rel-2}) is that a \CC term always
+produces a value that is as secure as the one produced by its related \DynIFC
+term. I translate \CC terms to \DynIFC by (1) getting rid of all the casts and
+(2) converting static heap enforcement (\texttt{ref} and \texttt{assign}) to
+dynamic enforcement (NSU) (Figure~\ref{fig:cast-erase}). The noninterference
+property of \CC (Lemma~\ref{lem:NI-CC}) follows directly from the multi-step
+simulation lemma (Lemma~\ref{lem:sim-mult}) and the noninterference result of
+\DynIFC (Lemma~\ref{lem:NI-old}).
 
 Third, the noninterference theorem of \Surface (Theorem~\ref{thm:NI-Surface}) is
 a corollary of the noninterference property of \CC.
@@ -238,90 +238,99 @@ structure of the proof directly follows the noninterference proof of
     {\leq}\textit{-const}~
     \inference{\ell' \preccurlyeq \ell}
               {\gc \vdash \dynconst{k}{\ell'} \leq \ccconst{k} \Leftarrow \iota_{\ell}}
-    \\[1ex]
+    \\[2ex]
     {\leq}\textit{-wrapped-const}~
     \inference{\ell' \preccurlyeq |\bar{c}| & \vdash \bar{c} : \ell \Rightarrow g & \mathbf{NF}\;\bar{c} & \ell \neq g}
     {\gc \vdash \dynconst{k}{\ell'} \leq \cccast{\ccconst{k}}{\coerc{\id{\iota}}{\bar{c}}} \Leftarrow \iota_g}
-    \\[1ex]
+    \\[2ex]
     % lambda
     {\leq}\textit{-lam}~
     \inference{\simrel{g}{N'}{N}{B} & \ell' \preccurlyeq \ell}
               {\simrel{\gc}{\dynlam{x}{N'}{\ell'}}{\cclam{x}{N}}{(\Fun{A}{g}{B})_{\ell}}}
-    \\[1ex]
+    \\[2ex]
     {\leq}\textit{-wrapped-lam}~
-    \inference{\simrel{g_3}{N'}{N}{D} & \ell \preccurlyeq |\bar{c}| & \vdash \bar{d} : g_1 \Rightarrow g_3 & \vdash \bm{c} : A \Rightarrow C & \vdash \bm{d} : D \Rightarrow B & \mathbf{NF}\;\bar{c}}
+    \inference{\simrel{g_3}{N'}{N}{D} & \ell \preccurlyeq |\bar{c}| \\ \vdash \bar{d} : g_1 \Rightarrow g_3 & \vdash \bm{c} : A \Rightarrow C & \vdash \bm{d} : D \Rightarrow B & \mathbf{NF}\;\bar{c}}
               {\simrel{\gc}{\dynlam{x}{N'}{\ell}}{\cccast{(\cclam{x}{N})}{\coerc{\funco{\bar{d}}{\bm{c}}{\bm{d}}}{\bar{c}}}}{(\Fun{A}{g_1}{B})_{g_2}}}
-    \\[1ex]
+    \\[2ex]
     % addr
     {\leq}\textit{-addr}~
     \inference{\ell' \preccurlyeq \ell}
               {\simrel{\gc}{\dynaddr{n_{\hat{\ell}}}{\ell'}}{\ccaddr{n}}{\Refer{(T_{\hat{\ell}})}_{\ell}}}
-    \\[1ex]
+    \\[2ex]
     {\leq}\textit{-wrapped-addr}~
     \inference{\ell \preccurlyeq |\bar{c}| & \vdash \bm{c} : T_{g_1} \Rightarrow S_{\hat{\ell}} & \vdash \bm{d} : S_{\hat{\ell}} \Rightarrow T_{g_1} & \mathbf{NF}\;\bar{c}}
               {\simrel{\gc}{\dynaddr{n_{\hat{\ell}}}{\ell}}{\cccast{(\ccaddr{n})}{\coerc{\refco{\bm{c}}{\bm{d}}}{\bar{c}}}}{(\Refer{(T_{g_1})})_{g_2}}}
-    \\[1ex]
+    \\[2ex]
     % app
     {\leq}\textit{-app}~
     \inference{\simrel{\ell^c}{M'}{M}{(\Fun{A}{\ell^c \curlyvee \ell}{B})_\ell} & \simrel{\ell^c}{N'}{N}{A}}
               {\simrel{\ell^c}{M'\;N'}{\ccapp{M}{N}{A}{B}{\ell}}{C}}
-    \\[1ex]
+    \\[2ex]
     % app*
     {\leq}\textit{-app}\star~
     \inference{\simrel{\gc}{M'}{M}{(\Fun{A}{\unk}{T_{\unk}})_{\unk}} & \simrel{\gc}{N'}{N}{A}}
               {\simrel{\gc}{M'\;N'}{\ccappstar{M}{N}{A}{T}{}}{T_{\unk}}}
-    \\[1ex]
+    \\[2ex]
     % if
     {\leq}\textit{-if}~
     \inference{\simrel{\ell^c}{L'}{L}{\Bool_\ell} & \simrel{\ell^c \curlyvee \ell}{M'}{M}{A} & \simrel{\ell^c \curlyvee \ell}{N'}{N}{A}}
               {\simrel{\ell^c}{\dynif{L'}{M'}{N'}}{\ccif{L}{A}{\ell}{M}{N}}{B}}
-    \\[1ex]
+    \\[2ex]
     % if*
     {\leq}\textit{-if}\star~
     \inference{\simrel{\gc}{L'}{L}{\Bool_{\unk}} & \simrel{\unk}{M'}{M}{T_{\unk}} & \simrel{\unk}{N'}{N}{T_{\unk}}}
               {\simrel{\gc}{\dynif{L'}{M'}{N'}}{\ccifstar{L}{T}{M}{N}}{T_{\unk}}}
-    \\[1ex]
-    % ref
-    {\leq}\textit{-ref}~
-    \inference{\simrel{\ell^c}{M'}{M}{T_\ell}}
-              {\simrel{\ell^c}{\dynref{?}{\ell}{M'}}{\ccref{\ell}{M}}{(\Refer{T_\ell})_{\low}}}
-    \quad
-    % ref?
-    {\leq}\textit{-ref?}~
-    \inference{\simrel{\unk}{M'}{M}{T_\ell}}
-              {\simrel{\unk}{\dynref{?}{\ell}{M'}}{\ccrefproj{\ell}{M}{p}}{(\Refer{T_\ell})_{\low}}}
-    \\[1ex]
-    % deref
-    {\leq}\textit{-deref}~
-    \inference{\simrel{\gc}{M'}{M}{(\Refer{A})_\ell}}
-              {\simrel{\gc}{\dynderef{M'}}{\ccderef{M}{A}{\ell}}{B}}
-    \qquad
-    % deref*
-    {\leq}\textit{-deref}\star~
-    \inference{\simrel{\gc}{M'}{M}{(\Refer{T_{\unk}})_{\unk}}}
-              {\simrel{\gc}{\dynderef{M'}}{\ccderefstar{M}{T}}{T_{\unk}}}
-    \\[1ex]
-    % assign
-    {\leq}\textit{-assign}~
-    \inference{\simrel{\ell^c}{L'}{L}{(\Refer{T_{\hat{\ell}}})_{\ell}} & \simrel{\ell^c}{M'}{M}{T_{\hat{\ell}}}}
-              {\simrel{\ell^c}{\dynassign{L'}{?}{M'}}{\ccassign{L}{M}{T}{\hat{\ell}}{\ell}}{\Unit_{\low}}}
-    \\[1ex]
-    {\leq}\textit{-assign?}~
-    \inference{\simrel{\gc}{L'}{L}{(\Refer{T_g})_{\unk}} & \simrel{\gc}{M'}{M}{T_g}}
-              {\simrel{\gc}{\dynassign{L'}{?}{M'}}{\ccassignproj{L}{M}{T}{g}{p}}{\Unit_{\low}}}
-    \\[1ex]
+    \\[2ex]
     % cast
     {\leq}\textit{-cast}~
     \inference{\simrel{\gc}{M}{N}{A} & \vdash \bm{c} : A \Rightarrow B}
               {\simrel{\gc}{M}{\cccast{N}{\bm{c}}}{B}}
-    \\[1ex]
+    \\[2ex]
     % prot
     {\leq}\textit{-prot}~
     \inference{\ell' \preccurlyeq \ell & g_2 \vdash M' \leq M \Leftarrow A & \vdash PC \Leftarrow g_2}
     {g_1 \vdash \dynprot{\ell'}{M'} \leq \ccprot{\PC}{\ell}{M}{A} \Leftarrow B}
   \end{gather*}
-  \caption{Simulation relation between \CC and \DynIFC}
-  \label{fig:sim-rel}
+  \caption{Simulation relation between \CC and \DynIFC (Part I)}
+  \label{fig:sim-rel-1}
+\end{figure}
+
+\begin{figure}[tbp]
+  \raggedright
+  \fbox{$\simrel{\gc}{M}{N}{A}$}
+  \small
+  \begin{gather*}
+    % ref
+    {\leq}\textit{-ref}~
+    \inference{\simrel{\ell^c}{M'}{M}{T_\ell}}
+              {\simrel{\ell^c}{\dynref{?}{\ell}{M'}}{\ccref{\ell}{M}}{(\Refer{T_\ell})_{\low}}}
+    \\[2ex]
+    % ref?
+    {\leq}\textit{-ref?}~
+    \inference{\simrel{\unk}{M'}{M}{T_\ell}}
+              {\simrel{\unk}{\dynref{?}{\ell}{M'}}{\ccrefproj{\ell}{M}{p}}{(\Refer{T_\ell})_{\low}}}
+    \\[2ex]
+    % deref
+    {\leq}\textit{-deref}~
+    \inference{\simrel{\gc}{M'}{M}{(\Refer{A})_\ell}}
+              {\simrel{\gc}{\dynderef{M'}}{\ccderef{M}{A}{\ell}}{B}}
+    \quad
+    % deref*
+    {\leq}\textit{-deref}\star~
+    \inference{\simrel{\gc}{M'}{M}{(\Refer{T_{\unk}})_{\unk}}}
+              {\simrel{\gc}{\dynderef{M'}}{\ccderefstar{M}{T}}{T_{\unk}}}
+    \\[2ex]
+    % assign
+    {\leq}\textit{-assign}~
+    \inference{\simrel{\ell^c}{L'}{L}{(\Refer{T_{\hat{\ell}}})_{\ell}} & \simrel{\ell^c}{M'}{M}{T_{\hat{\ell}}}}
+              {\simrel{\ell^c}{\dynassign{L'}{?}{M'}}{\ccassign{L}{M}{T}{\hat{\ell}}{\ell}}{\Unit_{\low}}}
+    \\[2ex]
+    {\leq}\textit{-assign?}~
+    \inference{\simrel{\gc}{L'}{L}{(\Refer{T_g})_{\unk}} & \simrel{\gc}{M'}{M}{T_g}}
+              {\simrel{\gc}{\dynassign{L'}{?}{M'}}{\ccassignproj{L}{M}{T}{g}{p}}{\Unit_{\low}}}
+  \end{gather*}
+  \caption{Simulation relation between \CC and \DynIFC (Part II)}
+  \label{fig:sim-rel-2}
 \end{figure}
 
 \begin{definition}[Simulation between heaps]
@@ -384,10 +393,8 @@ depending on whether $V_r$ is a constant, a $\lambda$, or an address.
   If $\simrel{g}{N'}{N}{A}$, $(\Gamma, x:B);\Sigma;g;\ell \vdash N \Leftarrow A$, and $\forall g. \simrel{g}{M'}{M}{B}$, then $\simrel{g}{N'[x:=M']}{N[x:=M]}{A}$.
 \end{lemma}
 \begin{proof}
-The proof is fully mechanized in Agda
-\footnote{In \texttt{substitution-pres-${\leq}$} of \texttt{/src/Security/SubstPres.agda}.
-The simulation relation is in \texttt{/src/Security/SimRel.agda}.} and can be found in the
-supplementary material.
+  The proof is fully mechanized in \texttt{/src/Security/SubstPres.agda}. The
+  simulation relation is defined in \texttt{/src/Security/SimRel.agda}.
 \end{proof}
 
 \begin{lemma}[Simulation with wrapped constant]
@@ -469,10 +476,12 @@ ${\leq}\textit{-wrapped-const}$), because the cases for $\lambda$s and addresses
       \end{itemize}
 \item $\simrel{\gc}{\dynconst{k}{\ell_1'}}{\cccast{\ccconst{k}}{\coerc{\id{\iota}}{\bar{c}}}}{-}$
       \begin{itemize}
-      \item[-] $\simrel{\gc}{\dynconst{k}{\ell_1'}}{\cccast{k}{\coerc{\id{\iota}}{\mathit{stamp}\;\bar{c}\;\high}}}{-}$
-               because $\ell_1' \preccurlyeq |\mathit{stamp}\;\bar{c}\;\high| = |\bar{c}| \curlyvee \high = \high$
-               (Lemma~\ref{lem:stamp-implicit} (Stamping models implicit flow)
-               and rule ${\leq}\textit{-wrapped-const}$).
+      \item[-]
+        $\simrel{\gc}{\dynconst{k}{\ell_1'}}{\cccast{k}{\coerc{\id{\iota}}{\mathit{stamp}\;\bar{c}\;\high}}}{-}$
+        because \newline $\ell_1' \preccurlyeq |\mathit{stamp}\;\bar{c}\;\high|
+        = |\bar{c}| \curlyvee \high = \high$ by Lemma~\ref{lem:stamp-implicit}
+        (Stamping models implicit flow) and rule
+        ${\leq}\textit{-wrapped-const}$.
       \end{itemize}
 \end{itemize}
 \item[Case 3] $\ell'=\high, \ell=\high$: Analogous to Case 2; the only difference is that
@@ -487,8 +496,8 @@ If $\mathbf{NF}\;e_1$ and $\cccast{e_1}{\bar{c}} \longrightarrow^{*} e_2$ and $\
 $|e_1| \preccurlyeq |e_2|$.
 \end{lemma}
 \begin{proof}
-The proof is fully mechanized in Agda \footnote{In \texttt{cast-security} of \texttt{/src/LabelExpr/Security.agda}.}
-and can be found in the supplementary material. The proof is by inversion on the multi-step reduction.
+The proof is in \texttt{cast-security} of \texttt{/src/LabelExpr/Security.agda}.
+The proof is by inversion on the multi-step reduction.
 \end{proof}
 
 \begin{lemma}[Stamping a label expression models implicit flow]
@@ -497,9 +506,9 @@ If $\mathbf{NF}\;e$, $|\mathit{stamp}\;e\;\ell| = |e| \curlyvee \ell$ and
 $|\mathit{stamp!}\;e\;\ell| = |e| \curlyvee \ell$.
 \end{lemma}
 \begin{proof}
-The proof is fully mechanized in Agda \footnote{In $\mathtt{stamp_e\texttt{-}security}$ and $\mathtt{stamp!_e\texttt{-}security}$ of
-\texttt{/src/LabelExpr/Security.agda}.}
-and can be found in the supplementary material. The proof is by casing on $\mathbf{NF}\;e$.
+The proof is fully mechanized in $\mathtt{stamp_e\texttt{-}security}$ and
+$\mathtt{stamp!_e\texttt{-}security}$ of \texttt{/src/LabelExpr/Security.agda}.
+The proof is by casing on $\mathbf{NF}\;e$.
 \end{proof}
 
 \begin{lemma}
@@ -993,14 +1002,16 @@ and
 then $V_1 = V_2$.
 \end{lemma}
 \begin{proof}
-From the definition of $\epsilon$ (Figure~\ref{fig:cast-erase}),
-we know $\simrel{\low}{\epsilon(M)[x:= \dynconst{b_i}{\high}]}{M [ x := \ccconst{b_i}]}{\Bool_{\low}}$.
-By Lemma~\ref{lem:sim-mult}, there exists $V_i', \mu_i'$ s.t
-$\reducemult{\epsilon(M)[x:= \dynconst{b_i}{\high}]}{\emptyset}{\low}{V_i'}{\mu_i'}$ and
-$\simrel{\low}{V_i'}{V_i}{\Bool_{\low}}$.
-The simulation relation must be of form $\simrel{\low}{\dynconst{a_i}{\low}}{\ccconst{a_i}}{\Bool_{\low}}$
-where $a_i$ is the output boolean. By Lemma~\ref{lem:NI-old}, $a_1 = a_2$,
-thus $V_1 = \ccconst{a_1} = \ccconst{a_2} = V_2$.
+From the definition of $\epsilon$ (Figure~\ref{fig:cast-erase}), we know
+$\simrel{\low}{\epsilon(M)[x:= \dynconst{b_i}{\high}]}{M [ x :=
+    \ccconst{b_i}]}{\Bool_{\low}}$. By Lemma~\ref{lem:sim-mult}, there exists
+$V_i', \mu_i'$ s.t $\reducemult{\epsilon(M)[x:=
+    \dynconst{b_i}{\high}]}{\emptyset}{\low}{V_i'}{\mu_i'}$ and
+$\simrel{\low}{V_i'}{V_i}{\Bool_{\low}}$. The simulation relation must be of
+form $\simrel{\low}{\dynconst{a_i}{\low}}{\ccconst{a_i}}{\Bool_{\low}}$ where
+$a_i$ is the output boolean. By Lemma~\ref{lem:small-step-impl-big-step} and
+Lemma~\ref{lem:NI-old} , $a_1 = a_2$, thus $V_1 = \ccconst{a_1} = \ccconst{a_2}
+= V_2$.
 \end{proof}
 
 \begin{theorem}[Noninterference for \Surface]
