@@ -975,9 +975,6 @@ Apply Lemma~\ref{lem:sim-leq} and then use the induction hypothesis.
 \end{description}
 \end{proof}
 
-\section{Noninterference of \Surface}
-\label{sec:NI}
-
 \begin{figure}[tbp]
   \raggedright
   \fbox{$\epsilon\;M\;A = M'$}
@@ -1029,6 +1026,12 @@ $a_i$ is the output boolean. By Lemma~\ref{lem:small-step-impl-big-step} and
 Lemma~\ref{lem:NI-old} , $a_1 = a_2$, thus $V_1 = \ccconst{a_1} = \ccconst{a_2}
 = V_2$.
 \end{proof}
+
+\section{Noninterference of \Surface}
+\label{sec:NI}
+
+The noninterference theorem of \Surface is a straightforward corollary of the
+noninterference lemma for \CC and compilation preserves types:
 
 \begin{theorem}[Noninterference for \Surface]
 \label{thm:NI-Surface}
