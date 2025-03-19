@@ -50,6 +50,10 @@ If $\vdash \bar{c} : g_1 \Rightarrow g_2$, then either
 (1) $\bar{c} \longrightarrow^{*} \bar{d}$ and $\mathbf{NF}\;\bar{d}$ or
 (2) $\bar{c} \longrightarrow^{*} \err{g_1}{g_2}{p}$.
 \end{lemma}
+\begin{proof}
+  The proof is in \texttt{cexpr-sn} of
+  \texttt{/src/CoercionExpr/CoercionExpr.agda}
+\end{proof}
 
 \noindent Normalization of coercion sequences is deterministic:
 
@@ -57,6 +61,9 @@ If $\vdash \bar{c} : g_1 \Rightarrow g_2$, then either
 If $\bar{c} \longrightarrow \bar{d}_1$ and $\bar{c} \longrightarrow \bar{d}_2$,
 then $\bar{d}_1 = \bar{d}_2$.
 \end{lemma}
+\begin{proof}
+  The proof is in \texttt{det} of \texttt{/src/CoercionExpr/CoercionExpr.agda}.
+\end{proof}
 
 \begin{lemma}[Normalization of coercion sequences is deterministic]
 Suppose $\bar{c} \longrightarrow^{*} \bar{d}_1$
@@ -64,6 +71,9 @@ and $\bar{c} \longrightarrow^{*} \bar{d}_2$.
 If $\mathbf{NF}\;\bar{d}_i$ or $\bar{d}_i = \err{g_1}{g_2}{p}$,
 then $\bar{d}_1 = \bar{d}_2$.
 \end{lemma}
+\begin{proof}
+  The proof is in \texttt{det-mult} of \texttt{/src/CoercionExpr/CoercionExpr.agda}.
+\end{proof}
 
 Recall that in Section~\ref{sec:cexpr-comp-stamp}, we mention that coercion
 composition models explicit flows, while coercion stamping models implicit flow.
@@ -81,6 +91,9 @@ equal to that of the first sequence:
   and $\mathbf{NF} \; \bar{c}'$,
   then $|\bar{c}| \preccurlyeq |\bar{c}'|$.
 \end{lemma}
+\begin{proof}
+  The proof is in \texttt{comp-security} of \texttt{/src/CoercionExpr/SecurityLevel.agda}.
+\end{proof}
 
 Next we show that stamping models implicit flow correctly, promoting
 the security of the stamped coercion by joining it with the stamped
@@ -92,6 +105,9 @@ label:
   then $| \mathit{stamp} \; \bar{c} \; \ell| = |\bar{c}| \curlyvee \ell$
   and $| \mathit{stamp!} \; \bar{c} \; \ell| = |\bar{c}| \curlyvee \ell$.
 \end{lemma}
+\begin{proof}
+  The proof is in \texttt{stamp$_{\mathtt{l}}$-security} of \texttt{/src/CoercionExpr/Stamping.agda}.
+\end{proof}
 
 \section{Noninterference of \DynIFC}
 \label{sec:NI-dynifc}
