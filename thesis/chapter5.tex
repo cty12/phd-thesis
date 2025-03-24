@@ -1,11 +1,33 @@
 \chapter{Type Safety of \Surface}
 \label{ch:type-safety}
 
-% place all 'properties of ...' sections here
+\section{Type Safety of \CC by Progress and Preservation}
+\label{sec:cc-type-safety}
 
-%% Finally, we explore meta-theoretic properties of this coercion calculus
-%% (Section~\ref{sec:cexpr-prop}), establishing the intuition that the security
-%% coercion calculus can be used to enforce gradual IFC, while satisfying the
-%% gradual guarantee.
+We show that \CC is type safe by proving progress and preservation. Progress
+says that a well-typed \CC term does not get stuck. The term is either a value
+or a blame, which does not reduce, or the term takes one reduction step. Heap
+well-typedness is defined point-wise.
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+\begin{theorem}[Progress]
+\label{thm:progress}
+Suppose \PC is well-typed: $\vdash \PC \Leftarrow g$,
+$M$ is well-typed: $\emptyset ; \Sigma ; g ; | \PC | \vdash M \Leftarrow A$,
+and the heap $\mu$ is also well-typed: $\Sigma \vdash \mu$.
+Then either (1) $M$ is a value or (2) $M$ is a blame: {\normalfont $M = \blame{p}$}
+or (3) $M$ can take a reduction step:
+$\reduce{M}{\mu}{\PC}{N}{\mu'}$ for some $N$ and $\mu'$.
+\end{theorem}
+
+The operation semantics of \CC preserves types and the well-typedness of heap:
+
+\begin{theorem}[Preservation]
+\label{thm:preservation}
+Suppose \PC is well-typed:  $\vdash \PC \Leftarrow g$,
+$M$ is well-typed: $\emptyset ; \Sigma ; g ; |\PC| \vdash M \Leftarrow A$
+and the heap $\mu$ is also well-typed: $\Sigma \vdash \mu$.
+If $\reduce{M}{\mu}{\PC}{N}{\mu'}$, there exists $\Sigma'$ s.t
+$\Sigma' \supseteq \Sigma$, $\emptyset ; \Sigma' ; g ; |\PC| \vdash N \Leftarrow A$,
+and $\Sigma' \vdash \mu'$.
+\end{theorem}
+

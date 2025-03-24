@@ -1001,6 +1001,11 @@ Apply Lemma~\ref{lem:sim-leq} and then use the induction hypothesis.
   \label{fig:cast-erase}
 \end{figure}
 
+We then prove that \CC satisfies termination-insensitive noninterference. The
+statement of termination-insensitive noninterference says that if we run a
+program with different high-security inputs in two executions, then their
+low-security output values should be the related (e.g the same boolean):
+
 \begin{lemma}[Noninterference for \CC]
 \label{lem:NI-CC}
 If $M$ is well-typed:
