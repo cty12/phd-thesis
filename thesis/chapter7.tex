@@ -210,19 +210,24 @@ label:
 %% \end{figure}
 
 We obtain the big-step semantics in Figure~\ref{fig:big-step-dyn} by a
-mechanical conversion from the successful (non-erroring) cases of the
-small-step semantics of \DynIFC in Figure~\ref{fig:dyn-ifc}. I conjecture that
-the two presentations of the semantics for \DynIFC are equivalent; in
-particular, multi-step reduction should imply big-step:
+mechanical conversion from the successful (non-erroring) cases of the small-step
+semantics of \DynIFC in Figure~\ref{fig:dyn-ifc}. I conjecture that small-step
+and big-step semantics for \DynIFC coincide; in particular, multi-stepping to a
+value should imply big-step:
 
 \begin{lemma}
-  \label{lem:small-step-impl-big-step}
+  \label{lem:mult-step-impl-big-step}
   If $\reducemult{M}{\mu}{\pc}{V}{\mu'}$, then $\bigstep{\mu}{\pc}{M}{V}{\mu'}$
 \end{lemma}
 
-\noindent The proof technique would be standard. We could define a denotational
-semantics for \DynIFC and prove Lemma~\ref{lem:small-step-impl-big-step} by
-soundness and adequacy~\parencite{Wadler:2020aa}.
+\noindent The proof technique for Lemma~\ref{lem:mult-step-impl-big-step} should
+be standard. We could first follow~\textcite{Streicher:2006aa} (the first
+exercise about PCF on p. 17) and prove a lemma that if
+$\reduce{M}{\mu_1}{\pc}{N}{\mu_2}$ and $\bigstep{\mu_2}{\pc}{N}{V}{\mu_3}$, then
+$\bigstep{\mu_1}{\pc}{M}{V}{\mu_3}$. We then perform induction on
+$\reducemult{M}{\mu}{\pc}{V}{\mu'}$: if $M$ is already a value, the goal is
+proved directly; otherwise, $M$ takes at least one reduction step, so we use the
+induction hypothesis and apply the aforementioned lemma.
 
 \begin{lemma}[Noninterference of \DynIFC]
 \label{lem:NI-old}
@@ -781,7 +786,9 @@ simulation relation.
   \ell^c \curlyvee \ell \vdash N' &\leq N \Leftarrow A
   \end{align}
   Take one step on the left side. We need to relate
-  $\simrel{\ell^c}{\dynprot{\ell'}{M'}}{\ccprot{(\mathit{stamp}\;\PC\;\ell)}{\ell}{M}{A}}{B}$.
+  \[
+  \simrel{\ell^c}{\dynprot{\ell'}{M'}}{\ccprot{(\mathit{stamp}\;\PC\;\ell)}{\ell}{M}{A}}{B}
+  \]
   The goal is directly proved by applying rule ${\leq}\textit{-prot}$.
   The case for $\beta$\textit{-if-false} is analogous.
   \item[Cases \textit{if-true-cast} and \textit{if-false-cast}:]
@@ -1027,7 +1034,7 @@ $V_i', \mu_i'$ s.t $\reducemult{\epsilon(M)[x:=
     \dynconst{b_i}{\high}]}{\emptyset}{\low}{V_i'}{\mu_i'}$ and
 $\simrel{\low}{V_i'}{V_i}{\Bool_{\low}}$. The simulation relation must be of
 form $\simrel{\low}{\dynconst{a_i}{\low}}{\ccconst{a_i}}{\Bool_{\low}}$ where
-$a_i$ is the output boolean. By Lemma~\ref{lem:small-step-impl-big-step} and
+$a_i$ is the output boolean. By Lemma~\ref{lem:mult-step-impl-big-step} and
 Lemma~\ref{lem:NI-old} , $a_1 = a_2$, thus $V_1 = \ccconst{a_1} = \ccconst{a_2}
 = V_2$.
 \end{proof}
