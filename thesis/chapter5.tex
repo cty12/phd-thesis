@@ -6,18 +6,27 @@
 
 We show that \CC is type safe by proving progress and preservation. Progress
 says that a well-typed \CC term does not get stuck. The term is either a value
-or a blame, which does not reduce, or the term takes one reduction step. Heap
-well-typedness is defined point-wise.
+or a blame, which does not reduce, or the term takes one reduction step.
 
 \begin{theorem}[Progress]
 \label{thm:progress}
 Suppose \PC is well-typed: $\vdash \PC \Leftarrow g$,
-$M$ is well-typed: $\emptyset ; \Sigma ; g ; | \PC | \vdash M \Leftarrow A$,
+$M$ is well-typed:
+\[
+\emptyset ; \Sigma ; g ; | \PC | \vdash M \Leftarrow A
+\]
 and the heap $\mu$ is also well-typed: $\Sigma \vdash \mu$.
 Then either (1) $M$ is a value or (2) $M$ is a blame: {\normalfont $M = \blame{p}$}
 or (3) $M$ can take a reduction step:
 $\reduce{M}{\mu}{\PC}{N}{\mu'}$ for some $N$ and $\mu'$.
 \end{theorem}
+
+Heap well-typedness is defined point-wise:
+
+\begin{align*}
+\Sigma \vdash \mu \triangleq & \forall n\,\ell\,T.\,\text{if}~\Sigma(\ell,n)=T \text{, then}~\mu(\ell,n)=V \\
+& \text{and}~\emptyset;\Sigma;\low;\low\vdash V \Leftarrow T_{\ell} ~\text{for some}~ V
+\end{align*}
 
 The operation semantics of \CC preserves types and the well-typedness of heap:
 
@@ -31,3 +40,14 @@ $\Sigma' \supseteq \Sigma$, $\emptyset ; \Sigma' ; g ; |\PC| \vdash N \Leftarrow
 and $\Sigma' \vdash \mu'$.
 \end{theorem}
 
+In addition, the compilation from \Surface to \CC preserves types:
+
+\begin{theorem}[Compilation preserves types]
+  \label{thm:compile-pres}
+  If $\Gamma ; g \vdash M : A$, then $\Gamma ; \emptyset ; g ; \low \vdash \compile{M} \Leftarrow A$.
+\end{theorem}
+
+\section{Type Safety of \Surface}
+\label{sec:cc-type-safety}
+
+TBA
