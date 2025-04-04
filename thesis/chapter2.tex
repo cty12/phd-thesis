@@ -430,16 +430,16 @@ function takes the form $\compile{M} = M'$, where $M$ is a \Surface program and
 $M'$ is a \CC term. I will define the compile function in
 Chapter~\ref{ch:compile}.
 
-I define the evaluation function (\textit{eval}, see below) for \Surface by (1)
-compiling from \Surface to \CC and (2) running the compiled \CC term using its
-operational semantics. I will define the $M \Downarrow N$ operator, which
-evaluates a \CC term $M$ to a value or a blame, and the $M \Uparrow$ operator,
-which means the \CC term $M$ diverges, in Chapter~\ref{ch:sem}. The
-\textit{eval} function takes a well-typed \Surface program $\emptyset ; \low
-\vdash M : \iota_{\ell}$, where $\iota \in \{\Unit, \Bool\}$, $\ell \in \{\low,
-\high\}$, and $k \in \{\true, \false, \unit\}$. The \textit{eval} function
-evaluates the \Surface program $M$ to a constant, signals a runtime error, or
-diverges (Figure~\ref{fig:eval}).
+I define the evaluation function (\textit{eval} in Figure~\ref{fig:eval}) for
+\Surface by (1) compiling from \Surface to \CC, (2) modeling input using
+substitution, and (3) running the compiled \CC term using its operational
+semantics. I will define the $M \Downarrow N$ operator, which evaluates a \CC
+term $M$ to a value or a blame, and the $M \Uparrow$ operator, which means the
+\CC term $M$ diverges, in Chapter~\ref{ch:sem}. The evaluation function takes a
+well-typed \Surface program $(x{:}\Bool_{\high}) ; \low \vdash M : \Bool_{\low}$
+and a boolean constant $b \in \{\true, \false\}$ as input. The function
+evaluates the program $M$ to a boolean constant $b'$, signals a runtime error,
+or diverges.
 
 }  %%%% end new text
 
