@@ -20,8 +20,11 @@ Then either (1) $M$ is a value or (2) $M$ is a blame: {\normalfont $M = \blame{p
 or (3) $M$ can take a reduction step:
 $\reduce{M}{\mu}{\PC}{N}{\mu'}$ for some $N$ and $\mu'$.
 \end{theorem}
+\begin{proof}
+  The proof is fully mechanized in \texttt{progress} of \texttt{/src/CC2/Progress.agda}.
+\end{proof}
 
-Heap well-typedness is defined point-wise:
+Heap well-typedness is defined point-wise (in \texttt{/src/Memory/HeapTyping.agda}):
 
 \begin{align*}
 \Sigma \vdash \mu \triangleq & \forall n\,\ell\,T.\,\text{if}~\Sigma(\ell,n)=T \text{, then}~\mu(\ell,n)=V \\
@@ -60,12 +63,12 @@ In addition, the compilation from \Surface to \CC preserves types:
     \quad
     \inference{}{\vdash \mathit{error}\;\bl{p} : A}
   \end{gather*}
-  \caption{Well-typed computation result}
+  \caption{Well-typed evaluation result}
   \label{fig:wt-result}
 \end{figure}
 
 \begin{theorem}[Type Safety of \Surface]
   \label{thm:type-safety}
   If $M$ is a well-typed \Surface program: $\emptyset;\low \vdash M : \iota_{\ell}$,
-  then the computation result is also well-typed: $\vdash \mathit{eval}(M) : \iota_{\ell}$.
+  then the evaluation result is also well-typed: $\vdash \mathit{eval}(M) : \iota_{\ell}$.
 \end{theorem}

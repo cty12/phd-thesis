@@ -410,15 +410,15 @@ because it is newly created and cannot leak information.
     \raggedright
         {\small \[
           \begin{array}{rcll}
-            \text{computation result}     & r & ::=  & k \MID \mathit{error}\;\bl{p} \MID \mathit{diverge}
+            \text{evaluation result}     & r & ::=  & b \MID \mathit{error}\;\bl{p} \MID \mathit{diverge}
           \end{array}
           \]}
-        \fbox{$\mathit{eval}(M)=r$}
+        \fbox{$\mathit{eval}(M, b)=r$}
         \begin{align*}
-          \mathit{eval}(M) =&\,k\;&\text{if}\;\compile(M) \Downarrow k \\
-          \mathit{eval}(M) =&\,k\;&\text{if}\;\compile(M) \Downarrow \cccast{k}{\mathbf{c}} \\
-          \mathit{eval}(M) =&\, \mathit{error}\;\bl{p} \;&\text{if~}\;\compile(M) \Downarrow \blame{\bl{p}} \\
-          \mathit{eval}(M) =&\, \mathit{diverge} \;&\text{if~}\;\compile(M) \Uparrow
+          \mathit{eval}(M, b) =&\,b'\;&\text{if}\;(\compile(M))[x:=\ccconst{b}] \Downarrow b' \\
+          \mathit{eval}(M, b) =&\,b'\;&\text{if}\;(\compile(M))[x:=\ccconst{b}] \Downarrow \cccast{b'}{\mathbf{c}} \\
+          \mathit{eval}(M, b) =&\, \mathit{error}\;\bl{p} \;&\text{if~}\;(\compile(M))[x:=\ccconst{b}] \Downarrow \blame{\bl{p}} \\
+          \mathit{eval}(M, b) =&\, \mathit{diverge} \;&\text{if~}\;(\compile(M))[x:=\ccconst{b}] \Uparrow
         \end{align*}
         \caption{Evaluation of \Surface}
         \label{fig:eval}
