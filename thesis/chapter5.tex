@@ -4,6 +4,18 @@
 \section{Type Safety of \CC by Progress and Preservation}
 \label{sec:cc-type-safety}
 
+We first prove that substitution preserves types:
+
+\begin{lemma}[Substitution preserves types]
+  \label{lem:subst-pres}
+  If $(\Gamma,x{:}A);\Sigma;g;\ell\vdash N \Leftarrow B$ and \\
+  $\forall g'\,\ell'.\,\Gamma;\Sigma;g';\ell' \vdash V \Leftarrow A$, then
+  $\Gamma;\Sigma;g\;\ell \vdash N[x:=V] \Leftarrow B$.
+\end{lemma}
+\begin{proof}
+  The proof is fully mechanized in \texttt{/src/CC2/SubstPreserve.agda}.
+\end{proof}
+
 We show that \CC is type safe by proving progress and preservation. Progress
 says that a well-typed \CC term does not get stuck. The term is either a value
 or a blame, which does not reduce, or the term takes one reduction step.
@@ -42,13 +54,22 @@ If $\reduce{M}{\mu}{\PC}{N}{\mu'}$, there exists $\Sigma'$ s.t
 $\Sigma' \supseteq \Sigma$, $\emptyset ; \Sigma' ; g ; |\PC| \vdash N \Leftarrow A$,
 and $\Sigma' \vdash \mu'$.
 \end{theorem}
+\begin{proof}
+  The proof is fully mechanized in \texttt{pres} of \texttt{/src/CC2/Preservation.agda}.
+\end{proof}
 
 In addition, the compilation from \Surface to \CC preserves types:
 
 \begin{theorem}[Compilation preserves types]
   \label{thm:compile-pres}
-  If $\Gamma ; g \vdash M : A$, then $\Gamma ; \emptyset ; g ; \low \vdash \compile{M} \Leftarrow A$.
+  If $M$ is a well-typed \Surface program: $\Gamma ; g \vdash M : A$, then the
+  compiled \CC term is also well-typed: $\Gamma ; \emptyset ; g ; \low \vdash
+  \compile{M} \Leftarrow A$.
 \end{theorem}
+\begin{proof}
+  The proof is fully mechanized in
+  \texttt{/src/Compile/CompilationPresTypes.agda}.
+\end{proof}
 
 \section{Type Safety of \Surface}
 \label{sec:surface-type-safety}
@@ -57,7 +78,7 @@ In addition, the compilation from \Surface to \CC preserves types:
   \raggedright
   \fbox{$\vdash r : A$}
   \begin{gather*}
-    \inference{k : \iota}{\vdash k : \iota_{\ell}}
+    \inference{b \in \{\true, \false\}}{\vdash b : \Bool_{\ell}}
     \quad
     \inference{}{\vdash \mathit{diverge} : A}
     \quad
@@ -69,6 +90,15 @@ In addition, the compilation from \Surface to \CC preserves types:
 
 \begin{theorem}[Type Safety of \Surface]
   \label{thm:type-safety}
-  If $M$ is a well-typed \Surface program: $\emptyset;\low \vdash M : \iota_{\ell}$,
-  then the evaluation result is also well-typed: $\vdash \mathit{eval}(M) : \iota_{\ell}$.
+  If $M$ is a well-typed \Surface program: $(x{:}\Bool_{\high});\low \vdash M : \Bool_{\low}$
+  and $\mathit{eval}(M,b)=r$,
+  then the result is also well-typed: $\vdash r : \Bool_{\low}$.
 \end{theorem}
+%% \begin{proof}
+%%   Casing on $r$ yields three cases:
+%%   \begin{itemize}
+%%     \item $r=b$.
+%%     \item $r=\mathit{error}\;\bl{p}$.
+%%     \item $r=\mathit{diverge}$.
+%%   \end{itemize}
+%% \end{proof}
