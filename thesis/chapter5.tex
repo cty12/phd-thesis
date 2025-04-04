@@ -48,6 +48,24 @@ In addition, the compilation from \Surface to \CC preserves types:
 \end{theorem}
 
 \section{Type Safety of \Surface}
-\label{sec:cc-type-safety}
+\label{sec:surface-type-safety}
 
-TBA
+\begin{figure}[tbp]
+  \raggedright
+  \fbox{$\vdash r : A$}
+  \begin{gather*}
+    \inference{k : \iota}{\vdash k : \iota_{\ell}}
+    \quad
+    \inference{}{\vdash \mathit{diverge} : A}
+    \quad
+    \inference{}{\vdash \mathit{error}\;\bl{p} : A}
+  \end{gather*}
+  \caption{Well-typed computation result}
+  \label{fig:wt-result}
+\end{figure}
+
+\begin{theorem}[Type Safety of \Surface]
+  \label{thm:type-safety}
+  If $M$ is a well-typed \Surface program: $\emptyset;\low \vdash M : \iota_{\ell}$,
+  then the computation result is also well-typed: $\vdash \mathit{eval}(M) : \iota_{\ell}$.
+\end{theorem}
