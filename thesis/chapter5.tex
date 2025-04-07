@@ -21,6 +21,14 @@ We first prove that substitution preserves types:
   The proof is fully mechanized in \texttt{/src/CC2/SubstPreserve.agda}.
 \end{proof}
 
+Heap well-typedness of \CC is defined point-wise (in
+\texttt{/src/Memory/HeapTyping.agda}):
+
+\begin{align*}
+  \Sigma \vdash \mu \triangleq & \forall n\,\ell\,T.\,\text{if}~\Sigma(\ell,n)=T \text{, then}~\mu(\ell,n)=V \\
+  & \text{and}~\emptyset;\Sigma;\low;\low\vdash V \Leftarrow T_{\ell} ~\text{for some}~ V
+\end{align*}
+
 We show that \CC is type safe by proving progress and preservation. Progress
 says that a well-typed \CC term does not get stuck. The term is either a value
 or a blame, which does not reduce, or the term takes one reduction step.
@@ -40,13 +48,6 @@ $\reduce{M}{\mu}{\PC}{N}{\mu'}$ for some $N$ and $\mu'$.
 \begin{proof}
   The proof is fully mechanized in \texttt{progress} of \texttt{/src/CC2/Progress.agda}.
 \end{proof}
-
-Heap well-typedness is defined point-wise (in \texttt{/src/Memory/HeapTyping.agda}):
-
-\begin{align*}
-\Sigma \vdash \mu \triangleq & \forall n\,\ell\,T.\,\text{if}~\Sigma(\ell,n)=T \text{, then}~\mu(\ell,n)=V \\
-& \text{and}~\emptyset;\Sigma;\low;\low\vdash V \Leftarrow T_{\ell} ~\text{for some}~ V
-\end{align*}
 
 The operation semantics of \CC preserves types and the well-typedness of heap:
 
