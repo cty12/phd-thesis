@@ -1,4 +1,348 @@
 \chapter{Gradual Guarantee of \Surface}
 \label{ch:gg}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+\section{Simulation Between More and Less Precise Coercion Sequences}
+\label{sec:sim-cexpr}
+
+\begin{figure}[tbp]
+\raggedright
+  \fbox{$\vdash c \sqsubseteq d$, $\vdash c \sqsubseteq g$ , and $\vdash g \sqsubseteq d$}
+  {\small
+  \begin{gather*}
+    {\sqsubseteq}\textit{-c} ~
+    \inference{g_1 \sqsubseteq g_1' & g_2 \sqsubseteq g_2' \\ \vdash c : g_1 \Rightarrow g_2 & \vdash d : g_1' \Rightarrow g_2'}
+              {\vdash c \sqsubseteq d}
+    \\[2ex]
+    {\sqsubseteq}\textit{-cl} ~
+    \inference{g_1 \sqsubseteq g & g_2 \sqsubseteq g \\ \vdash c : g_1 \Rightarrow g_2}
+              {\vdash c \sqsubseteq g}
+    \qquad
+    {\sqsubseteq}\textit{-cr} ~
+    \inference{g \sqsubseteq g_1 & g \sqsubseteq g_2 \\ \vdash d : g_1 \Rightarrow g_2}
+              {\vdash g \sqsubseteq d}
+  \end{gather*}}
+  \fbox{$\vdash \bar{c} \sqsubseteq \bar{d}$}
+  {\small
+  \begin{gather*}
+    {\sqsubseteq}\textit{-id} ~
+    \inference{g \sqsubseteq g'}
+              {\vdash \id{g} \sqsubseteq \id{g'}}
+    \quad
+    {\sqsubseteq}\textit{-cast} ~
+    \inference{\vdash \bar{c} \sqsubseteq \bar{d} & \vdash c \sqsubseteq d}
+              {\vdash \bar{c} \seq c \sqsubseteq \bar{d} \seq d}
+    \\[2ex]
+    {\sqsubseteq}\textit{-castl} ~
+    \inference{\vdash \bar{c} \sqsubseteq \bar{d} & \vdash c \sqsubseteq g_2 \\ \vdash \bar{d} : g_1 \Rightarrow g_2}
+              {\vdash \bar{c} \seq c \sqsubseteq \bar{d}}
+    \quad
+    {\sqsubseteq}\textit{-castr} ~
+    \inference{\vdash \bar{c} \sqsubseteq \bar{d} & \vdash g_2 \sqsubseteq d \\ \vdash \bar{c} : g_1 \Rightarrow g_2}
+              {\vdash \bar{c} \sqsubseteq \bar{d} \seq d}
+    \\[2ex]
+    {\sqsubseteq}\textit{-}\bot ~
+    \inference{g_1 \sqsubseteq g_3 & g_2 \sqsubseteq g_4 & \vdash \bar{c} : g_1 \Rightarrow g_2}
+              {\vdash \bar{c} \sqsubseteq \err{g_3}{g_4}{p}}
+  \end{gather*}}
+  \fbox{$\vdash \bar{c} \sqsubseteq_l g$}
+  {\small
+  \begin{gather*}
+    {\sqsubseteq}_l\textit{-id} ~
+    \inference{g \sqsubseteq g'}
+              {\vdash \id{g} \sqsubseteq_l g'}
+    \qquad\quad
+    {\sqsubseteq}_l\textit{-cast} ~
+    \inference{\vdash \bar{c} \sqsubseteq_l g & \vdash c \sqsubseteq_l g}
+              {\vdash \bar{c} \seq c \sqsubseteq_l g}
+  \end{gather*}}
+ \fbox{$\vdash g \sqsubseteq_r \bar{d}$}
+ {\small
+  \begin{gather*}
+    {\sqsubseteq}_r\textit{-id} ~
+    \inference{g \sqsubseteq g'}
+              {\vdash g \sqsubseteq_r \id{g'}}
+    \quad
+    {\sqsubseteq}_r\textit{-cast} ~
+    \inference{\vdash g \sqsubseteq_r \bar{d} & \vdash g \sqsubseteq_r d}
+              {\vdash g \sqsubseteq_r \bar{d} \seq d}
+    \\[2ex]
+    {\sqsubseteq}_r\textit{-}\bot ~
+    \inference{g \sqsubseteq g_1 & g \sqsubseteq g_2}
+              {\vdash g \sqsubseteq_r \err{g_1}{g_2}{p}}
+  \end{gather*}}
+  \caption{Precision relation of the coercion calculus}
+  \label{fig:cexpr-prec}
+\end{figure}
+
+In this chapter, our end goal is to prove the gradual guarantee for \Surface.
+The proof depends on a simulation lemma between more and less precise terms of
+the cast calculus \CC . We use coercion sequences as the IFC monitor in \CC.
+Reducing a coercion sequence can result in a blame which errors the program. So
+we would like to prove that the simulation lemma holds for the coercion calculus
+on security labels.
+%
+The precision relation on security coercions is defined in
+Figure~\ref{fig:cexpr-prec}. The precision relation between two coercion
+sequences $\bar{c},\bar{d}$ takes the form $\vdash \bar{c} \sqsubseteq \bar{d}$.
+Recall that the gradual guarantee states that replacing type annotations with
+\unk (decreasing type precision) should result in the same value for a correctly
+running program while adding annotations (increasing type precision) may trigger
+more runtime errors. The precision relation is a syntactical characterization of
+the runtime behaviors of programs of different type precision. We explain the
+intuition with two examples.
+
+\begin{example}
+\label{ex:prec}
+\normalfont
+
+Consider the following two programs that are related by precision
+because the first one has a $\unk$ annotation where the second one
+has \high.
+\[
+\true_{\low} : \Bool_{\unk} : \Bool_{\unk} \qquad\text{ and }\qquad
+\true_{\low} : \Bool_{\high} : \Bool_{\unk}
+\]
+At runtime, the less precise program on the left produces value
+$(\cccast{\true}{\id{\low} \seq \inj{\low}})$ and the more precise program
+on the right produces $(\cccast{\true}{\id{\low} \seq \up \seq \inj{\high}})$.
+The \texttt{true}s are straightforwardly related; we need to show the two
+coercion sequences are also related:
+\[
+\vdash \id{\low} \seq \inj{\low} \sqsubseteq \id{\low} \seq \up \seq \inj{\high}
+\]
+Starting at the beginning of the
+two sequences, we have $\id{\low} \sqsubseteq \id{\low}$ because
+$\sqsubseteq$ is reflexive. Next we have
+$\inj{\low} \sqsubseteq \;\up$, which makes sense because the source
+and targets of the two coercions are related by precision:
+$\low \sqsubseteq \low$ and $\unk \sqsubseteq \high$.  Finally, the
+coercion $\inj{\high}$ can be added to the end of the more precise
+sequence because both its source and target type or more precise than
+the target of the left-hand sequence.  That is,
+$\unk \sqsubseteq \high$ and $\unk \sqsubseteq \unk$.
+%
+The injections at the ends of the two sequences, \inj{\low}
+and \inj{\high}, cannot be directly related via precision because
+$\low \not\sqsubseteq \high$.  Instead, \inj{\low} is related
+with \up{}. This underlines the indispensability of explicit subtype
+coercion \up{} for the purposes of proving the gradual guarantee.
+
+\end{example}
+
+\begin{example}
+\label{ex:prec-error}
+\normalfont
+
+Next we consider an example where the less precise program produces a
+value but the more precise program encounters an error. This situation
+is allowed by the gradual guarantee, but the opposite one is not. We
+extend the example with a cast to $\low$ on the more precise side.
+\[
+\true_{\low} : \Bool_{\unk} : \Bool_{\unk} : \Bool_{\unk}
+\qquad\text{ and }\qquad
+\true_{\low} : \Bool_{\high} : \Bool_{\unk} : \Bool_{\low}
+\]
+The first program again produces value $(\cccast{\true}{\id{\low}\seq\inj{\low}})$.
+The second, on the other hand, reduces to
+$(\cccast{\true}{\id{\low} \seq \up \seq \highlightred{\inj{\high} \seq \proj{\low}{p}}}) \longrightarrow^{*}
+(\cccast{\true}{\err{\low}{\low}{p}})$, because of the contradicting
+annotations \high and \low (note that \high is in the middle of the sequence and both the
+source and target labels of the blame coercion are \low so that types are preserved).
+The failure is then propagated out and the term further reduces to \blame{p}.
+The precision of coercion sequences relates $\boldsymbol{\bot}$ on the right-hand side
+to any coercion sequence on the left so long as the respective source and target types are
+related via precision, in this case $\low \sqsubseteq \low$ and $\unk \sqsubseteq \low$.
+\end{example}
+
+Consider the security levels (Definition~\ref{def:sec}) of both sides
+of Example~\ref{ex:prec}, which are \low on the less precise side and
+\high on the more precise side.
+We observe that \Surface programs related by precision may produce
+values of different security: a less precise value may have lower
+security than a more precise value. Indeed, we prove the following for
+coercions in normal form:
+
+\begin{lemma}[Security is monotonic with respect to precision]
+\label{lem:prec-sec}
+Suppose $\mathbf{NF}\; \bar{c}$ and $\mathbf{NF}\; \bar{d}$. If $\vdash \bar{c} \sqsubseteq \bar{d}$, then $| \bar{c} | \preccurlyeq | \bar{d} |$.
+\end{lemma}
+
+Next we prove a catch-up lemma for coercion sequences, where the less
+precise side catches up with a more precise sequence that is in normal
+form. The proof is by casing on $\mathbf{NF}\;\bar{d}$ first and then
+performing induction on the precision relation in each case.
+
+\begin{lemma}[Catching up to a more precise coercion sequence]
+\label{lem:cexpr-catchup}
+If $\mathbf{NF}\; \bar{d}$ and $\vdash \bar{c} \sqsubseteq \bar{d}$,
+there exists $\bar{c}'$ such that $\bar{c} \longrightarrow^{*} \bar{c}'$
+and $\vdash \bar{c}' \sqsubseteq \bar{d}$.
+\end{lemma}
+
+\noindent Using Lemma~\ref{lem:cexpr-catchup}, we then prove the following
+simulation lemma for coercion sequences:
+
+\begin{lemma}[Simulation between related coercion sequences]
+\label{lem:cexpr-sim}
+If $\vdash \bar{c} \sqsubseteq \bar{d}$ and $\bar{d} \longrightarrow \bar{d}'$,
+there exists $\bar{c}'$ such that $\bar{c} \longrightarrow^{*} \bar{c}'$
+and $\vdash \bar{c}' \sqsubseteq \bar{d}'$.
+\end{lemma}
+
+We also prove that stamping on coercion sequences preserves precision:
+
+\begin{lemma}[Stamping preserves precision of coercion sequences]
+\label{lem:cexpr-stamp-sim}
+If $\vdash \bar{c} \sqsubseteq \bar{d}$, then \\ $\vdash \mathit{stamp}\;\bar{c}\;\ell \sqsubseteq \mathit{stamp}\;\bar{d}\;\ell$
+and $\vdash \mathit{stamp!}\;\bar{c}\;\ell_1 \sqsubseteq \mathit{stamp!}\;\bar{d}\;\ell_2$ and
+$\vdash \mathit{stamp!}\;\bar{c}\;\ell_1 \sqsubseteq \mathit{stamp}\;\bar{d}\;\ell_2$ if $\ell_1 \preccurlyeq \ell_2$.
+\end{lemma}
+
+
+\section{Simulation Between \CC Terms of Different Precision}
+\label{sec:simulation}
+
+\begin{figure}[tbp]
+\raggedright
+  \fbox{$\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{M'}{A}{A'}$}
+  {\small
+  \begin{gather*}
+  {\sqsubseteq}\textit{-addr}~
+  \inference{\Sigma(\hat{\ell}, n) = T & \Sigma'(\hat{\ell}, n) = T'}
+  {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{\ccaddr{n}}{\ccaddr{n}}{(\Refer{T_{\hat{\ell}}})_\ell}{(\Refer{T'_{\hat{\ell}}})_\ell}}
+  \\[1ex]
+  {\sqsubseteq}\textit{-ref?l}~
+  \inference{\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{\unk}{\ell_1}{\ell_2}{\ell_3}\ccprec{M}{M'}{T_\ell}{T'_\ell} & \ell_1 \preccurlyeq \ell}
+  {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{\unk}{\ell_1}{\ell_2}{\ell_3}\ccprec{\ccrefproj{\ell}{M}{p}}{\ccref{\ell}{M'}}{(\Refer{T_\ell})_{\low}}{(\Refer{T'_\ell})_{\low}}}
+  \\[1ex]
+  {\sqsubseteq}\textit{-prot!}~
+  \inference
+  {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g_1}{g_1'}{|\PC|}{|\PC'|}\ccprec{M}{M'}{T_{\unk}}{T'_{\unk}} &
+   \ccprec{\PC}{\PC'}{g_1}{g_1'} \\
+   \ell_1 \curlyvee \ell_2 \preccurlyeq |\PC| & \ell'_1 \curlyvee \ell'_2 \preccurlyeq |\PC'| &
+   \highlight{highlight}{\ell_2 \preccurlyeq \ell_2'}}
+  {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g_2}{g_2'}{\ell_1}{\ell'_1}\ccprec{\ccprot{\PC}{\ell_2}{M}{T_{\unk}}}{\ccprot{\PC'}{\ell'_2}{M'}{T'_{\unk}}}{T_{\unk}}{T'_{\unk}}}
+  \\[1ex]
+  {\sqsubseteq}\textit{-cast}~
+  \inference
+  {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{M'}{A}{A'} & \bm{c} \sqsubseteq \bm{c'} &
+   \vdash \bm{c} : A \Rightarrow B & \vdash \bm{c'} : A' \Rightarrow B'}
+  {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{\cccast{M}{\bm{c}}}{\cccast{M'}{\bm{c'}}}{B}{B'}}
+  \\[1ex]
+  {\sqsubseteq}\textit{-castl}~
+  \inference
+  {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{M'}{A}{A'} &
+   \bm{c} \sqsubseteq A' & \vdash \bm{c} : A \Rightarrow B}
+  {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{\cccast{M}{\bm{c}}}{M'}{B}{A'}}
+  \\[1ex]
+  {\sqsubseteq}\textit{-castr}~
+  \inference
+  {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{M'}{A}{A'} &
+   A \sqsubseteq \bm{c'} & \vdash \bm{c'} : A' \Rightarrow B'}
+  {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{\cccast{M'}{\bm{c'}}}{A}{B'}}
+  \\[1ex]
+  {\sqsubseteq}\textit{-blame}~
+  \inference
+  {\Gamma; \Sigma; g; \ell \vdash M \Leftarrow A & A \sqsubseteq A'}
+  {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{\blame{p}}{A}{A'}}
+  \end{gather*}}
+  \caption{Precision rules of \CC}
+  \label{fig:cc-prec}
+\end{figure}
+
+The main simulation lemma says that if two terms are related by
+\textit{precision} and the more precise side takes one step, then the less
+precise side is able to multi-step and get back in sync. The precision relation
+is in form
+$\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{M'}{A}{A'}$,
+where $\Gamma;\Sigma;g;\ell$ corresponds to the typing context, heap context,
+type of \PC, and security of \PC of the less precise term $M$ and
+$\Gamma';\Sigma';g';\ell'$ is for those of the more precise term $M'$. The types
+of the two terms, $A$ and $A'$, are related by precision between types. The
+intuition between this precision relation is that casts are allowed to appear in
+different places between the more precise and the less precise \CC terms.
+Moreover, the casts must be in shapes that preserve the precision of \Surface
+(more or fewer static type annotations provided by the programmer). According to
+the gradual guarantee, the more precise side is allowed to signal more blames,
+so there is a rule (${\sqsubseteq}\textit{-blame}$) that relates \blame{p} to
+any term $M$ on the less precise side as long as their types are in sync. We
+list selected precision rules in Figure~\ref{fig:cc-prec}.
+
+With the precision relation of \CC defined, we first state the catch-up lemma,
+which catches up to a more-precise value by multi-stepping on the less-precise
+side:
+
+\begin{lemma}[Catching up to more precise]
+\label{lem:catchup}
+If term $M$ and value $V'$ are related by precision:
+$$\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{V'}{A}{A'}$$
+then there exists value $V$ s.t $M\mid\mu\mid\PC \longrightarrow^{*} V\mid\mu$ and
+$\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{V}{V'}{A}{A'}$.
+\end{lemma}
+
+We prove the main simulation lemma using the catch-up lemma. Heap precision is
+defined point-wise similar to the definition of heap well-typedness.
+
+\begin{lemma}[Simulation between more precise and less precise \CC terms]
+\label{lem:sim}
+Suppose \PC, $\PC'$ are related by precision: $\ccprec{\PC}{\PC'}{g}{g'}$.
+Moreover suppose $M$, $M'$ are related by precision:
+$$\precctx{\emptyset}{\emptyset}{\Sigma_1}{\Sigma_1'}{g}{g'}{|\PC|}{|\PC'|}\ccprec{M}{M'}{A}{A'}$$
+heap contexts $\Sigma_1$, $\Sigma_1'$ are related by precision:
+$\Sigma_1 \sqsubseteq \Sigma_1'$, the initial heaps $\mu_1$, $\mu_1'$
+are also related by precision: $\Sigma_1 ; \Sigma_1' \vdash \mu_1 \sqsubseteq \mu_1'$. \\
+If \reduce{M'}{\mu_1'}{\PC'}{N'}{\mu_2'}, there exists $\Sigma_2$,
+$\Sigma_2'$, $N$, $\mu_2$ s.t $\Sigma_2 \supseteq \Sigma_1$,
+$\Sigma_2' \supseteq \Sigma_1'$, $\Sigma_2 \sqsubseteq \Sigma_2'$ ,
+$$M\mid\mu_1\mid\PC \longrightarrow^{*} N\mid\mu_2$$
+the resulting terms are related by precision:
+$\precctx{\emptyset}{\emptyset}{\Sigma_2}{\Sigma_2'}{g}{g'}{|\PC|}{|\PC'|}\ccprec{N}{N'}{A}{A'}$
+and the resulting heaps are also related by precision: $\Sigma_2 ; \Sigma_2' \vdash \mu_2 \sqsubseteq \mu_2'$.
+\end{lemma}
+
+
+\section{The Gradual Guarantee of \Surface}
+\label{sec:gg}
+
+\begin{figure}[tbp]
+  \raggedright
+  \fbox{$\vdash M \sqsubseteq M'$}
+  \begin{gather*}
+    \inference{}{\vdash \const{k}{\ell} \sqsubseteq \const{k}{\ell}} \qquad
+    \inference{g_1 \sqsubseteq g_2 & A_1 \sqsubseteq A_2 & \vdash N_1 \sqsubseteq N_2 }
+              {\vdash \lam{g_1}{x}{A_1}{N_1}{\ell} \sqsubseteq \lam{g_2}{x}{A_2}{N_2}{\ell}} \\[1ex]
+              \inference{\vdash M_1 \sqsubseteq M_2}
+                        {\vdash \refexp{\ell}{M_1}{p} \sqsubseteq \refexp{\ell}{M_2}{p}} \qquad
+                        \inference{\vdash M_1 \sqsubseteq M_2 & A_1 \sqsubseteq A_2}
+                                  {\vdash \ann{M_1}{A_1}{p} \sqsubseteq \ann{M_2}{A_2}{p}}
+  \end{gather*}
+  \caption{Selected precision rules of \Surface}
+  \label{fig:surface-precision}
+\end{figure}
+
+Finally, we state the gradual guarantee of \Surface and prove it as a
+corollary of Lemma~\ref{lem:sim}. The definition of term precision
+for \Surface is in Figure~\ref{fig:surface-precision}.
+
+\begin{theorem}[Gradual guarantee]
+\label{thm:gg}
+Suppose $M$ and $M'$ are well-typed terms in \Surface
+that are related by precision, that is $\vdash M \sqsubseteq M'$.
+So $\emptyset ; \low \vdash M : A$, $\emptyset ; \low \vdash M' : A'$,
+and $A \sqsubseteq A'$.
+If the compilation of $M'$ reduces to a value:
+$\compile{M'}\mid\emptyset\mid\low \longrightarrow^{*} V'\mid\mu'$ \\
+there exists a value $V$ and heap $\mu$ s.t. the compilation of $M$ reduces to $V$:
+$\compile{M}\mid\emptyset\mid\low \longrightarrow^{*} V\mid\mu$ \\ and
+the resulting values are related by precision for some $\Sigma$,
+$\Sigma'$:
+$$\precctx{\emptyset}{\emptyset}{\Sigma}{\Sigma'}{\low}{\low}{\low}{\low}\ccprec{V}{V'}{A}{A'}$$
+\end{theorem}
+\begin{proof}
+  Compilation preserves precision, so
+  $\precctx{\emptyset}{\emptyset}{\emptyset}{\emptyset}{\low}{\low}{\low}{\low}\ccprec{\compile{M}}{\compile{M'}}{A}{A'}$.
+  We then proceed by induction on the reduction of $\compile{M'}$ to a value $V'$,
+  using Lemma~\ref{lem:sim} to show that $\compile{M}$ reduces to a corresponding term at each step.
+  So we have $\compile{M} \longrightarrow^{*} N$ where $N \sqsubseteq V'$ for some $N$.
+  We then apply Lemma~\ref{lem:catchup} to show that $N$ reduces to a value $V$ where $V \sqsubseteq V'$.
+\end{proof}
