@@ -82,12 +82,16 @@ Chapter~\ref{ch:compile}) preserves types:
   \raggedright
   \fbox{$\vdash r : A$}
   \begin{gather*}
+    \textit{WT-const}~
     \inference{k : \iota}{\vdash k : \iota_{\ell}}
-    \quad
+    \qquad
+    \textit{WT-addr}~
     \inference{}{\vdash \mathit{addr} : (\Refer{A})_{g}}
-    \quad
+    \\[1ex]
+    \textit{WT-fun}
     \inference{}{\vdash \mathit{fun} : (\Fun{A}{g_2}{B})_{g_1}}
-    \quad
+    \qquad
+    \textit{WT-diverge}
     \inference{}{\vdash \mathit{diverge} : A}
   \end{gather*}
   \caption{Well-typed evaluation result}
@@ -99,7 +103,7 @@ reduction of \CC preserves types, which is a direct corollary of
 Theorem~\ref{thm:preservation}:
 
 \begin{lemma}
-  \label{thm:pres-mult}
+  \label{lem:pres-mult}
   Suppose $\emptyset ; \Sigma ; \low ; \low \vdash M \Leftarrow A$ and $\Sigma \vdash \mu$.
   If $\reducemult{M}{\mu}{\low}{M'}{\mu'}$,
   then there exists $\Sigma'$ s.t $\Sigma' \supseteq \Sigma$, $\emptyset ; \Sigma' ; \low ; \low \vdash M' \Leftarrow A$,
@@ -113,7 +117,7 @@ Theorem~\ref{thm:preservation}:
 We then prove the following lemma about the evaluation of \CC:
 
 \begin{lemma}
-  \label{thm:pres-bigstep}
+  \label{lem:pres-bigstep}
   If $\emptyset ; \Sigma ; \low ; \low \vdash M \Leftarrow A$ and $\Sigma \vdash
   \mu$, then either (1) $M \mid \mu \Downarrow V \mid \mu'$ and $\emptyset ;
   \Sigma' ; \low ; \low \vdash V \Leftarrow A$ for some $\Sigma', \mu'$, or (2)
@@ -121,19 +125,22 @@ We then prove the following lemma about the evaluation of \CC:
   \mid \mu \Uparrow$.
 \end{lemma}
 \begin{proof}
-  By Theorem~\ref{thm:progress} (progress), $M$ is a value or a blame, or $M$
-  can take a reduction step.
+  By law of excluded middle, there are four cases: (1) $M$ reduces to a value,
+  (2) $M$ reduces to a blame, (3) $M$ diverges, and (4) $M$ gets stuck.
   \begin{itemize}
-    \item If $M$ is a value or a blame, the lemma is trivially true.
-    \item Otherwise, if $M$ takes on step, we have
-      $\reduce{M}{\mu}{\low}{N}{\mu'}$ for some $N,\mu'$. By
-      Theorem~\ref{thm:preservation} (preservation), $N$ is well-typed:
-      $\emptyset ; \Sigma' ; \low ; \low \vdash N \Leftarrow A$ for some
-      $\Sigma'$, and the heap is also well-typed: $\Sigma' \vdash \mu'$. If $N$
-      is a value or a blame, the goal is proved by taking one step from $M$ to
-      $N$, and then from $N$ to the resulting value or blame (induction
-      hypothesis). Otherwise, $N$ diverges; $M$ takes one step to $N$, so $M$
-      also diverges.
+    \item \textbf{$M$ reduces to some value $V$:} $M \mid \mu \Downarrow V \mid
+      \mu'$. By definition of ${-}\mid{-}\Downarrow{-}\mid{-}$,
+      $\reducemult{M}{\mu}{\low}{V}{\mu'}$. By Lemma~\ref{lem:pres-mult}
+      (multi-step reduction of \CC preserves types), we have $\emptyset ; \Sigma' ;
+      \low ; \low \vdash V \Leftarrow A$ for some $\Sigma'$.
+    \item \textbf{$M$ reduces to a blame:} $M \mid \mu \Downarrow \blame{p} \mid
+      \mu'$. The lemma is trivially true.
+    \item \textbf{$M$ diverges:} $M \mid \mu \Uparrow$. The lemma is also
+      trivially true.
+    \item \textbf{Otherwise, $M$ gets stuck:} $\reducemult{M}{\mu}{\low}{L}{\mu'}$, $L$ is
+      neither a value nor a blame, and there is no $N$ such that
+      $\reducemult{L}{\mu'}{\low}{N}{\mu''}$ for some $\mu''$. By
+      Theorem~\ref{thm:progress} (progress of \CC), such a case can never happen.
   \end{itemize}
 \end{proof}
 
@@ -145,11 +152,22 @@ Finally, we prove type safety for \Surface:
   and $\mathit{eval}(M,b)=r$,
   then the result is also well-typed: $\vdash r : \Bool_{\low}$.
 \end{theorem}
-%% \begin{proof}
-%%   Casing on $r$ yields three cases:
-%%   \begin{itemize}
-%%     \item $r=b$.
-%%     \item $r=\mathit{error}\;\bl{p}$.
-%%     \item $r=\mathit{diverge}$.
-%%   \end{itemize}
-%% \end{proof}
+\begin{proof}
+  By Theorem~\ref{thm:compile-pres} (compilation preserves types) and
+  Lemma~\ref{lem:subst-pres} (substitution preserves types), $\emptyset ;
+  \emptyset ; \low ; \low \vdash (\compile{M})[x:=\ccconst{b}] \Leftarrow
+  \Bool_{\low}$. Empty heap is trivially well-typed: $\emptyset \vdash
+  \emptyset$. Applying Lemma~\ref{lem:pres-bigstep} yields three cases:
+  \begin{itemize}
+  \item $(\compile{M})[x:=b] \mid \emptyset \Downarrow V \mid \mu$ and $\emptyset ; \Sigma' ; \low
+    ; \low \vdash V \Leftarrow \Bool_{\low}$ for some $\Sigma'$. By the
+    canonical form of a value of $\Bool_{\low}$, $V = \ccconst{b'}$ for some
+    $b'$. As a result, $r=\mathit{eval}(M,b)=obs(\ccconst{b'})=b'$. By rule
+    \textit{WT-const} of Figure~\ref{fig:wt-result}, $\vdash b' : \Bool_{\low}$,
+    so $\vdash r : \Bool_{\low}$.
+  \item $(\compile{M})[x:=b] \mid \mu \Downarrow \blame{p} \mid \mu'$. By
+    definition, $\mathit{eval}(M,b)=\mathit{diverge}$. By rule
+    \textit{WT-diverge}, $\vdash r : \Bool_{\low}$.
+  \item $(\compile{M})[x:=b] \mid \mu \Uparrow$. Same as the case for blame.
+  \end{itemize}
+\end{proof}
