@@ -66,7 +66,7 @@ Chapter~\ref{ch:compile}) preserves types:
 
 \begin{theorem}[Compilation preserves types]
   \label{thm:compile-pres}
-  If $M$ is a well-typed \Surface program: $\Gamma ; g \vdash M : A$, then the
+  If $M$ is a well-typed \Surface term: $\Gamma ; g \vdash M : A$, then the
   compiled \CC term is also well-typed: $\Gamma ; \emptyset ; g ; \low \vdash
   \compile{M} \Leftarrow A$.
 \end{theorem}
@@ -126,7 +126,7 @@ We then prove the following lemma about the evaluation of \CC:
 \end{lemma}
 \begin{proof}
   By law of excluded middle, there are four cases: (1) $M$ reduces to a value,
-  (2) $M$ reduces to a blame, (3) $M$ diverges, and (4) $M$ gets stuck.
+  (2) $M$ reduces to a blame, (3) $M$ diverges, or (4) $M$ gets stuck.
   \begin{itemize}
     \item \textbf{$M$ reduces to some value $V$:} $M \mid \mu \Downarrow V \mid
       \mu'$. By definition of ${-}\mid{-}\Downarrow{-}\mid{-}$,
@@ -137,10 +137,10 @@ We then prove the following lemma about the evaluation of \CC:
       \mu'$. The lemma is trivially true.
     \item \textbf{$M$ diverges:} $M \mid \mu \Uparrow$. The lemma is also
       trivially true.
-    \item \textbf{Otherwise, $M$ gets stuck:} $\reducemult{M}{\mu}{\low}{L}{\mu'}$, $L$ is
-      neither a value nor a blame, and there is no $N$ such that
-      $\reducemult{L}{\mu'}{\low}{N}{\mu''}$ for some $\mu''$. By
-      Theorem~\ref{thm:progress} (progress of \CC), such a case can never happen.
+    \item \textbf{Otherwise, $M$ gets stuck:}
+      $\reducemult{M}{\mu}{\low}{L}{\mu'}$, $L$ is neither a value nor a blame,
+      and there is no $N$ such that $\reduce{L}{\mu'}{\low}{N}{\mu''}$ for some
+      $\mu''$, but that contradicts Theorem~\ref{thm:progress} (progress of \CC).
   \end{itemize}
 \end{proof}
 
@@ -148,12 +148,15 @@ Finally, we prove type safety for \Surface:
 
 \begin{theorem}[Type Safety of \Surface]
   \label{thm:type-safety}
-  If $M$ is a well-typed \Surface program: $(x{:}\Bool_{\high});\low \vdash M : \Bool_{\low}$
+  If $M$ is a \Surface program and
+  % If $M$ is a well-typed \Surface program: $(x{:}\Bool_{\high});\low \vdash M : \Bool_{\low}$
   and $\mathit{eval}(M,b)=r$,
-  then the result is also well-typed: $\vdash r : \Bool_{\low}$.
+  then the evaluation result is well-typed: $\vdash r : \Bool_{\low}$.
 \end{theorem}
 \begin{proof}
-  By Theorem~\ref{thm:compile-pres} (compilation preserves types) and
+  By Definition~\ref{def:surface-program} (\Surface programs),
+  $(x{:}\Bool_{\high});\low \vdash M : \Bool_{\low}$. By
+  Theorem~\ref{thm:compile-pres} (compilation preserves types) and
   Lemma~\ref{lem:subst-pres} (substitution preserves types), $\emptyset ;
   \emptyset ; \low ; \low \vdash (\compile{M})[x:=\ccconst{b}] \Leftarrow
   \Bool_{\low}$. Empty heap is trivially well-typed: $\emptyset \vdash
@@ -168,6 +171,8 @@ Finally, we prove type safety for \Surface:
   \item $(\compile{M})[x:=b] \mid \mu \Downarrow \blame{p} \mid \mu'$. By
     definition, $\mathit{eval}(M,b)=\mathit{diverge}$. By rule
     \textit{WT-diverge}, $\vdash r : \Bool_{\low}$.
-  \item $(\compile{M})[x:=b] \mid \mu \Uparrow$. Same as the case for blame.
+  \item $(\compile{M})[x:=b] \mid \mu \Uparrow$. By
+    definition, $\mathit{eval}(M,b)=\mathit{diverge}$. By rule
+    \textit{WT-diverge}, $\vdash r : \Bool_{\low}$.
   \end{itemize}
 \end{proof}

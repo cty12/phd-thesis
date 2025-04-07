@@ -433,22 +433,31 @@ because it is newly created and cannot leak information.
         \label{fig:eval}
   \end{figure}
 
-I define the semantics of \Surface through a compile function that takes a
-well-typed \Surface program and returns a cast-calculus (\CC) term. The compile
-function takes the form $\compile{M} = M'$, where $M$ is a \Surface program and
-$M'$ is a \CC term. I will define the compile function in
-Chapter~\ref{ch:compile}.
-
 I define the evaluation function (\textit{eval} in Figure~\ref{fig:eval}) for
 \Surface by (1) compiling from \Surface to \CC, (2) modeling input using
-substitution, and (3) running the compiled \CC term using its operational
-semantics. I will define the $M \Downarrow N$ operator, which evaluates a \CC
-term $M$ to a value or a blame, and the $M \Uparrow$ operator, which means the
-\CC term $M$ diverges, in Chapter~\ref{ch:sem}. The evaluation function takes a
-well-typed \Surface program $(x{:}\Bool_{\high}) ; \low \vdash M : A$
-and a boolean constant $b \in \{\true, \false\}$ as input. The function
-evaluates the program $M$ to a boolean constant $b'$, signals a runtime error,
-or diverges.
+substitution, and (3) running the compiled \CC term using the operational
+semantics of \CC. I will define the compilation function in
+Chapter~\ref{ch:compile}. The compilation function is of form $\compile{M} =
+M'$, which takes a well-typed \Surface term $M$ and returns a cast-calculus
+(\CC) term $M'$. I will define the $M \mid \mu \Downarrow N \mid \mu'$ operator,
+which evaluates a \CC term $M$ to a value or a blame, as well as the $M \mid \mu
+\Uparrow$ operator, which means the \CC term $M$ diverges, in
+Chapter~\ref{ch:sem}. The evaluation function is of form $\mathit{eval}(M,b)=r$.
+It takes a well-typed \Surface term $(x{:}\Bool_{\high}) ; \low \vdash M : A$
+and a boolean constant $b \in \{\true, \false\}$ as input. The evaluation of $M$
+either produces the observation of a value $\mathit{obs}(V)$, or diverges, or
+gets stuck.
+
+\subsection{\Surface Programs}
+
+A \Surface program is defined as a \Surface term that takes a high-security
+boolean input and returns a low-security boolean output:
+
+\begin{definition}[Whole programs of \Surface]
+  \label{def:surface-program}
+  A \Surface program is a \Surface term which is well-typed at
+  $(x{:}\Bool_{\high});\low\vdash M : \Bool_{\low}$.
+\end{definition}
 
 }  %%%% end new text
 

@@ -1042,12 +1042,12 @@ Lemma~\ref{lem:NI-old} , $a_1 = a_2$, thus $V_1 = \ccconst{a_1} = \ccconst{a_2}
 \section{Noninterference of \Surface}
 \label{sec:NI}
 
-The noninterference theorem of \Surface is a straightforward corollary of the
-noninterference lemma for \CC and compilation preserves types:
+The noninterference lemma of \Surface is a straightforward corollary of the
+noninterference lemma of \CC and compilation preserves types:
 
-\begin{theorem}[Noninterference for \Surface]
-\label{thm:NI-Surface}
-Suppose a \Surface program $M$ is well-typed:
+\begin{lemma}
+\label{lem:NI-Surface}
+Suppose a \Surface term $M$ is well-typed:
 \[
 (x{:}\Bool_{\high}) ; \low \vdash M : \Bool_{\low}
 \]
@@ -1059,9 +1059,26 @@ If for any boolean inputs $b_1,b_2$
 \reducemult{(\compile{M}) [ x := \ccconst{b_2}]}{\emptyset}{\low}{V_2}{\mu_2}
 \end{equation*}}
 then the resulting values $V_1 = V_2$.
-\end{theorem}
+\end{lemma}
 \begin{proof}
 By Theorem~\ref{thm:compile-pres} (Compilation preserves types),
 $(x{:}\Bool_{\high}) ; \emptyset ; \low ; \low \vdash M' \Leftarrow \Bool_{\low}$.
 By Lemma~\ref{lem:NI-CC} (Noninterference for \CC), $V_1 = V_2$.
+\end{proof}
+
+Finally, we prove noninterference for \Surface as a direct corollary of
+Lemma~\ref{lem:NI-Surface}.
+
+\begin{theorem}[Noninterference for \Surface]
+  \label{thm:NI-Surface}
+  If $M$ is a \Surface program and $\mathit{eval}(M,b_1)=b_1'$ and $\mathit{eval}(M,b_2)=b_2'$,
+  then $b_1' = b_2'$.
+\end{theorem}
+\begin{proof}
+  By Definition~\ref{def:surface-program} (\Surface programs),
+  $(x{:}\Bool_{\high}) ; \low \vdash M : \Bool_{\low}$. By the definition of
+  \textit{eval} and the canonical form of a value of $\Bool_{\low}$,
+  $\reducemult{(\compile{M}) [ x := \ccconst{b_1}]}{\emptyset}{\low}{\ccconst{b_1'}}{\mu_1}$ and
+  $\reducemult{(\compile{M}) [ x := \ccconst{b_2}]}{\emptyset}{\low}{\ccconst{b_2'}}{\mu_2}$.
+  Applying Lemma~\ref{lem:NI-Surface}, $b_1'=b_2'$.
 \end{proof}

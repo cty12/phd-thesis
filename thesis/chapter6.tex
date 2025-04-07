@@ -157,7 +157,7 @@ related via precision, in this case $\low \sqsubseteq \low$ and $\unk \sqsubsete
 Consider the security levels (Definition~\ref{def:sec}) of both sides
 of Example~\ref{ex:prec}, which are \low on the less precise side and
 \high on the more precise side.
-We observe that \Surface programs related by precision may produce
+We observe that \Surface terms related by precision may produce
 values of different security: a less precise value may have lower
 security than a more precise value. Indeed, we prove the following for
 coercions in normal form:
@@ -266,7 +266,7 @@ Moreover, the casts must be in shapes that preserve the precision of \Surface
 the gradual guarantee, the more precise side is allowed to signal more blames,
 so there is a rule (${\sqsubseteq}\textit{-blame}$) that relates \blame{p} to
 any term $M$ on the less precise side as long as their types are in sync. We
-list selected precision rules in Figure~\ref{fig:cc-prec}.
+list precision rules in Figure~\ref{fig:cc-prec}.
 
 With the precision relation of \CC defined, we first state the catch-up lemma,
 which catches up to a more-precise value by multi-stepping on the less-precise
@@ -306,17 +306,48 @@ and the resulting heaps are also related by precision: $\Sigma_2 ; \Sigma_2' \vd
 
 \begin{figure}[tbp]
   \raggedright
-  \fbox{$\vdash M \sqsubseteq M'$}
+  \fbox{$\vdash M_1 \sqsubseteq M_2$}
+  {\small
   \begin{gather*}
-    \inference{}{\vdash \const{k}{\ell} \sqsubseteq \const{k}{\ell}} \qquad
+    % const
+    \inference{}{\vdash \const{k}{\ell} \sqsubseteq \const{k}{\ell}}
+    \qquad
+    % var
+    \inference{}{\vdash x \sqsubseteq x}
+    \\[2ex]
+    % lam
     \inference{g_1 \sqsubseteq g_2 & A_1 \sqsubseteq A_2 & \vdash N_1 \sqsubseteq N_2 }
-              {\vdash \lam{g_1}{x}{A_1}{N_1}{\ell} \sqsubseteq \lam{g_2}{x}{A_2}{N_2}{\ell}} \\[1ex]
-              \inference{\vdash M_1 \sqsubseteq M_2}
-                        {\vdash \refexp{\ell}{M_1}{p} \sqsubseteq \refexp{\ell}{M_2}{p}} \qquad
-                        \inference{\vdash M_1 \sqsubseteq M_2 & A_1 \sqsubseteq A_2}
-                                  {\vdash \ann{M_1}{A_1}{p} \sqsubseteq \ann{M_2}{A_2}{p}}
-  \end{gather*}
-  \caption{Selected precision rules of \Surface}
+              {\vdash \lam{g_1}{x}{A_1}{N_1}{\ell} \sqsubseteq \lam{g_2}{x}{A_2}{N_2}{\ell}}
+    \quad
+    % app
+    \inference{\vdash L_1 \sqsubseteq L_2 & \vdash M_1 \sqsubseteq M_2}
+              {\vdash \app{L_1}{M_1}{p} \sqsubseteq \app{L_2}{M_2}{p}}
+    \\[2ex]
+    % if
+    \inference{\vdash L_1 \sqsubseteq L_2 & \vdash M_1 \sqsubseteq M_2 & \vdash N_1 \sqsubseteq N_2}
+              {\vdash \ifexp{L_1}{M_1}{N_1}{p} \sqsubseteq \ifexp{L_2}{M_2}{N_2}{p}}
+    \\[2ex]
+    % ann
+    \inference{\vdash M_1 \sqsubseteq M_2 & A_1 \sqsubseteq A_2}
+              {\vdash \ann{M_1}{A_1}{p} \sqsubseteq \ann{M_2}{A_2}{p}}
+    \quad
+    % let
+    \inference{\vdash M_1 \sqsubseteq M_2 & \vdash N_1 \sqsubseteq N_2}
+              {\vdash \letexp{x}{M_1}{N_1} \sqsubseteq \letexp{x}{M_2}{N_2}}
+    \\[2ex]
+    % ref
+    \inference{\vdash M_1 \sqsubseteq M_2}
+              {\vdash \refexp{\ell}{M_1}{p} \sqsubseteq \refexp{\ell}{M_2}{p}}
+    \quad
+    % deref
+    \inference{\vdash M_1 \sqsubseteq M_2}
+              {\vdash \deref{M_1}{p} \sqsubseteq \deref{M_2}{p}}
+    \\[2ex]
+    % assign
+    \inference{\vdash L_1 \sqsubseteq L_2 & \vdash M_1 \sqsubseteq M_2}
+              {\vdash \assign{L_1}{M_1}{p} \sqsubseteq \assign{L_2}{M_2}{p}}
+  \end{gather*}}
+  \caption{Precision rules of \Surface}
   \label{fig:surface-precision}
 \end{figure}
 
