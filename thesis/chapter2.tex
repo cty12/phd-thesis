@@ -424,8 +424,9 @@ because it is newly created and cannot leak information.
         \end{align*}
         \fbox{$\mathit{eval}(M, b)=r$}
         \begin{align*}
-          \mathit{eval}(M, b) =&\, \mathit{obs}(V)\;&\text{if}\;(\compile(M))[x:=\ccconst{b}] \Downarrow V \\
-          \mathit{eval}(M, b) =&\, \mathit{diverge} \;&\text{if~}\;(\compile(M))[x:=\ccconst{b}] \Downarrow \blame{\bl{p}} ~or~ (\compile(M))[x:=\ccconst{b}] \Uparrow \\
+          \mathit{eval}(M, b) =&\, \mathit{obs}(V)\;&\text{if}\;(\compile(M))[x:=\ccconst{b}] \mid \emptyset \Downarrow V \mid \mu \\
+          \mathit{eval}(M, b) =&\, \mathit{diverge} \;&\text{if~}\;(\compile(M))[x:=\ccconst{b}] \mid \emptyset \Downarrow \blame{\bl{p}} \mid \mu \\
+                                                    & &\text{or}~ (\compile(M))[x:=\ccconst{b}] \mid \emptyset \Uparrow \\
           \mathit{eval}(M, b) =&\, \mathit{stuck}\;&\text{otherwise}
         \end{align*}
         \caption{Evaluation of \Surface}

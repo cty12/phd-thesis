@@ -58,7 +58,11 @@ and $\Sigma' \vdash \mu'$.
   The proof is fully mechanized in \texttt{pres} of \texttt{/src/CC2/Preservation.agda}.
 \end{proof}
 
-In addition, the compilation from \Surface to \CC preserves types:
+\section{Compilation From \CC to \Surface Preserves Types}
+\label{sec:compile-pres}
+
+We prove that the compilation from \Surface to \CC (defined in
+Chapter~\ref{ch:compile}) preserves types:
 
 \begin{theorem}[Compilation preserves types]
   \label{thm:compile-pres}
@@ -78,15 +82,62 @@ In addition, the compilation from \Surface to \CC preserves types:
   \raggedright
   \fbox{$\vdash r : A$}
   \begin{gather*}
-    \inference{b \in \{\true, \false\}}{\vdash b : \Bool_{\ell}}
+    \inference{k : \iota}{\vdash k : \iota_{\ell}}
+    \quad
+    \inference{}{\vdash \mathit{addr} : (\Refer{A})_{g}}
+    \quad
+    \inference{}{\vdash \mathit{fun} : (\Fun{A}{g_2}{B})_{g_1}}
     \quad
     \inference{}{\vdash \mathit{diverge} : A}
-    \quad
-    \inference{}{\vdash \mathit{error}\;\bl{p} : A}
   \end{gather*}
   \caption{Well-typed evaluation result}
   \label{fig:wt-result}
 \end{figure}
+
+Leading to the type safety for \Surface, we first prove that multi-step
+reduction of \CC preserves types, which is a direct corollary of
+Theorem~\ref{thm:preservation}:
+
+\begin{lemma}
+  \label{thm:pres-mult}
+  Suppose $\emptyset ; \Sigma ; \low ; \low \vdash M \Leftarrow A$ and $\Sigma \vdash \mu$.
+  If $\reducemult{M}{\mu}{\low}{M'}{\mu'}$,
+  then there exists $\Sigma'$ s.t $\Sigma' \supseteq \Sigma$, $\emptyset ; \Sigma' ; \low ; \low \vdash M' \Leftarrow A$,
+  and $\Sigma' \vdash \mu'$.
+\end{lemma}
+\begin{proof}
+  Mechanized in \texttt{pres-mult} of \texttt{/src/CC2/MultiStep.agda}. By
+  induction on the reduction sequence.
+\end{proof}
+
+We then prove the following lemma about the evaluation of \CC:
+
+\begin{lemma}
+  \label{thm:pres-bigstep}
+  If $\emptyset ; \Sigma ; \low ; \low \vdash M \Leftarrow A$ and $\Sigma \vdash
+  \mu$, then either (1) $M \mid \mu \Downarrow V \mid \mu'$ and $\emptyset ;
+  \Sigma' ; \low ; \low \vdash V \Leftarrow A$ for some $\Sigma', \mu'$, or (2)
+  $M \mid \mu \Downarrow \blame{p} \mid \mu'$ for some $\bl{p}, \mu'$, or (3) $M
+  \mid \mu \Uparrow$.
+\end{lemma}
+\begin{proof}
+  By Theorem~\ref{thm:progress} (progress), $M$ is a value or a blame, or $M$
+  can take a reduction step.
+  \begin{itemize}
+    \item If $M$ is a value or a blame, the lemma is trivially true.
+    \item Otherwise, if $M$ takes on step, we have
+      $\reduce{M}{\mu}{\low}{N}{\mu'}$ for some $N,\mu'$. By
+      Theorem~\ref{thm:preservation} (preservation), $N$ is well-typed:
+      $\emptyset ; \Sigma' ; \low ; \low \vdash N \Leftarrow A$ for some
+      $\Sigma'$, and the heap is also well-typed: $\Sigma' \vdash \mu'$. If $N$
+      is a value or a blame, the goal is proved by taking one step from $M$ to
+      $N$, and then from $N$ to the resulting value or blame (induction
+      hypothesis). Otherwise, $N$ diverges; $M$ takes one step to $N$, so $M$
+      also diverges.
+  \end{itemize}
+\end{proof}
+
+Finally, we prove type safety for \Surface:
 
 \begin{theorem}[Type Safety of \Surface]
   \label{thm:type-safety}
