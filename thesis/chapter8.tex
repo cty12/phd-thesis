@@ -1,4 +1,181 @@
 \chapter{Conclusion and Future Work}
 \label{ch:conclusion}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+To conclude my dissertation, I discuss possible future work in
+Section~\ref{sec:future} and summarize the entire dissertation in
+Section~\ref{sec:conclusion}.
+
+\section{Future Work}
+\label{sec:future}
+
+There are four main research questions about \Surface that remain to be
+answered.
+
+\subsection{RQ1: How to mechanize the noninterference proof for \Surface?}
+
+To answer RQ1, we plan to mechanize the noninterference proof for
+\Surface by extending the Agda model of \Surface. In prior
+work~\parencite{chen2024quest}, we modeled the semantics of \Surface in
+Agda and mechanized the proofs of type safety and the gradual
+guarantee. We also mechanized the noninterference proof for the
+dynamic extreme of \Surface called \DynIFC. We proved on paper that
+\Surface satisfies noninterference by a simulation between \Surface
+and \DynIFC. Given the sensitive nature of information-flow control,
+we plan to verify that \Surface is indeed secure by mechanizing its
+noninterference proof.
+
+Following our pen-and-paper proof, we plan to take a three-step
+approach. In the first step, we define a relation between terms in the
+\CC cast calculus and terms in \DynIFC. This relation captures the
+semantic invariant that the value produced by a \CC term is always at
+least as secure as the one produced by its related term in \DynIFC. We
+define this simulation relation as a datatype in Agda. Second, we
+prove a simulation lemma between \CC and \DynIFC: if a \CC term and a
+\DynIFC term are related and the \CC side takes one step, the two
+sides are able to step to terms that are related again. Finally in the
+last step, we prove the noninterference lemma of \CC as a corollary of
+the simulation lemma, and then the noninterference theorem of \Surface
+as a corollary of both the noninterference lemma of \CC and
+that compilation from \Surface to \CC preserves types.
+
+\subsection{RQ2: Is it possible to make \Surface space efficient?}
+
+%% The following commented sentences are not introductory, so they
+%% don't belong here. They belongs in a place where we talk about tail
+%% recursion, but it looks like we don't talk anywhere else about tail
+%% recursion, so this should just be deleted. -Jeremy
+%%
+%% Representing casts as coercions does not automatically enable space efficiency.
+%% A na\"ive implementation of coercions breaks the tail call property, because two
+%% mutually recursive functions (where the recursive calls are in tail position)
+%% may cause the mediating casts to build up and takes up space proportional to the
+%% number of calls.
+
+In prior work, we design two coercion-based cast calculi for GTLC,
+$\lambda\textup{\textsf{C}}$ and $\lambda\textup{\textsf{S}}$, and
+establish a bisimulation between the
+two~\parencite{Siek:2015ab}. $\lambda\textup{\textsf{C}}$ is not space
+efficient, while $\lambda\textup{\textsf{S}}$ is space efficient. The
+key design that enables space efficiency for
+$\lambda\textup{\textsf{S}}$ is that the semantics compresses
+coercions into a compact form using the composition operator. However,
+the IFC cast calculus \CC does not compress security coercions, so the
+current semantics of \Surface is not space efficient.
+
+We plan to develop a space-efficient semantics for \Surface, thereby
+presenting a positive answer to the research question. Inspired by
+$\lambda\textup{\textsf{S}}$, we will define a composition operator on
+security coercions and use it to define a space-efficient
+semantics. In addition, we plan to mechanize our space efficiency
+proof by extending the Agda model of
+\Surface. Our mechanization is
+expected to follow the one in our prior work about
+GTLC~\parencite{siek_chen_2021}, by proving that the size of any cast is
+bounded.
+
+\subsection{RQ3: Is \SurfacePlus expressive?}
+\label{sec:case-studies}
+
+We plan to show that \SurfacePlus is expressive by (1) implementing
+\SurfacePlus in the Grift compiler and (2) exploring software
+prototypes of smart contracts, mobile applications, and university
+education systems using this compiler.  The \SurfacePlus language will
+augment \Surface with numbers, strings, tuples, vectors, and recursive
+types.
+
+\paragraph{Compiler development} In the first step, we plan to build a compiler
+for \SurfacePlus, namely GriftIFC, by modifying the compiler passes of Grift to
+incorporate security types and security coercions. First, we extend the
+typechecker of Grift to accept programs with security type annotations. For the
+cast insertion pass, we are going to implement the cast insertion algorithm in
+Section 6.2 of our prior work~\parencite{chen2024quest}. The algorithm inserts
+security coercions whenever there is insufficient static information to enforce
+IFC. After this step, the source program is translated to an intermediate
+representation where all casts are made explicit. For the cast lowering pass, we
+are going to modify Grift to expose runtime functions that implement the
+semantics of security coercions. We plan to use the same closure conversion and
+memory allocation / reclamation techniques as Grift.
+
+\paragraph{Case studies} In the second step, we plan to demonstrate
+the expressiveness of \SurfacePlus via four case studies using
+GriftIFC. In each case study, we will experiment with multiple
+versions of the same program that vary in precision, to demonstrate
+that gradual typing is indeed able to enable programmer-controlled
+migration between static and dynamic IFC in real-world applications.
+\begin{itemize}
+\item[] \textbf{Smart contracts}~ We are going to implement a prototype in
+  \SurfacePlus that simulates the Parity Wallet smart contract attack and
+  demonstrate that \SurfacePlus is able to protect the integrity of important
+  state variables. We will also explore the prevention techniques against common
+  smart contract security threats such as confused deputy attacks and
+  re-entrancy attacks, by encoding the defense against the two types of attacks
+  as information-flow properties in \SurfacePlus
+  following~\textcite{cecchetti2021compositional} and~\textcite{yaoscif}.
+\item[] \textbf{E-voting}~ We plan to reimplement part of the Civitas e-voting
+  system~\parencite{clarkson2008civitas} in \SurfacePlus. This case study will
+  demonstrate that \SurfacePlus is expressive enough for existing programs that
+  take advantage of static and dynamic IFC to enforce their security policies.
+\item[] \textbf{Mobile computing}~ We plan to implement the two case studies of
+  Lifty~\parencite{polikarpova2020liquid}, ``AirBnB'' and ``Instagram''. ``AirBnB''
+  models an information leak of AirBnB which displays uncensored phone numbers
+  in message previews. We will follow Lifty and implement the information-flow
+  policies that (1) unredacted phone numbers are only visible to message
+  senders and system administrators (2) redacted phone numbers are
+  visible to message recipients using \SurfacePlus. ``Instagram'' models the
+  information leakage of Instagram that exposes the ``following'' relation of
+  private accounts through followers whose accounts are public. We plan to
+  enforce the information-flow policy that the ``following'' relation between A
+  and B is visible to C if the accounts of both A and B are visible to C.
+\item[] \textbf{Education}~ We plan to implement a prototype student information
+  management system in \SurfacePlus that is compliant with FERPA. The system
+  should protect confidential information, such as a student's GPA, transcript,
+  SSN, and banking information, against public disclosure. On the other hand,
+  the student's ``directory information'' such as name, enrollment status,
+  campus, and field of study are publicly visible by default, unless restricted
+  by the student.
+\end{itemize}
+
+\subsection{RQ4: Is it possible to implement \SurfacePlus with high
+        performance?}
+
+We plan to demonstrate that it is possible to implement \SurfacePlus with high
+performance. We are going to evaluate the performance of GriftIFC by (1)
+measuring the execution time of versions of a program that vary in type
+precision and (2) comparing the runtime overhead of GriftIFC against fully
+static IFC programming languages, such as Jif~\parencite{Myers:2006aa} and Flow
+Caml~\parencite{simonet-flowcaml-manual}, and fully dynamic systems, such as
+LIO~\parencite{STEFAN:2017ta}.
+
+\paragraph{Benchmark suite and sampling} To evaluate the implementation of
+gradually-typed languages, one needs to consider many versions of the same
+program obtained by adding or removing type annotations~\parencite{Takikawa:2016aa}.
+We plan to build a benchmark suite for gradual IFC using excerpts from the case
+study programs of Section~\ref{sec:case-studies}.
+After that, we plan to extend the type sampling algorithm of Grift. The type
+sampling algorithm takes a statically-typed program and generates gradual
+versions of the original program, by inserting gradual types at the source
+locations where static types were originally found. The algorithm constrains the
+overall program’s type precision, so that the percentage of the unknown type
+falls in a certain range. The algorithm selects an equal number of samples for
+each range until the desired number of samples have been generated.
+
+\paragraph{Runtime cost of gradual IFC under different type precision}
+We will explore the runtime overhead of gradual IFC with respect to type
+precision. For each program in the benchmark suite, we plan to measure the
+execution time of configurations that vary in precision and show the result in a
+scatter graph, where x-axis is type precision and y-axis is program execution
+time.
+
+\paragraph{Gradual IFC overhead compared to static and dynamic IFC}
+To measure the overhead of gradual IFC compared with fully static IFC, we plan
+to compare the execution time of programs in \SurfacePlus to the same
+programs adapted to Jif and Flow Caml. To measure the overhead compared with
+fully dynamic IFC, we will compare \SurfacePlus to LIO. In both
+experiments, we plan to display the results as bar charts where x-axis is
+different benchmark programs in different IFC languages and y-axis is their
+execution time.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+TBA
