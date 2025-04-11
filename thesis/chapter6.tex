@@ -207,14 +207,38 @@ $\vdash \mathit{stamp!}\;\bar{c}\;\ell_1 \sqsubseteq \mathit{stamp}\;\bar{d}\;\e
   \fbox{$\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{M'}{A}{A'}$}
   {\small
   \begin{gather*}
+  {\sqsubseteq}\textit{-var}~
+  \inference{\Gamma \ni x : A & \Gamma' \ni x : A'}
+            {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{x}{x}{A}{A'}}
+  \\[3ex]
+  {\sqsubseteq}\textit{-const}~
+  \inference{}
+            {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{\ccconst{k}}{\ccconst{k}}{\iota_{\ell}}{\iota_{\ell}}}
+  \\[3ex]
   {\sqsubseteq}\textit{-addr}~
   \inference{\Sigma(\hat{\ell}, n) = T & \Sigma'(\hat{\ell}, n) = T'}
   {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{\ccaddr{n}}{\ccaddr{n}}{(\Refer{T_{\hat{\ell}}})_\ell}{(\Refer{T'_{\hat{\ell}}})_\ell}}
-  \\[1ex]
+  \\[3ex]
+    {\sqsubseteq}\textit{-lam}~
+    \inference{g_2 \sqsubseteq g_2' & A \sqsubseteq A' \\
+               \forall \ell_3\,\ell_3'.\, \precctx{(\Gamma,x{:}A)}{(\Gamma',x{:}A')}{\Sigma}{\Sigma'}{g_2}{g_2'}{\ell_3}{\ell_3'}\ccprec{N}{N'}{B}{B'}}
+              {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g_1}{g_1'}{\ell_1}{\ell_1'}\ccprec{\cclam{x}{N}}{\cclam{x}{N'}}{(\Fun{A}{g_2}{B})_{\ell_2}}{(\Fun{A'}{g_2'}{B'})_{\ell_2}}}
+  \\[3ex]
+    {\sqsubseteq}\textit{-app}~
+    \inference{\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{\ell_1}{\ell_1}{\ell_2}{\ell_2'}\ccprec{L}{L'}{(\Fun{A}{\ell_1 \curlyvee \ell_3}{B})_{\ell_3}}{(\Fun{A'}{\ell_1 \curlyvee \ell_3}{B'})_{\ell_3}} \\
+    \precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{\ell_1}{\ell_1}{\ell_2}{\ell_2'}\ccprec{M}{M'}{A}{A'} \\
+    C = \mathit{stamp}\;B\;\ell_3 & C' = \mathit{stamp}\;B'\;\ell_3}
+              {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{\ell_1}{\ell_1}{\ell_2}{\ell_2'}\ccprec{\ccapp{L}{M}{A}{B}{\ell_3}}{\ccapp{L'}{M'}{A'}{B'}{\ell_3}}{C}{C'}}
+  \\[3ex]
+  {\sqsubseteq}\textit{-app}{\star}~
+    \inference{\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{L}{L'}{(\Fun{A}{\unk}{T_{\unk}})_{\unk}}{(\Fun{A'}{\unk}{T'_{\unk}})_{\unk}} \\
+      \precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{M'}{A}{A'}}
+              {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{\ccappstar{L}{M}{A}{T}}{\ccappstar{L'}{M'}{A'}{T'}}{T_{\unk}}{T'_{\unk}}}
+  \\[3ex]
   {\sqsubseteq}\textit{-ref?l}~
   \inference{\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{\unk}{\ell_1}{\ell_2}{\ell_3}\ccprec{M}{M'}{T_\ell}{T'_\ell} & \ell_1 \preccurlyeq \ell}
   {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{\unk}{\ell_1}{\ell_2}{\ell_3}\ccprec{\ccrefproj{\ell}{M}{p}}{\ccref{\ell}{M'}}{(\Refer{T_\ell})_{\low}}{(\Refer{T'_\ell})_{\low}}}
-  \\[1ex]
+  \\[3ex]
   {\sqsubseteq}\textit{-prot!}~
   \inference
   {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g_1}{g_1'}{|\PC|}{|\PC'|}\ccprec{M}{M'}{T_{\unk}}{T'_{\unk}} &
@@ -222,25 +246,25 @@ $\vdash \mathit{stamp!}\;\bar{c}\;\ell_1 \sqsubseteq \mathit{stamp}\;\bar{d}\;\e
    \ell_1 \curlyvee \ell_2 \preccurlyeq |\PC| & \ell'_1 \curlyvee \ell'_2 \preccurlyeq |\PC'| &
    \highlight{highlight}{\ell_2 \preccurlyeq \ell_2'}}
   {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g_2}{g_2'}{\ell_1}{\ell'_1}\ccprec{\ccprot{\PC}{\ell_2}{M}{T_{\unk}}}{\ccprot{\PC'}{\ell'_2}{M'}{T'_{\unk}}}{T_{\unk}}{T'_{\unk}}}
-  \\[1ex]
+  \\[3ex]
   {\sqsubseteq}\textit{-cast}~
   \inference
   {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{M'}{A}{A'} & \bm{c} \sqsubseteq \bm{c'} &
    \vdash \bm{c} : A \Rightarrow B & \vdash \bm{c'} : A' \Rightarrow B'}
   {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{\cccast{M}{\bm{c}}}{\cccast{M'}{\bm{c'}}}{B}{B'}}
-  \\[1ex]
+  \\[3ex]
   {\sqsubseteq}\textit{-castl}~
   \inference
   {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{M'}{A}{A'} &
    \bm{c} \sqsubseteq A' & \vdash \bm{c} : A \Rightarrow B}
   {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{\cccast{M}{\bm{c}}}{M'}{B}{A'}}
-  \\[1ex]
+  \\[3ex]
   {\sqsubseteq}\textit{-castr}~
   \inference
   {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{M'}{A}{A'} &
    A \sqsubseteq \bm{c'} & \vdash \bm{c'} : A' \Rightarrow B'}
   {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{\cccast{M'}{\bm{c'}}}{A}{B'}}
-  \\[1ex]
+  \\[3ex]
   {\sqsubseteq}\textit{-blame}~
   \inference
   {\Gamma; \Sigma; g; \ell \vdash M \Leftarrow A & A \sqsubseteq A'}
