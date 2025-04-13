@@ -221,7 +221,7 @@ $\vdash \mathit{stamp!}\;\bar{c}\;\ell_1 \sqsubseteq \mathit{stamp}\;\bar{d}\;\e
   \\[3ex]
     {\sqsubseteq}\textit{-lam}~
     \inference{g_2 \sqsubseteq g_2' & A \sqsubseteq A' \\
-               \forall \ell_3\,\ell_3'.\, \precctx{(\Gamma,x{:}A)}{(\Gamma',x{:}A')}{\Sigma}{\Sigma'}{g_2}{g_2'}{\ell_3}{\ell_3'}\ccprec{N}{N'}{B}{B'}}
+               \forall \ell\,\ell'.\, \precctx{(\Gamma,x{:}A)}{(\Gamma',x{:}A')}{\Sigma}{\Sigma'}{g_2}{g_2'}{\ell}{\ell'}\ccprec{N}{N'}{B}{B'}}
               {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g_1}{g_1'}{\ell_1}{\ell_1'}\ccprec{\cclam{x}{N}}{\cclam{x}{N'}}{(\Fun{A}{g_2}{B})_{\ell_2}}{(\Fun{A'}{g_2'}{B'})_{\ell_2}}}
   \\[3ex]
     {\sqsubseteq}\textit{-app}~
@@ -234,6 +234,33 @@ $\vdash \mathit{stamp!}\;\bar{c}\;\ell_1 \sqsubseteq \mathit{stamp}\;\bar{d}\;\e
     \inference{\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{L}{L'}{(\Fun{A}{\unk}{T_{\unk}})_{\unk}}{(\Fun{A'}{\unk}{T'_{\unk}})_{\unk}} \\
       \precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{M'}{A}{A'}}
               {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{\ccappstar{L}{M}{A}{T}}{\ccappstar{L'}{M'}{A'}{T'}}{T_{\unk}}{T'_{\unk}}}
+  \\[3ex]
+    {\sqsubseteq}\textit{-app${\star}$l}~
+    \inference{\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{\ell_1}{\ell_2}{\ell_2'}\ccprec{L}{L'}{(\Fun{A}{\unk}{T_{\unk}})_{\unk}}{(\Fun{A'}{\ell_1 \curlyvee \ell_3}{B'})_{\ell_3}} \\
+                  \precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{\ell_1}{\ell_2}{\ell_2'}\ccprec{M}{M'}{A}{A'} \\
+                  C' = \mathit{stamp}\;B'\;\ell_3}
+              {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{\ell_1}{\ell_2}{\ell_2'}\ccprec{\ccappstar{L}{M}{A}{T}}{\ccapp{L'}{M'}{A'}{B'}{\ell_3}}{T_{\unk}}{C'}}
+  \\[3ex]
+  {\sqsubseteq}\textit{-let}~
+  \inference{\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell_1}{\ell_1'}\ccprec{M}{M'}{A}{A'} \\
+  \forall \ell_2\,\ell_2'.\, \precctx{(\Gamma,x{:}A)}{(\Gamma',x{:}A')}{\Sigma}{\Sigma'}{g}{g'}{\ell_2}{\ell_2'}\ccprec{N}{N'}{B}{B'}}
+  {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell_1}{\ell_1'}\ccprec{\cclet{x}{M}{A}{N}}{\cclet{x}{M'}{A'}{N'}}{B}{B'}}
+  \end{gather*}}
+  \caption{Precision rules of \CC (Part I)}
+  \label{fig:cc-prec-1}
+\end{figure}
+
+\begin{figure}[tbp]
+\raggedright
+  \fbox{$\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{M'}{A}{A'}$}
+  {\small
+  \begin{gather*}
+  {\sqsubseteq}\textit{-if}~
+  \inference{\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{\ell_1}{\ell_1}{\ell_2}{\ell_2'}\ccprec{L}{L'}{\Bool_{\ell_3}}{\Bool_{\ell_3}} \\
+      \forall \ell\,\ell'.\,\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{\ell_1 \curlyvee \ell_3}{\ell_1 \curlyvee \ell_3}{\ell}{\ell'}\ccprec{M}{M'}{A}{A'} \\
+      \forall \ell\,\ell'.\,\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{\ell_1 \curlyvee \ell_3}{\ell_1 \curlyvee \ell_3}{\ell}{\ell'}\ccprec{N}{N'}{A}{A'} \\
+      B = \mathit{stamp}\;A\;\ell_3 & B' = \mathit{stamp}\;A'\;\ell_3}
+            {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{\ell_1}{\ell_1}{\ell_2}{\ell_2'}\ccprec{\ccif{L}{A}{\ell_3}{M}{N}}{\ccif{L'}{A'}{\ell_3}{M'}{N'}}{B}{B'}}
   \\[3ex]
   {\sqsubseteq}\textit{-ref?l}~
   \inference{\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{\unk}{\ell_1}{\ell_2}{\ell_3}\ccprec{M}{M'}{T_\ell}{T'_\ell} & \ell_1 \preccurlyeq \ell}
@@ -270,8 +297,8 @@ $\vdash \mathit{stamp!}\;\bar{c}\;\ell_1 \sqsubseteq \mathit{stamp}\;\bar{d}\;\e
   {\Gamma; \Sigma; g; \ell \vdash M \Leftarrow A & A \sqsubseteq A'}
   {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{\blame{p}}{A}{A'}}
   \end{gather*}}
-  \caption{Precision rules of \CC}
-  \label{fig:cc-prec}
+  \caption{Precision rules of \CC (Part II)}
+  \label{fig:cc-prec-2}
 \end{figure}
 
 The main simulation lemma says that if two terms are related by
