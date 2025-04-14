@@ -612,9 +612,10 @@ Finally, we state and prove the gradual guarantee of \Surface as a corollary of 
   If $\mathit{eval}(M', b_1)=b_2$, then $\mathit{eval}(M, b_1)=b_2$.
 \end{theorem}
 \begin{proof}
-  By Definition~\ref{def:surface-program}, $(x{:}\Bool_{\high});\low\vdash M :
-  \Bool_{\low}$ and $(x{:}\Bool_{\high});\low\vdash M' : \Bool_{\low}$. By
-  $\mathit{eval}(M', b_1)=b_2$ and inversion on the definition of \textit{eval}
+  By Definition~\ref{def:surface-program} (whole programs of \Surface),
+  $(x{:}\Bool_{\high});\low\vdash M : \Bool_{\low}$ and
+  $(x{:}\Bool_{\high});\low\vdash M' : \Bool_{\low}$. By $\mathit{eval}(M',
+  b_1)=b_2$ and inversion on the definition of \textit{eval}
   (Figure~\ref{fig:eval}), we have
   $\reducemult{(\compile{M'})[x:=\ccconst{b_1}]}{\emptyset}{\low}{\ccconst{b_2}}{\mu'}$
   for some $\mu'$. By Lemma~\ref{lem:gg}, there exists some $V, \mu$ such that

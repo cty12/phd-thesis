@@ -1075,7 +1075,7 @@ Lemma~\ref{lem:NI-Surface}.
   then $b_1' = b_2'$.
 \end{theorem}
 \begin{proof}
-  By Definition~\ref{def:surface-program} (\Surface programs),
+  By Definition~\ref{def:surface-program} (whole programs of \Surface),
   $(x{:}\Bool_{\high}) ; \low \vdash M : \Bool_{\low}$. By the definition of
   \textit{eval} and the canonical form of a value of $\Bool_{\low}$,
   $\reducemult{(\compile{M}) [ x := \ccconst{b_1}]}{\emptyset}{\low}{\ccconst{b_1'}}{\mu_1}$ and
