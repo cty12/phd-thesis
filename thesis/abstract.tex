@@ -13,10 +13,35 @@
 
 \vspace{1.5\baselineskip}
 
-%Insert your abstract here
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Ensuring the security and privacy of personal data typically involves tracking
+and checking the flow of information. Languages with gradual information-flow
+control combine static and dynamic techniques to prevent security leaks. Gradual
+languages should satisfy the gradual guarantee: programs that only differ in the
+precision of their type annotations should behave the same modulo cast errors.
+Unfortunately, Toro et al. [2018] identify a tension between the gradual
+guarantee and information security. They conjecture that it is not possible to
+enforce noninterference and satisfy the gradual guarantee.
 
+In my PhD dissertation, I harmoniously combine static and dynamic enforcement of
+information-flow control (IFC) in one programming language, \Surface. \Surface
+satisfies both noninterference and the gradual guarantee at the same time
+without making any sacrifices. \Surface (1) enforces information flow security,
+(2) satisfies the gradual guarantee, (3) supports type-based reasoning, and (4)
+requires no extra static analysis prior to program execution. The key to the
+design of \Surface is to exclude the unknown label from runtime security labels.
+On the technical side, the semantics of \Surface is the first gradual
+information-flow control language to be specified using coercion calculi (a la
+Henglein). Casts in \Surface are represented by security coercions, which
+enforce the flow of information while satisfying the gradual guarantee.
 
+I mechanize the proofs of type safety and the gradual guarantee for \Surface in
+the Agda proof assistant. I prove noninterference for \Surface by simulating
+\Surface with its dynamic extreme.
+
+In summary, my thesis is that it is possible to design a gradual IFC programming
+language that satisfies noninterference and the gradual guarantee while
+supporting type-based reasoning, by excluding the unknown label from run-time
+security labels and using security coercions to represent casts.
 
 \ifdefined\committeeMemberFourTypedName
 
