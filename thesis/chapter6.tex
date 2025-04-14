@@ -600,3 +600,16 @@ Finally, we state and prove the gradual guarantee of \Surface as a corollary of 
   Suppose $M$ and $M'$ are \Surface programs related by precision: $\vdash M \sqsubseteq M'$.
   If $\mathit{eval}(M', b_1)=b_2$, then $\mathit{eval}(M, b_1)=b_2$.
 \end{theorem}
+\begin{proof}
+  By Definition~\ref{def:surface-program}, $(x{:}\Bool_{\high});\low\vdash M :
+  \Bool_{\low}$ and $(x{:}\Bool_{\high});\low\vdash M' : \Bool_{\low}$. By
+  $\mathit{eval}(M', b_1)=b_2$ and inversion on the definition of \textit{eval}
+  (Figure~\ref{fig:eval}), we have
+  $\reducemult{(\compile{M'})[x:=\ccconst{b_1}]}{\emptyset}{\low}{\ccconst{b_2}}{\mu'}$
+  for some $\mu'$. By Lemma~\ref{lem:gg}, there exists some $V, \mu$ such that
+  $$(\compile{M})[x:=\ccconst{b_1}]\mid\emptyset\mid\low \longrightarrow^{*} V\mid\mu$$
+  and
+  $$\precctx{\emptyset}{\emptyset}{\Sigma}{\Sigma'}{\low}{\low}{\low}{\low}\ccprec{V}{\ccconst{b_2}}{\Bool_{\low}}{\Bool_{\low}}$$
+  By inversion on the precision of \CC and by the canonical form of a value of $\Bool_{\low}$, $V = \ccconst{b_2}$.
+  By the definition of \textit{eval}, $\mathit{eval}(M, b_1)=b_2$.
+\end{proof}
