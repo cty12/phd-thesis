@@ -312,6 +312,32 @@ $\vdash \mathit{stamp!}\;\bar{c}\;\ell_1 \sqsubseteq \mathit{stamp}\;\bar{d}\;\e
   \fbox{$\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{M'}{A}{A'}$}
   {\small
   \begin{gather*}
+  {\sqsubseteq}\textit{-assign}~
+  \inference{\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{\ell_1}{\ell_1}{\ell_2}{\ell_2'}\ccprec{L}{L'}{(\Refer{T_{\hat{\ell}}})_\ell}{(\Refer{T'_{\hat{\ell}}})_\ell} \\
+             \precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{\ell_1}{\ell_1}{\ell_2}{\ell_2'}\ccprec{M}{M'}{T_{\hat{\ell}}}{T'_{\hat{\ell}}} \\
+             \ell_1 \preccurlyeq \hat{\ell} & \ell \preccurlyeq \hat{\ell}}
+            {\begin{align*}\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{\ell_1}{\ell_1}{\ell_2}{\ell_2'}
+                \vdash \ccassign{L}{M}{T}{\hat{\ell}}{\ell} \sqsubseteq \ccassign{L'}{M'}{T'}{\hat{\ell}}{\ell} \Leftarrow \\
+                \Unit_{\low} \sqsubseteq \Unit_{\low}
+            \end{align*}}
+  \\[4ex]
+  {\sqsubseteq}\textit{-assign?}~
+    \inference{\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{L}{L'}{(\Refer{T_{\hat{g}}})_{\unk}}{(\Refer{T'_{\hat{g}'}})_{\unk}} \\
+      \precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{M'}{T_{\hat{g}}}{T'_{\hat{g}'}} }
+              {\begin{align*}\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}
+                  \vdash \ccassignproj{L}{M}{T}{\hat{g}}{p} \sqsubseteq \ccassignproj{L'}{M'}{T'}{\hat{g}'}{q} \Leftarrow \\
+                  \Unit_{\low} \sqsubseteq \Unit_{\low}
+              \end{align*}}
+  \\[4ex]
+    {\sqsubseteq}\textit{-assign?l}~
+    \inference{\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{\ell_1}{\ell_2}{\ell_2'}\ccprec{L}{L'}{(\Refer{T_{\hat{g}}})_{\unk}}{(\Refer{T'_{\hat{\ell}}})_\ell} \\
+      \precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{\ell_1}{\ell_2}{\ell_2'}\ccprec{M}{M'}{T_{\hat{g}}}{T'_{\hat{\ell}}} \\
+      \ell_1 \preccurlyeq \hat{\ell} & \ell \preccurlyeq \hat{\ell}}
+              {\begin{align*}\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{\ell_1}{\ell_2}{\ell_2'}
+                  \vdash \ccassignproj{L}{M}{T}{\hat{g}}{p} \sqsubseteq \ccassign{L'}{M'}{T'}{\hat{\ell}}{\ell} \Leftarrow \\
+                  \Unit_{\low} \sqsubseteq \Unit_{\low}
+              \end{align*}}
+  \\[4ex]
   {\sqsubseteq}\textit{-prot}~
     \inference
         {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g_1}{g_1'}{|\PC|}{|\PC'|}\ccprec{M}{M'}{A}{A'} &
@@ -319,7 +345,7 @@ $\vdash \mathit{stamp!}\;\bar{c}\;\ell_1 \sqsubseteq \mathit{stamp}\;\bar{d}\;\e
           \ell_1 \curlyvee \ell_2 \preccurlyeq |\PC| & \ell'_1 \curlyvee \ell_2 \preccurlyeq |\PC'| &
           B = \mathit{stamp}\;A\;\ell_2 & B' = \mathit{stamp}\;A'\;\ell_2}
         {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g_2}{g_2'}{\ell_1}{\ell'_1}\ccprec{\ccprot{\PC}{\ell_2}{M}{A}}{\ccprot{\PC'}{\ell_2}{M'}{A'}}{B}{B'}}
-        \\[3ex]
+  \\[4ex]
   {\sqsubseteq}\textit{-prot!}~
   \inference
   {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g_1}{g_1'}{|\PC|}{|\PC'|}\ccprec{M}{M'}{T_{\unk}}{T'_{\unk}} &
@@ -327,7 +353,7 @@ $\vdash \mathit{stamp!}\;\bar{c}\;\ell_1 \sqsubseteq \mathit{stamp}\;\bar{d}\;\e
    \ell_1 \curlyvee \ell_2 \preccurlyeq |\PC| & \ell'_1 \curlyvee \ell'_2 \preccurlyeq |\PC'| &
    \highlight{highlight}{\ell_2 \preccurlyeq \ell_2'}}
   {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g_2}{g_2'}{\ell_1}{\ell'_1}\ccprec{\ccprot{\PC}{\ell_2}{M}{T_{\unk}}}{\ccprot{\PC'}{\ell'_2}{M'}{T'_{\unk}}}{T_{\unk}}{T'_{\unk}}}
-  \\[3ex]
+  \\[4ex]
   {\sqsubseteq}\textit{-prot!l}~
   \inference
       {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g_1}{g_1'}{|\PC|}{|\PC'|}\ccprec{M}{M'}{T_{\unk}}{A} &
@@ -336,32 +362,41 @@ $\vdash \mathit{stamp!}\;\bar{c}\;\ell_1 \sqsubseteq \mathit{stamp}\;\bar{d}\;\e
           B = \mathit{stamp}\;A\;\ell_2' &
           \highlight{highlight}{\ell_2 \preccurlyeq \ell_2'}}
       {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g_2}{g_2'}{\ell_1}{\ell'_1}\ccprec{\ccprot{\PC}{\ell_2}{M}{T_{\unk}}}{\ccprot{\PC'}{\ell'_2}{M'}{A}}{T_{\unk}}{B}}
-        \\[3ex]
+  \end{gather*}}
+  \caption{Precision rules of \CC (Part III)}
+  \label{fig:cc-prec-3}
+\end{figure}
+
+\begin{figure}[tbp]
+\raggedright
+  \fbox{$\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{M'}{A}{A'}$}
+  {\small
+  \begin{gather*}
   {\sqsubseteq}\textit{-cast}~
   \inference
-  {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{M'}{A}{A'} & \bm{c} \sqsubseteq \bm{c'} &
+  {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{M'}{A}{A'} & \bm{c} \sqsubseteq \bm{c'} \\
    \vdash \bm{c} : A \Rightarrow B & \vdash \bm{c'} : A' \Rightarrow B'}
   {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{\cccast{M}{\bm{c}}}{\cccast{M'}{\bm{c'}}}{B}{B'}}
-  \\[3ex]
+  \\[4ex]
   {\sqsubseteq}\textit{-castl}~
   \inference
   {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{M'}{A}{A'} &
    \bm{c} \sqsubseteq A' & \vdash \bm{c} : A \Rightarrow B}
   {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{\cccast{M}{\bm{c}}}{M'}{B}{A'}}
-  \\[3ex]
+  \\[4ex]
   {\sqsubseteq}\textit{-castr}~
   \inference
   {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{M'}{A}{A'} &
    A \sqsubseteq \bm{c'} & \vdash \bm{c'} : A' \Rightarrow B'}
   {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{\cccast{M'}{\bm{c'}}}{A}{B'}}
-  \\[3ex]
+  \\[4ex]
   {\sqsubseteq}\textit{-blame}~
   \inference
   {\Gamma; \Sigma; g; \ell \vdash M \Leftarrow A & A \sqsubseteq A'}
   {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{\blame{p}}{A}{A'}}
   \end{gather*}}
-  \caption{Precision rules of \CC (Part III)}
-  \label{fig:cc-prec-3}
+  \caption{Precision rules of \CC (Part IV)}
+  \label{fig:cc-prec-4}
 \end{figure}
 
 The main simulation lemma says that if two terms are related by
@@ -380,7 +415,9 @@ Moreover, the casts must be in shapes that preserve the precision of \Surface
 the gradual guarantee, the more precise side is allowed to signal more blames,
 so there is a rule (${\sqsubseteq}\textit{-blame}$) that relates \blame{p} to
 any term $M$ on the less precise side as long as their types are in sync. We
-list precision rules in Figure~\ref{fig:cc-prec}.
+list the precision rules for the cast calculus \CC in
+Figure~\ref{fig:cc-prec-1},~\ref{fig:cc-prec-2},~\ref{fig:cc-prec-3},
+and~\ref{fig:cc-prec-4}.
 
 With the precision relation of \CC defined, we first state the catch-up lemma,
 which catches up to a more-precise value by multi-stepping on the less-precise
