@@ -445,8 +445,27 @@ $\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{V}{V'}{A}
   The proof is mechanized in \texttt{/src/Simulation/CatchUp.agda}.
 \end{proof}
 
-We prove the main simulation lemma using the catch-up lemma. Heap precision is
-defined point-wise similar to the definition of heap well-typedness.
+It is straightforward to show that substitution preserves precision for \CC
+(typing context precision is defined point-wise):
+
+\begin{lemma}[Substitution preserves precision]
+  \label{lem:subst-pres-prec}
+  Suppose the typing contexts are related by precision: $\Gamma \sqsubseteq
+  \Gamma$ and $\Sigma \sqsubseteq \Sigma'$. If
+  $$\precctx{(\Gamma,x{:}A)}{(\Gamma',x{:}A')}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{N}{N'}{B}{B'}$$
+  and
+  $$\forall g\,g'\,\ell\,\ell'.\, \precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{V}{V'}{A}{A'}$$
+  then
+  $\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{N[x:=V]}{N'[x:=V']}{B}{B'}$.
+\end{lemma}
+\begin{proof}
+  The proof is mechanized in \texttt{/src/CC2/SubstPrecision.agda}.
+\end{proof}
+
+We then prove the main simulation lemma using Lemma~\ref{lem:catchup}
+("catch-up") and Lemma~\ref{lem:subst-pres-prec} (substitution preserves
+precision). Heap precision is defined point-wise, similar to the definition of
+heap well-typedness.
 
 \begin{lemma}[Simulation between more precise and less precise \CC terms]
 \label{lem:sim}
@@ -528,29 +547,56 @@ and the resulting heaps are also related by precision: $\Sigma_2 ; \Sigma_2' \vd
   \label{fig:surface-precision}
 \end{figure}
 
-Finally, we state the gradual guarantee of \Surface and prove it as a
-corollary of Lemma~\ref{lem:sim}. The definition of term precision
-for \Surface is in Figure~\ref{fig:surface-precision}.
+The definition of term precision for \Surface is in
+Figure~\ref{fig:surface-precision}. We first prove that the compilation from
+\Surface to \CC preserves types:
 
-\begin{theorem}[Gradual guarantee]
-\label{thm:gg}
-Suppose $M$ and $M'$ are well-typed terms in \Surface
-that are related by precision, that is $\vdash M \sqsubseteq M'$.
-So $\emptyset ; \low \vdash M : A$, $\emptyset ; \low \vdash M' : A'$,
-and $A \sqsubseteq A'$.
-If the compilation of $M'$ reduces to a value:
-$\compile{M'}\mid\emptyset\mid\low \longrightarrow^{*} V'\mid\mu'$ \\
-there exists a value $V$ and heap $\mu$ s.t. the compilation of $M$ reduces to $V$:
-$\compile{M}\mid\emptyset\mid\low \longrightarrow^{*} V\mid\mu$ \\ and
-the resulting values are related by precision for some $\Sigma$,
-$\Sigma'$:
-$$\precctx{\emptyset}{\emptyset}{\Sigma}{\Sigma'}{\low}{\low}{\low}{\low}\ccprec{V}{V'}{A}{A'}$$
-\end{theorem}
+\begin{lemma}[Compilation preserves precision]
+  \label{lem:compile-pres-prec}
+  Suppose the tying contexts are related by precision: $\Gamma \sqsubseteq
+  \Gamma'$, and the PC labels are also related: $g \sqsubseteq g'$. If
+  well-typed \Surface terms $M, M'$ are related by precision: $\vdash M
+  \sqsubseteq M'$ and $\Gamma ; g \vdash M : A$ and $\Gamma'; g' \vdash M' :
+  A'$, then
+  $$\forall \ell\, \ell'.\, \precctx{\Gamma}{\Gamma'}{\emptyset}{\emptyset}{g}{g'}{\ell}{\ell'}\ccprec{\compile{M}}{\compile{M'}}{A}{A'}$$
+\end{lemma}
 \begin{proof}
-  Compilation preserves precision, so
-  $\precctx{\emptyset}{\emptyset}{\emptyset}{\emptyset}{\low}{\low}{\low}{\low}\ccprec{\compile{M}}{\compile{M'}}{A}{A'}$.
-  We then proceed by induction on the reduction of $\compile{M'}$ to a value $V'$,
-  using Lemma~\ref{lem:sim} to show that $\compile{M}$ reduces to a corresponding term at each step.
-  So we have $\compile{M} \longrightarrow^{*} N$ where $N \sqsubseteq V'$ for some $N$.
-  We then apply Lemma~\ref{lem:catchup} to show that $N$ reduces to a value $V$ where $V \sqsubseteq V'$.
+  The proof is mechanized in \texttt{/src/Compile/Precision/CompilePrecision.agda}.
 \end{proof}
+
+We prove the following lemma about \Surface that is a corollary of
+Lemma~\ref{lem:sim}:
+
+\begin{lemma}
+\label{lem:gg}
+Suppose $M$ and $M'$ are well-typed terms in \Surface that are related by
+precision, that is $\vdash M \sqsubseteq M'$ and $(x{:}\Bool_{\high}); \low \vdash
+M : A$ and $(x{:}\Bool_{\high}); \low \vdash M' : A'$, so $A \sqsubseteq A'$.
+%
+If the compilation of $M'$ substituted with input $b$ reduces to a value:
+$$(\compile{M'})[x:=\ccconst{b}]\mid\emptyset\mid\low \longrightarrow^{*} V'\mid\mu'$$
+there exists some value $V$ and heap $\mu$ s.t. the compilation of $M$
+substituted with $b$ reduces to $V$:
+$$(\compile{M})[x:=\ccconst{b}]\mid\emptyset\mid\low \longrightarrow^{*} V\mid\mu$$
+and the resulting values are related by precision for some $\Sigma$, $\Sigma'$:
+$$\precctx{\emptyset}{\emptyset}{\Sigma}{\Sigma'}{\low}{\low}{\low}{\low}\ccprec{V}{V'}{A}{A'}$$
+\end{lemma}
+\begin{proof}
+  By Lemma~\ref{lem:compile-pres-prec} (compilation preserves precision), we have
+  $$\precctx{(x{:}\Bool_{\high})}{(x{:}\Bool_{\high})}{\emptyset}{\emptyset}{\low}{\low}{\low}{\low}\ccprec{\compile{M}}{\compile{M'}}{A}{A'}$$
+  Substitution preserves precision (Lemma~\ref{lem:subst-pres-prec}), so
+  $$\precctx{\emptyset}{\emptyset}{\emptyset}{\emptyset}{\low}{\low}{\low}{\low}\ccprec{(\compile{M})[x:=\ccconst{b}]}{(\compile{M'})[x:=\ccconst{b}]}{A}{A'}$$
+  We then proceed by induction on the reduction of $(\compile{M'})[x:=\ccconst{b}]$ to a value
+  $V'$, using Lemma~\ref{lem:sim} to show that $(\compile{M})[x:=\ccconst{b}]$ reduces to a
+  corresponding term at each step. So we have $(\compile{M})[x:=\ccconst{b}] \longrightarrow^{*}
+  N$ where $N \sqsubseteq V'$ for some $N$. We then apply
+  Lemma~\ref{lem:catchup} to show that $N$ reduces to a value $V$ where $V
+  \sqsubseteq V'$.
+\end{proof}
+
+Finally, we state and prove the gradual guarantee of \Surface as a corollary of Lemma~\ref{lem:gg}:
+
+\begin{theorem}[Gradual guarantee of \Surface]
+  Suppose $M$ and $M'$ are \Surface programs related by precision: $\vdash M \sqsubseteq M'$.
+  If $\mathit{eval}(M', b_1)=b_2$, then $\mathit{eval}(M, b_1)=b_2$.
+\end{theorem}
