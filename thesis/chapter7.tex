@@ -1,32 +1,36 @@
 \chapter{Noninterference of \Surface}
 \label{ch:noninterference}
 
-In this chapter, I first show that security checks can be modeled by reducing
-security coercion sequences to their normal form (Section~\ref{sec:norm-IF}).
-After that, I present the full proof of noninterference for \Surface. The proof
-employs a three-step approach.
+In this chapter, I prove that \Surface satisfies noninterference: high-security
+input never flows into low-security output.
 
-First, I prove that the dynamic extreme of \Surface, \DynIFC, satisfies
-noninterference (Section~\ref{sec:NI-dynifc}). This proof is a straightforward
+I show that security checks can be modeled by reducing security coercion
+sequences to their normal form in Section~\ref{sec:norm-IF}. After that, I
+present the full proof of noninterference for \Surface. This proof employs a
+three-step approach.
+
+First, in Section~\ref{sec:NI-dynifc}, I prove that the dynamic extreme of
+\Surface, \DynIFC, satisfies noninterference. This proof is a straightforward
 adaptation of the noninterference proof from \textcite{Chen:2022aa}. The proof
 (Lemma~\ref{lem:NI-old}) uses a standard erasure-based
 approach~\parencite{LI20101974, stefan2011flexible, stefan2012flexible,
   Fennell:2013ab, STEFAN:2017ta}, where the high-security parts of a program are
 erased to an opaque value.
 
-Second, I prove a simulation lemma between \CC and \DynIFC
-(Lemma~\ref{lem:sim-leq}). The main intuition of the simulation relation
-(Figure~\ref{fig:sim-rel-1} and~\ref{fig:sim-rel-2}) is that a \CC term always
-produces a value that is as secure as the one produced by its related \DynIFC
-term. I translate \CC terms to \DynIFC by (1) getting rid of all the casts and
-(2) converting static heap enforcement (\texttt{ref} and \texttt{assign}) to
-dynamic enforcement (NSU) (Figure~\ref{fig:cast-erase}). The noninterference
-property of \CC (Lemma~\ref{lem:NI-CC}) follows directly from the multi-step
-simulation lemma (Lemma~\ref{lem:sim-mult}) and the noninterference result of
-\DynIFC (Lemma~\ref{lem:NI-old}).
+Second, in Section~\ref{sec:sim-cc-dynifc}, I prove a simulation lemma between
+\CC and \DynIFC (Lemma~\ref{lem:sim-leq}). The main intuition of the simulation
+relation (Figure~\ref{fig:sim-rel-1} and~\ref{fig:sim-rel-2}) is that a \CC term
+always produces a value that is as secure as the one produced by its related
+\DynIFC term. I translate \CC terms to \DynIFC by (1) getting rid of all the
+casts and (2) converting static heap enforcement (\texttt{ref} and
+\texttt{assign}) to dynamic enforcement (NSU) (Figure~\ref{fig:cast-erase}). The
+noninterference property of \CC (Lemma~\ref{lem:NI-CC}) follows directly from
+the multi-step simulation lemma (Lemma~\ref{lem:sim-mult}) and the
+noninterference result of \DynIFC (Lemma~\ref{lem:NI-old}).
 
-Third, the noninterference theorem of \Surface (Theorem~\ref{thm:NI-Surface}) is
-a corollary of the noninterference property of \CC.
+Third, in Section~\ref{sec:NI}, I prove the noninterference theorem of \Surface
+(Theorem~\ref{thm:NI-Surface}) as a corollary of the noninterference property of
+\CC.
 
 Similar to \GSLRef and GLIO, the statements of noninterference for
 both \DynIFC and \CC are termination-insensitive.  Thus, I will only

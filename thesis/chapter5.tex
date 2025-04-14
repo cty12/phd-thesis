@@ -2,9 +2,13 @@
 \label{ch:type-safety}
 
 In this chapter, I prove that untrapped errors (or ``undefined behaviors'')
-never occur in \Surface. In other words, I am going to prove that the evaluation
-of a \Surface program on any input will never reach the \textit{stuck} case of
-the \textit{eval} function defined in Figure~\ref{fig:eval}.
+never occur in \Surface. In other words, the evaluation of a \Surface program
+will never reach the \textit{stuck} case of \textit{eval}. In
+Section~\ref{sec:cc-type-safety}, I prove that the cast calculus \CC satisfies
+progress and preservation. In Section~\ref{sec:compile-pres}, I prove that the
+compilation from \Surface to \CC preserves types. Finally, in
+Section~\ref{sec:surface-type-safety}, I prove the type safety theorem for
+\Surface.
 
 \section{Type Safety of \CC by Progress and Preservation}
 \label{sec:cc-type-safety}
