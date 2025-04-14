@@ -4,7 +4,13 @@
 In this chapter, I prove that \Surface satisfies that gradual guarantee: if a
 \Surface program successfully evaluates to some output value, then a variant of
 the program in which the type annotations are less precise must also evaluate to
-the same output value.
+the same output value. In particular, in Section~\ref{sec:sim-cexpr}, I prove a
+simulation lemma between more and less precise coercion sequences: if the more
+precise side takes one step, the less precise side can take zero or more steps
+and be related by precision again. After that, in Section~\ref{sec:simulation},
+I prove a similar simulation lemma for the cast calculus \CC. Finally, in
+Section~\ref{sec:gg}, I prove the gradual guarantee for \Surface as a corollary
+of the simulation lemma for \CC.
 
 \section{Simulation Between More and Less Precise Coercion Sequences}
 \label{sec:sim-cexpr}
