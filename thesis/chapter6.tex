@@ -166,6 +166,9 @@ coercions in normal form:
 \label{lem:prec-sec}
 Suppose $\mathbf{NF}\; \bar{c}$ and $\mathbf{NF}\; \bar{d}$. If $\vdash \bar{c} \sqsubseteq \bar{d}$, then $| \bar{c} | \preccurlyeq | \bar{d} |$.
 \end{lemma}
+\begin{proof}
+  The proof is mechanized in \texttt{/src/CoercionExpr/SecurityLevel.agda}.
+\end{proof}
 
 Next we prove a catch-up lemma for coercion sequences, where the less
 precise side catches up with a more precise sequence that is in normal
@@ -175,9 +178,12 @@ performing induction on the precision relation in each case.
 \begin{lemma}[Catching up to a more precise coercion sequence]
 \label{lem:cexpr-catchup}
 If $\mathbf{NF}\; \bar{d}$ and $\vdash \bar{c} \sqsubseteq \bar{d}$,
-there exists $\bar{c}'$ such that $\bar{c} \longrightarrow^{*} \bar{c}'$
-and $\vdash \bar{c}' \sqsubseteq \bar{d}$.
+there exists $\bar{c}'$ such that $\bar{c} \longrightarrow^{*} \bar{c}'$,
+$\mathbf{NF}\; \bar{c}'$, and $\vdash \bar{c}' \sqsubseteq \bar{d}$.
 \end{lemma}
+\begin{proof}
+  The proof is mechanized in \texttt{/src/CoercionExpr/CatchUp.agda}.
+\end{proof}
 
 \noindent Using Lemma~\ref{lem:cexpr-catchup}, we then prove the following
 simulation lemma for coercion sequences:
@@ -188,6 +194,9 @@ If $\vdash \bar{c} \sqsubseteq \bar{d}$ and $\bar{d} \longrightarrow \bar{d}'$,
 there exists $\bar{c}'$ such that $\bar{c} \longrightarrow^{*} \bar{c}'$
 and $\vdash \bar{c}' \sqsubseteq \bar{d}'$.
 \end{lemma}
+\begin{proof}
+  The proof is mechanized in \texttt{sim} of \texttt{/src/CoercionExpr/Simulation.agda}.
+\end{proof}
 
 We also prove that stamping on coercion sequences preserves precision:
 
@@ -197,7 +206,9 @@ If $\vdash \bar{c} \sqsubseteq \bar{d}$, then \\ $\vdash \mathit{stamp}\;\bar{c}
 and $\vdash \mathit{stamp!}\;\bar{c}\;\ell_1 \sqsubseteq \mathit{stamp!}\;\bar{d}\;\ell_2$ and
 $\vdash \mathit{stamp!}\;\bar{c}\;\ell_1 \sqsubseteq \mathit{stamp}\;\bar{d}\;\ell_2$ if $\ell_1 \preccurlyeq \ell_2$.
 \end{lemma}
-
+\begin{proof}
+  The proof is mechanized in \texttt{/src/CoercionExpr/Stamping.agda}.
+\end{proof}
 
 \section{Simulation Between \CC Terms of Different Precision}
 \label{sec:simulation}
@@ -430,6 +441,9 @@ $$\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{V'}{A
 then there exists value $V$ s.t $M\mid\mu\mid\PC \longrightarrow^{*} V\mid\mu$ and
 $\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{V}{V'}{A}{A'}$.
 \end{lemma}
+\begin{proof}
+  The proof is mechanized in \texttt{/src/Simulation/CatchUp.agda}.
+\end{proof}
 
 We prove the main simulation lemma using the catch-up lemma. Heap precision is
 defined point-wise similar to the definition of heap well-typedness.
@@ -450,7 +464,9 @@ the resulting terms are related by precision:
 $\precctx{\emptyset}{\emptyset}{\Sigma_2}{\Sigma_2'}{g}{g'}{|\PC|}{|\PC'|}\ccprec{N}{N'}{A}{A'}$
 and the resulting heaps are also related by precision: $\Sigma_2 ; \Sigma_2' \vdash \mu_2 \sqsubseteq \mu_2'$.
 \end{lemma}
-
+\begin{proof}
+  The proof is mechanized in \texttt{/src/Simulation/Simulation.agda}.
+\end{proof}
 
 \section{The Gradual Guarantee of \Surface}
 \label{sec:gg}
@@ -461,40 +477,50 @@ and the resulting heaps are also related by precision: $\Sigma_2 ; \Sigma_2' \vd
   {\small
   \begin{gather*}
     % const
+    {\sqsubseteq}^G\textit{-const}~
     \inference{}{\vdash \const{k}{\ell} \sqsubseteq \const{k}{\ell}}
     \qquad
     % var
+    {\sqsubseteq}^G\textit{-var}~
     \inference{}{\vdash x \sqsubseteq x}
     \\[2ex]
     % lam
+    {\sqsubseteq}^G\textit{-lam}~
     \inference{g_1 \sqsubseteq g_2 & A_1 \sqsubseteq A_2 & \vdash N_1 \sqsubseteq N_2 }
               {\vdash \lam{g_1}{x}{A_1}{N_1}{\ell} \sqsubseteq \lam{g_2}{x}{A_2}{N_2}{\ell}}
     \quad
     % app
+    {\sqsubseteq}^G\textit{-app}~
     \inference{\vdash L_1 \sqsubseteq L_2 & \vdash M_1 \sqsubseteq M_2}
               {\vdash \app{L_1}{M_1}{p} \sqsubseteq \app{L_2}{M_2}{p}}
     \\[2ex]
     % if
+    {\sqsubseteq}^G\textit{-if}~
     \inference{\vdash L_1 \sqsubseteq L_2 & \vdash M_1 \sqsubseteq M_2 & \vdash N_1 \sqsubseteq N_2}
               {\vdash \ifexp{L_1}{M_1}{N_1}{p} \sqsubseteq \ifexp{L_2}{M_2}{N_2}{p}}
     \\[2ex]
     % ann
+    {\sqsubseteq}^G\textit{-ann}~
     \inference{\vdash M_1 \sqsubseteq M_2 & A_1 \sqsubseteq A_2}
               {\vdash \ann{M_1}{A_1}{p} \sqsubseteq \ann{M_2}{A_2}{p}}
-    \quad
+    \\[2ex]
     % let
+    {\sqsubseteq}^G\textit{-let}~
     \inference{\vdash M_1 \sqsubseteq M_2 & \vdash N_1 \sqsubseteq N_2}
               {\vdash \letexp{x}{M_1}{N_1} \sqsubseteq \letexp{x}{M_2}{N_2}}
     \\[2ex]
     % ref
+    {\sqsubseteq}^G\textit{-ref}~
     \inference{\vdash M_1 \sqsubseteq M_2}
               {\vdash \refexp{\ell}{M_1}{p} \sqsubseteq \refexp{\ell}{M_2}{p}}
     \quad
     % deref
+    {\sqsubseteq}^G\textit{-deref}~
     \inference{\vdash M_1 \sqsubseteq M_2}
               {\vdash \deref{M_1}{p} \sqsubseteq \deref{M_2}{p}}
     \\[2ex]
     % assign
+    {\sqsubseteq}^G\textit{-assign}~
     \inference{\vdash L_1 \sqsubseteq L_2 & \vdash M_1 \sqsubseteq M_2}
               {\vdash \assign{L_1}{M_1}{p} \sqsubseteq \assign{L_2}{M_2}{p}}
   \end{gather*}}
