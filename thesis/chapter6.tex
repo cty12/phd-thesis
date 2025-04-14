@@ -262,10 +262,64 @@ $\vdash \mathit{stamp!}\;\bar{c}\;\ell_1 \sqsubseteq \mathit{stamp}\;\bar{d}\;\e
       B = \mathit{stamp}\;A\;\ell_3 & B' = \mathit{stamp}\;A'\;\ell_3}
             {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{\ell_1}{\ell_1}{\ell_2}{\ell_2'}\ccprec{\ccif{L}{A}{\ell_3}{M}{N}}{\ccif{L'}{A'}{\ell_3}{M'}{N'}}{B}{B'}}
   \\[3ex]
+  {\sqsubseteq}\textit{-if}{\star}~
+  \inference{\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell_1}{\ell_1'}\ccprec{L}{L'}{\Bool_{\unk}}{\Bool_{\unk}} \\
+      \forall \ell_2\,\ell_2'.\,\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{\unk}{\unk}{\ell_2}{\ell_2'}\ccprec{M}{M'}{T_{\unk}}{T'_{\unk}} \\
+      \forall \ell_2\,\ell_2'.\,\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{\unk}{\unk}{\ell_2}{\ell_2'}\ccprec{N}{N'}{T_{\unk}}{T'_{\unk}} }
+            {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell_1}{\ell_1'}\ccprec{\ccifstar{L}{T}{M}{N}}{\ccifstar{L'}{T'}{M'}{N'}}{T_{\unk}}{T'_{\unk}}}
+  \\[3ex]
+  {\sqsubseteq}\textit{-if${\star}$l}~
+  \inference{\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{\ell_1}{\ell_2}{\ell_2'}\ccprec{L}{L'}{\Bool_{\unk}}{\Bool_{\ell_3}} \\
+    \forall \ell\,\ell'.\,\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{\unk}{\ell_1 \curlyvee \ell_3}{\ell}{\ell'}\ccprec{M}{M'}{T_{\unk}}{A'} \\
+    \forall \ell\,\ell'.\,\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{\unk}{\ell_1 \curlyvee \ell_3}{\ell}{\ell'}\ccprec{N}{N'}{T_{\unk}}{A'} \\
+    B' = \mathit{stamp}\;A'\;\ell_3}
+            {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{\ell_1}{\ell_2}{\ell_2'}\ccprec{\ccifstar{L}{T}{M}{N}}{\ccif{L'}{A'}{\ell_3}{M'}{N'}}{T_{\unk}}{B'}}
+  \\[3ex]
+    {\sqsubseteq}\textit{-ref}~
+    \inference{\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{\ell_1}{\ell_1}{\ell_2}{\ell_2'}\ccprec{M}{M'}{T_{\ell_3}}{T'_{\ell_3}} &
+               \ell_1 \preccurlyeq \ell_3}
+              {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{\ell_1}{\ell_1}{\ell_2}{\ell_2'}\ccprec{\ccref{\ell_3}{M}}{\ccref{\ell_3}{M'}}{(\Refer{T_{\ell_3}})_{\low}}{(\Refer{T'_{\ell_3}})_{\low}}}
+  \\[3ex]
+    {\sqsubseteq}\textit{-ref?}~
+    \inference{\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{\unk}{\unk}{\ell_1}{\ell_1'}\ccprec{M}{M'}{T_{\ell_2}}{T'_{\ell_2}}}
+              {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{\unk}{\unk}{\ell_1}{\ell_1'}\ccprec{\ccrefproj{\ell_2}{M}{p}}{\ccrefproj{\ell_2}{M'}{q}}{(\Refer{T_{\ell_2}})_{\low}}{(\Refer{T'_{\ell_2}})_{\low}}}
+  \\[3ex]
   {\sqsubseteq}\textit{-ref?l}~
-  \inference{\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{\unk}{\ell_1}{\ell_2}{\ell_3}\ccprec{M}{M'}{T_\ell}{T'_\ell} & \ell_1 \preccurlyeq \ell}
+  \inference{\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{\unk}{\ell_1}{\ell_2}{\ell_3}\ccprec{M}{M'}{T_\ell}{T'_\ell} &
+             \ell_1 \preccurlyeq \ell}
   {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{\unk}{\ell_1}{\ell_2}{\ell_3}\ccprec{\ccrefproj{\ell}{M}{p}}{\ccref{\ell}{M'}}{(\Refer{T_\ell})_{\low}}{(\Refer{T'_\ell})_{\low}}}
   \\[3ex]
+  {\sqsubseteq}\textit{-deref}~
+  \inference{\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell_1}{\ell_1'}\ccprec{M}{M'}{(\Refer{A})_{\ell_2}}{(\Refer{A'})_{\ell_2}} \\
+  B = \mathit{stamp}\;A\;\ell_2 & B' = \mathit{stamp}\;A'\;\ell_2}
+  {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell_1}{\ell_1'}\ccprec{\ccderef{M}{A}{\ell_2}}{\ccderef{M'}{A'}{\ell_2}}{B}{B'}}
+  \\[3ex]
+    {\sqsubseteq}\textit{-deref}{\star}~
+    \inference{\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{M'}{(\Refer{T_{\unk}})_{\unk}}{(\Refer{T'_{\unk}})_{\unk}}}
+              {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{\ccderefstar{M}{T}}{\ccderefstar{M'}{T'}}{T_{\unk}}{T'_{\unk}}}
+  \\[3ex]
+    {\sqsubseteq}\textit{-deref${\star}$l}~
+    \inference{\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{M'}{(\Refer{T_{\unk}})_{\unk}}{(\Refer{A'})_{\ell_2}} \\
+               B' = \mathit{stamp}\;A'\;\ell_2}
+              {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell_1}{\ell_1'}\ccprec{\ccderefstar{M}{T}}{\ccderef{M'}{A'}{\ell_2}}{T_{\unk}}{B'}}
+  \end{gather*}}
+  \caption{Precision rules of \CC (Part II)}
+  \label{fig:cc-prec-2}
+\end{figure}
+
+\begin{figure}[tbp]
+\raggedright
+  \fbox{$\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{M'}{A}{A'}$}
+  {\small
+  \begin{gather*}
+  {\sqsubseteq}\textit{-prot}~
+    \inference
+        {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g_1}{g_1'}{|\PC|}{|\PC'|}\ccprec{M}{M'}{A}{A'} &
+          \ccprec{\PC}{\PC'}{g_1}{g_1'} \\
+          \ell_1 \curlyvee \ell_2 \preccurlyeq |\PC| & \ell'_1 \curlyvee \ell_2 \preccurlyeq |\PC'| &
+          B = \mathit{stamp}\;A\;\ell_2 & B' = \mathit{stamp}\;A'\;\ell_2}
+        {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g_2}{g_2'}{\ell_1}{\ell'_1}\ccprec{\ccprot{\PC}{\ell_2}{M}{A}}{\ccprot{\PC'}{\ell_2}{M'}{A'}}{B}{B'}}
+        \\[3ex]
   {\sqsubseteq}\textit{-prot!}~
   \inference
   {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g_1}{g_1'}{|\PC|}{|\PC'|}\ccprec{M}{M'}{T_{\unk}}{T'_{\unk}} &
@@ -274,6 +328,15 @@ $\vdash \mathit{stamp!}\;\bar{c}\;\ell_1 \sqsubseteq \mathit{stamp}\;\bar{d}\;\e
    \highlight{highlight}{\ell_2 \preccurlyeq \ell_2'}}
   {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g_2}{g_2'}{\ell_1}{\ell'_1}\ccprec{\ccprot{\PC}{\ell_2}{M}{T_{\unk}}}{\ccprot{\PC'}{\ell'_2}{M'}{T'_{\unk}}}{T_{\unk}}{T'_{\unk}}}
   \\[3ex]
+  {\sqsubseteq}\textit{-prot!l}~
+  \inference
+      {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g_1}{g_1'}{|\PC|}{|\PC'|}\ccprec{M}{M'}{T_{\unk}}{A} &
+          \ccprec{\PC}{\PC'}{g_1}{g_1'} \\
+          \ell_1 \curlyvee \ell_2 \preccurlyeq |\PC| & \ell'_1 \curlyvee \ell'_2 \preccurlyeq |\PC'| &
+          B = \mathit{stamp}\;A\;\ell_2' &
+          \highlight{highlight}{\ell_2 \preccurlyeq \ell_2'}}
+      {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g_2}{g_2'}{\ell_1}{\ell'_1}\ccprec{\ccprot{\PC}{\ell_2}{M}{T_{\unk}}}{\ccprot{\PC'}{\ell'_2}{M'}{A}}{T_{\unk}}{B}}
+        \\[3ex]
   {\sqsubseteq}\textit{-cast}~
   \inference
   {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{M'}{A}{A'} & \bm{c} \sqsubseteq \bm{c'} &
@@ -297,8 +360,8 @@ $\vdash \mathit{stamp!}\;\bar{c}\;\ell_1 \sqsubseteq \mathit{stamp}\;\bar{d}\;\e
   {\Gamma; \Sigma; g; \ell \vdash M \Leftarrow A & A \sqsubseteq A'}
   {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{\blame{p}}{A}{A'}}
   \end{gather*}}
-  \caption{Precision rules of \CC (Part II)}
-  \label{fig:cc-prec-2}
+  \caption{Precision rules of \CC (Part III)}
+  \label{fig:cc-prec-3}
 \end{figure}
 
 The main simulation lemma says that if two terms are related by
