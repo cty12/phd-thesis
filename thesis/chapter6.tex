@@ -1,6 +1,11 @@
 \chapter{Gradual Guarantee of \Surface}
 \label{ch:gg}
 
+In this chapter, I prove that \Surface satisfies that gradual guarantee: if a
+\Surface program successfully evaluates to some output value, then a variant of
+the program in which the type annotations are less precise must also evaluate to
+the same output value.
+
 \section{Simulation Between More and Less Precise Coercion Sequences}
 \label{sec:sim-cexpr}
 
@@ -74,7 +79,7 @@
   \label{fig:cexpr-prec}
 \end{figure}
 
-In this chapter, our end goal is to prove the gradual guarantee for \Surface.
+Our end goal is to prove the gradual guarantee for \Surface.
 The proof depends on a simulation lemma between more and less precise terms of
 the cast calculus \CC . We use coercion sequences as the IFC monitor in \CC.
 Reducing a coercion sequence can result in a blame which errors the program. So
