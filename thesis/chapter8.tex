@@ -207,17 +207,22 @@ execution time.
 \section{Conclusion}
 \label{sec:conclusion}
 
-We presented the design of a gradual information-flow
-language \Surface that satisfies both noninterference and the gradual
-guarantee while maintaining the principle of type-based reasoning. The
-key to the design of \Surface is to walk back the decision in \GSLRef
-to include the unknown label \unk among the runtime security labels.
-So \Surface takes a more standard approach to gradually-typed IFC:
-the \unk label can be used in type annotations but not as the security
-level of a runtime value.  The \Surface language is defined by
-translation to a cast calculus \CC.  This intermediate language
-employs a coercion calculus to express the implicit conversions
-between more-or-less precise parts of the program. We proved that
-\Surface satisfies termination-insensitive noninterference.
-We proved that \Surface satisfies the gradual guarantee and
-mechanized the result in Agda.
+In my dissertation, I presented the design of a gradual information-flow
+language \Surface, which satisfies both noninterference and the gradual
+guarantee, while maintaining the principle of type-based reasoning. The key to
+the design of \Surface is to walk back the decision in \GSLRef to include the
+unknown label \unk among the runtime security labels. So \Surface takes a more
+standard approach to gradually-typed IFC: the \unk label can be used in type
+annotations but not as the security level of a runtime value. The \Surface
+language is defined by translation to a cast calculus \CC. This intermediate
+language employs a coercion calculus to express the implicit conversions between
+more-or-less precise parts of the program; the security coercion calculus is
+able to capture both explicit and implicit information flows. I proved that
+\Surface satisfies termination-insensitive noninterference. I also proved that
+\Surface satisfies type safety as well as the gradual guarantee and mechanized
+those results in Agda.
+
+In summary, my dissertation shows that it is possible to design a gradual IFC
+programming language that satisfies noninterference and the gradual guarantee
+while supporting type-based reasoning, by excluding the unknown label from
+run-time security labels and using security coercions to represent casts.
