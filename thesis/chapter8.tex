@@ -119,13 +119,24 @@ versions of the same program that vary in precision, to demonstrate
 that gradual typing is indeed able to enable programmer-controlled
 migration between static and dynamic IFC in real-world applications.
 \begin{itemize}
-\item[] \textbf{Smart contracts}~ We are going to implement a prototype in
-  \SurfacePlus that simulates the Parity Wallet smart contract attack and
-  demonstrate that \SurfacePlus is able to protect the integrity of important
-  state variables. We will also explore the prevention techniques against common
-  smart contract security threats such as confused deputy attacks and
-  re-entrancy attacks, by encoding the defense against the two types of attacks
-  as information-flow properties in \SurfacePlus
+\item[] \textbf{Smart contracts}~ To support interactions between both users and
+  smart contracts on the Ethereum blockchain~\parencite{Wood:aa}, the Solidity
+  programming language features two unique mechanisms, fallback functions and
+  delegate calls~\parencite{dannen2017solidity}. Unfortunately, security flaws
+  may arise from the sophisticated interaction between those two mechanism. For
+  example, the Parity Multisig wallet bug \parencite{parity-bug-deep} enables
+  the attacker to take full control of the victim's contract by setting its
+  ownership through carefully crafted function calls. Recently,
+  \textcite{yaoscif} study the security challenges of smart contracts through
+  the lens of IFC; they observe that in an open blockchain system, public
+  callable functions cannot ensure the privilege of the caller statically, so
+  dynamic checking is necessary in addition to static IFC. We are going to
+  implement a prototype in \SurfacePlus that simulates the Parity Wallet smart
+  contract attack and demonstrate that \SurfacePlus is able to protect the
+  integrity of important state variables. We will also explore the prevention
+  techniques against common smart contract security threats such as confused
+  deputy attacks and re-entrancy attacks, by encoding the defense against the
+  two types of attacks as information-flow properties in \SurfacePlus
   following~\textcite{cecchetti2021compositional} and~\textcite{yaoscif}.
 \item[] \textbf{E-voting}~ We plan to reimplement part of the Civitas e-voting
   system~\parencite{clarkson2008civitas} in \SurfacePlus. This case study will
@@ -191,7 +202,22 @@ experiments, we plan to display the results as bar charts where x-axis is
 different benchmark programs in different IFC languages and y-axis is their
 execution time.
 
+\clearpage
+
 \section{Conclusion}
 \label{sec:conclusion}
 
-TBA
+We presented the design of a gradual information-flow
+language \Surface that satisfies both noninterference and the gradual
+guarantee while maintaining the principle of type-based reasoning. The
+key to the design of \Surface is to walk back the decision in \GSLRef
+to include the unknown label \unk among the runtime security labels.
+So \Surface takes a more standard approach to gradually-typed IFC:
+the \unk label can be used in type annotations but not as the security
+level of a runtime value.  The \Surface language is defined by
+translation to a cast calculus \CC.  This intermediate language
+employs a coercion calculus to express the implicit conversions
+between more-or-less precise parts of the program. We proved that
+\Surface satisfies termination-insensitive noninterference.
+We proved that \Surface satisfies the gradual guarantee and
+mechanized the result in Agda.
