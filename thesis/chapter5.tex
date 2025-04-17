@@ -10,6 +10,12 @@ compilation from \Surface to \CC preserves types. Finally, in
 Section~\ref{sec:surface-type-safety}, I prove the type safety theorem for
 \Surface.
 
+The Agda mechanization is available at:
+\begin{center}
+  \url{https://github.com/Gradual-Typing/LambdaIFCStar}
+  %\quad at release \texttt{v2.0 (PLDI 2024)}
+\end{center}
+
 \section{Type Safety of \CC by Progress and Preservation}
 \label{sec:cc-type-safety}
 
@@ -154,7 +160,11 @@ We then prove the following lemma about the evaluation of \CC:
   \end{itemize}
 \end{proof}
 
-Finally, we prove type safety for \Surface:
+Finally, we prove type safety for \Surface. Recall that a \Surface program may
+evaluate to a constant, an address, or a function, or the program may diverge,
+or the program may get stuck (Figure~\ref{fig:eval}). The well-typedness of
+evaluation results is defined in Figure~\ref{fig:wt-result}. The evaluation
+result being well-typed means that a \Surface program never gets stuck:
 
 \begin{theorem}[Type Safety of \Surface]
   \label{thm:type-safety}
