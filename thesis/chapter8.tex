@@ -1,15 +1,46 @@
-\chapter{Conclusion and Future Work}
+\chapter{Future Work and Conclusion}
 \label{ch:conclusion}
 
-To conclude my dissertation, I discuss possible future work in
-Section~\ref{sec:future} and summarize the entire dissertation in
-Section~\ref{sec:conclusion}.
+To conclude my dissertation, I discuss future research directions of \Surface
+(and gradual IFC in general) in Section~\ref{sec:future} and summarize the
+entire dissertation in Section~\ref{sec:conclusion}.
 
 \section{Future Work}
 \label{sec:future}
 
-There are four main research questions about \Surface that I would like to
-answer.
+I plan to augment \Surface with numbers, strings, tuples, vectors, and recursive
+types. I also plan to support arbitrary security label lattices. Let us call the
+extended language \SurfacePlus. There are four main research questions about the
+theory and practice of \Surface / \SurfacePlus that I would like to answer:
+
+\paragraph{RQ1 (theory): How to mechanize the noninterference proof for \Surface?}
+In Chapter~\ref{ch:noninterference} of this dissertation, I present an on-paper
+noninterference proof for \Surface by simulation with its dynamic extreme. It
+remains an open question how to mechanize the noninterference proof for
+\Surface.
+
+\paragraph{RQ2 (theory and practice): Is it possible to make \Surface space efficient?} The
+space efficiency problem in gradual typing was first recognized and solved (in
+theory) for the gradually-typed lambda calculus (GTLC)
+by~\textcite{Herman:2006uq,Herman:2010aa} and (in practice)
+by~\textcite{Kuhlenschmidt:2019aa}. The space efficiency problem of gradual IFC
+remains to be investigated.
+
+\paragraph{RQ3 (practice): Is \SurfacePlus expressive?} It remains an open
+question whether \SurfacePlus, or gradual IFC in general, is expressive enough
+to support real-world use cases such as blockchain, e-voting, mobile app
+development, and digital education systems. It is also interesting to explore
+how the gradual transition between static and dynamic IFC in \SurfacePlus
+benefits the development and security enhancement of such applications.
+
+\paragraph{RQ4 (practice): Is it possible to implement \SurfacePlus with high
+  performance?} Grift~\parencite{Kuhlenschmidt:2019aa} is an efficient compiler
+for a gradually-typed language with structural types called GTLC+. However,
+currently there is no IFC support in Grift. It is worth investigating whether it
+is possible to implement \SurfacePlus in a similarly efficient manner.
+
+For the rest of this section, I will describe the research plan and the expected
+outcome for each research question in its own subsection.
 
 \subsection{RQ1: How to mechanize the noninterference proof for \Surface?}
 
@@ -40,36 +71,21 @@ that compilation from \Surface to \CC preserves types.
 
 \subsection{RQ2: Is it possible to make \Surface space efficient?}
 
-%% The following commented sentences are not introductory, so they
-%% don't belong here. They belongs in a place where we talk about tail
-%% recursion, but it looks like we don't talk anywhere else about tail
-%% recursion, so this should just be deleted. -Jeremy
-%%
-%% Representing casts as coercions does not automatically enable space efficiency.
-%% A na\"ive implementation of coercions breaks the tail call property, because two
-%% mutually recursive functions (where the recursive calls are in tail position)
-%% may cause the mediating casts to build up and takes up space proportional to the
-%% number of calls.
+\textcite{Siek:2015ab} design two coercion-based cast calculi for GTLC,
+$\lambda\textup{\textsf{C}}$ and $\lambda\textup{\textsf{S}}$, and establish a
+bisimulation between the two~. $\lambda\textup{\textsf{C}}$ is not space
+efficient, while $\lambda\textup{\textsf{S}}$ is space efficient. The key design
+that enables space efficiency for $\lambda\textup{\textsf{S}}$ is that the
+semantics compresses coercions into a compact form using the composition
+operator. However, the IFC cast calculus \CC does not compress security
+coercions, so the current semantics of \Surface is not space efficient.
 
-In prior work, we design two coercion-based cast calculi for GTLC,
-$\lambda\textup{\textsf{C}}$ and $\lambda\textup{\textsf{S}}$, and
-establish a bisimulation between the
-two~\parencite{Siek:2015ab}. $\lambda\textup{\textsf{C}}$ is not space
-efficient, while $\lambda\textup{\textsf{S}}$ is space efficient. The
-key design that enables space efficiency for
-$\lambda\textup{\textsf{S}}$ is that the semantics compresses
-coercions into a compact form using the composition operator. However,
-the IFC cast calculus \CC does not compress security coercions, so the
-current semantics of \Surface is not space efficient.
-
-We plan to develop a space-efficient semantics for \Surface, thereby
-presenting a positive answer to the research question. Inspired by
-$\lambda\textup{\textsf{S}}$, we will define a composition operator on
-security coercions and use it to define a space-efficient
-semantics. In addition, we plan to mechanize our space efficiency
-proof by extending the Agda model of
-\Surface. Our mechanization is
-expected to follow the one in our prior work about
+We plan to develop a space-efficient semantics for \Surface, thereby presenting
+a positive answer to the research question. Inspired by
+$\lambda\textup{\textsf{S}}$, we will define a composition operator on security
+coercions and use it to define a space-efficient semantics. In addition, we plan
+to mechanize our space efficiency proof by extending the Agda model of \Surface.
+Our mechanization is expected to follow the one in our prior work about
 GTLC~\parencite{siek_chen_2021}, by proving that the size of any cast is
 bounded.
 
@@ -88,13 +104,13 @@ for \SurfacePlus, namely GriftIFC, by modifying the compiler passes of Grift to
 incorporate security types and security coercions. First, we extend the
 typechecker of Grift to accept programs with security type annotations. For the
 cast insertion pass, we are going to implement the cast insertion algorithm in
-Section 6.2 of our prior work~\parencite{chen2024quest}. The algorithm inserts
-security coercions whenever there is insufficient static information to enforce
-IFC. After this step, the source program is translated to an intermediate
-representation where all casts are made explicit. For the cast lowering pass, we
-are going to modify Grift to expose runtime functions that implement the
-semantics of security coercions. We plan to use the same closure conversion and
-memory allocation / reclamation techniques as Grift.
+Figure~\ref{fig:compile} of Chapter~\ref{ch:compile} of this dissertation. The
+algorithm inserts security coercions whenever there is insufficient static
+information to enforce IFC. After this step, the source program is translated to
+an intermediate representation where all casts are made explicit. For the cast
+lowering pass, we are going to modify Grift to expose runtime functions that
+implement the semantics of security coercions. We plan to use the same closure
+conversion and memory allocation / reclamation techniques as Grift.
 
 \paragraph{Case studies} In the second step, we plan to demonstrate
 the expressiveness of \SurfacePlus via four case studies using
