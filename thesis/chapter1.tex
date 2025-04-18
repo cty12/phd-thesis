@@ -533,6 +533,7 @@ high-security literals, such as passwords, in program text.
 
 \section{Thesis Statement}
 
+{\color{NavyBlue} %%% new text
 The main enabling insight leads us to the thesis of this dissertation. My thesis
 is that a gradual IFC programming language is able to satisfy the gradual
 guarantee while supporting type-based reasoning, as long as there is no \unk
@@ -548,6 +549,7 @@ representation for casts:
       labels and using security coercions to represent casts.}
   }
 }
+}%%% end new text
 
 \section{Technical Contributions and Outline}
 
@@ -585,15 +587,15 @@ information flows that are statically ensured to be safe will never be checked
 again at runtime. On the contrary, the AGT mechanism for dynamic checking
 (called evidence) is attached to most nodes in the syntax tree.
 
+{\color{NavyBlue} %%% new text
 In summary, my dissertation makes the following technical contributions:
 
 \begin{enumerate}
-\item I identify the main cause of the tension between information flow security
+\item Identify the main cause of the tension between information flow security
   and the gradual guarantee in \GSLRef: the inclusion of \unk in the runtime
   security levels.
-\item I design two coercion calculi that serve as the runtime IFC monitor: a
-  coercion calculus for security labels and a coercion calculus for secure
-  values.
+\item Two coercion calculi that serve as the runtime IFC monitor: a coercion
+  calculus for security labels and a coercion calculus for secure values.
 \item A cast calculus \CC with IFC that defines the dynamic semantics of
   \Surface.
 \item The Agda formalization of \Surface and its cast calculus \CC.
@@ -672,5 +674,5 @@ cast calculus \CC, is available online in the following software repository:
 \begin{center}
   \large
   \url{https://github.com/Gradual-Typing/LambdaIFCStar}
-  %\quad at release \texttt{v2.0 (PLDI 2024)}
 \end{center}
+}%%% end new text

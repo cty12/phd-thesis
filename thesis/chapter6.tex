@@ -1,6 +1,7 @@
 \chapter{Gradual Guarantee of \Surface}
 \label{ch:gg}
 
+{\color{NavyBlue} %%% new text
 In this chapter, I prove that \Surface satisfies that gradual guarantee: if a
 \Surface program successfully evaluates to some output value, then a variant of
 the program in which the type annotations are less precise must also evaluate to
@@ -11,6 +12,12 @@ and be related by precision again. After that, in Section~\ref{sec:simulation},
 I prove a similar simulation lemma for the cast calculus \CC. Finally, in
 Section~\ref{sec:gg}, I prove the gradual guarantee for \Surface as a corollary
 of the simulation lemma for \CC.
+
+The Agda proofs cited in the section are available at:
+\begin{center}
+  \url{https://github.com/Gradual-Typing/LambdaIFCStar}
+\end{center}
+} %%% end new text
 
 \section{Simulation Between More and Less Precise Coercion Sequences}
 \label{sec:sim-cexpr}
@@ -575,6 +582,7 @@ Figure~\ref{fig:surface-precision}. We first prove that the compilation from
   The proof is mechanized in \texttt{/src/Compile/Precision/CompilePrecision.agda}.
 \end{proof}
 
+{\color{NavyBlue} %%% new text
 We prove the following lemma about \Surface that is a corollary of
 Lemma~\ref{lem:sim}:
 
@@ -625,3 +633,4 @@ Finally, we state and prove the gradual guarantee of \Surface as a corollary of 
   By inversion on the precision of \CC and by the canonical form of a value of $\Bool_{\low}$, $V = \ccconst{b_2}$.
   By the definition of \textit{eval}, $\mathit{eval}(M, b_1)=b_2$.
 \end{proof}
+} %%% end new text

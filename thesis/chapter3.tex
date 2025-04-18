@@ -1,8 +1,7 @@
 \chapter{The Definition of the Cast Calculus \CC}
 \label{ch:sem}
 
-%\todo[inline]{Add sentences about why using coercions as the cast representation}
-
+{\color{NavyBlue} %%% new text
 In this chapter, I first motivate using coercion as the cast representation in
 Section~\ref{sec:why-coercions}. I present a coercion calculus for security
 labels in Section~\ref{sec:coercion-calc-labels}. I show that coercion on
@@ -10,8 +9,8 @@ security labels can model both explicit and implicit information flows. I then
 define a second coercion calculus whose purpose is to cast a program value from
 one type to another type in Section~\ref{sec:coercion-calc-values}. I use this
 second coercion calculus to represent casts between security types in the
-intermediate language \CC. Finally, with both coercion calculi in hand, I am
-going to present the full definition of \CC in Section~\ref{sec:cc}.
+intermediate language \CC. Finally, with both coercion calculi in hand, I
+present the full definition of \CC in Section~\ref{sec:cc}.
 
 \section{Why Coercions?}
 \label{sec:why-coercions}
@@ -40,6 +39,8 @@ Second, the coercion representation benefits mechanization because it enables
 modular reasoning. The main simulation lemma (Lemma~\ref{lem:sim}) depends on
 the simulation results of coercion sequences and label expressions, which are
 stated as separate lemmas and reasoned independently in our Agda code.
+
+} %%% end new text
 
 \section{A Coercion Calculus for Security Labels}
 \label{sec:coercion-calc-labels}

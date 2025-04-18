@@ -1,6 +1,7 @@
 \chapter{Noninterference of \Surface}
 \label{ch:noninterference}
 
+{\color{NavyBlue} %%% new text
 In this chapter, I prove that \Surface satisfies noninterference: high-security
 input never flows into low-security output.
 
@@ -32,6 +33,8 @@ Third, in Section~\ref{sec:NI}, I prove the noninterference theorem of \Surface
 (Theorem~\ref{thm:NI-Surface}) as a corollary of the noninterference property of
 \CC.
 
+} %%% end new text
+
 Similar to \GSLRef and GLIO, the statements of noninterference for
 both \DynIFC and \CC are termination-insensitive.  Thus, I will only
 consider successful executions that produce values. In other words,
@@ -40,6 +43,11 @@ such as NSU errors in \DynIFC or cast errors in \CC.  As I explained
 in Section~\ref{sec:example1}, the programming language runtime can
 force the program to diverge whenever blame is detected, possibly
 sending a private error message to the software developer.
+
+The Agda proofs cited in the section are available at:
+\begin{center}
+  \url{https://github.com/Gradual-Typing/LambdaIFCStar}
+\end{center}
 
 \section{The Normalization of Coercions Checks Information Flow}
 \label{sec:norm-IF}
@@ -1070,6 +1078,7 @@ $(x{:}\Bool_{\high}) ; \emptyset ; \low ; \low \vdash M' \Leftarrow \Bool_{\low}
 By Lemma~\ref{lem:NI-CC} (Noninterference for \CC), $V_1 = V_2$.
 \end{proof}
 
+{\color{NavyBlue} %%% new text
 Finally, we prove noninterference for \Surface as a direct corollary of
 Lemma~\ref{lem:NI-Surface}. Noninterference says that for any high-security,
 sensitive user input $b_1, b_2$, the low-security, publicly visible output will
@@ -1088,3 +1097,5 @@ always be the same:
   $\reducemult{(\compile{M}) [ x := \ccconst{b_2}]}{\emptyset}{\low}{\ccconst{b_2'}}{\mu_2}$.
   Applying Lemma~\ref{lem:NI-Surface}, $b_1'=b_2'$.
 \end{proof}
+
+} %%% end new text

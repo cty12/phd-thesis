@@ -1,11 +1,13 @@
 \chapter{Compiling From \Surface to \CC}
 \label{ch:compile}
 
+{\color{NavyBlue} %%% new text
 In this section, I first present the coerce functions that produce coercions
 between security labels and types (Section~\ref{sec:coerce-func}). I then
 present the compilation function from \Surface to \CC
 (Section~\ref{sec:compile-func}), so that the semantics of \Surface can be given
 by \CC.
+} %%% end new text
 
 \section{Coerce Functions}
 \label{sec:coerce-func}
@@ -123,6 +125,8 @@ and
 \label{fig:compile}
 \end{figure}
 
+{\color{NavyBlue} %%% new text
+
 The compile function takes the form $\compile{M} = M'$, where $M$ is a \Surface
 program and $M'$ is a \CC term. We discuss interesting cases: function
 application, if-conditional, annotation, reference creation, dereferencing, and
@@ -185,3 +189,5 @@ using coercion $\bm{c_2}$, which casts from the type of $M'$ to the type of the
 memory cell. If at least one of the three security labels is \unk, the typing
 information is insufficient to justify the assignment. The compilation produces
 an \texttt{assign?} instead, whose semantics performs NSU checking at runtime.
+
+} %%% end new text

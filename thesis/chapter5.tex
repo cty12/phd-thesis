@@ -1,6 +1,7 @@
 \chapter{Type Safety of \Surface}
 \label{ch:type-safety}
 
+{\color{NavyBlue} %%% new text
 In this chapter, I prove that untrapped errors (or ``undefined behaviors'')
 never occur in \Surface. In other words, the evaluation of a \Surface program
 will never reach the \textit{stuck} case of \textit{eval}. In
@@ -10,11 +11,12 @@ compilation from \Surface to \CC preserves types. Finally, in
 Section~\ref{sec:surface-type-safety}, I prove the type safety theorem for
 \Surface.
 
-The Agda mechanization is available at:
+The Agda proofs cited in the section are available at:
 \begin{center}
   \url{https://github.com/Gradual-Typing/LambdaIFCStar}
-  %\quad at release \texttt{v2.0 (PLDI 2024)}
 \end{center}
+
+} %%% end new text
 
 \section{Type Safety of \CC by Progress and Preservation}
 \label{sec:cc-type-safety}
@@ -114,6 +116,8 @@ Chapter~\ref{ch:compile}) preserves types:
   \label{fig:wt-result}
 \end{figure}
 
+{\color{NavyBlue} %%% new text
+
 Leading to the type safety for \Surface, we first prove that multi-step
 reduction of \CC preserves types, which is a direct corollary of
 Theorem~\ref{thm:preservation}:
@@ -196,3 +200,5 @@ result being well-typed means that a \Surface program never gets stuck:
     \textit{WT-diverge}, $\vdash r : \Bool_{\low}$.
   \end{itemize}
 \end{proof}
+
+} %%% end new text
