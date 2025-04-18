@@ -490,7 +490,7 @@ walking back this usual design choice, I am going to present a gradual
 IFC programming language \Surface and prove that \Surface satisfies
 both noninterference and the gradual guarantee without any sacrifices.
 
-\section{Key Enabling Insight and Thesis Statement}
+\section{Key Enabling Insight}
 
 In \GSLRef{}, one can write a literal such as $\true_{\unk}$ in a program. At
 runtime, the literal becomes a value of unknown security level. I observe that
@@ -531,13 +531,17 @@ The choice of \low as the default label is because most literals (if not all) in
 real programs are low security. In fact, it is bad practice to embed
 high-security literals, such as passwords, in program text.
 
-The thesis of this dissertation is that a gradual IFC programming
-language is able to satisfy the gradual guarantee, as long as there is no \unk
-among runtime security labels:
+\section{Thesis Statement}
+
+The main enabling insight leads us to the thesis of this dissertation. My thesis
+is that a gradual IFC programming language is able to satisfy the gradual
+guarantee while supporting type-based reasoning, as long as there is no \unk
+among runtime security labels, and the language uses security coercions as the
+representation for casts:
 
 \vspace{20pt}
 \fbox{
-	\parbox{0.9\linewidth}{\textbf{\large \ul{My thesis:}\\ It is possible to
+	\parbox{0.9\linewidth}{\textbf{\Large \ul{My thesis:}\\ It is possible to
       design a gradual IFC programming language that satisfies both
       noninterference and the gradual guarantee while supporting type-based
       reasoning, by excluding the unknown label \unk from runtime security
@@ -660,8 +664,6 @@ The rest of this dissertation is organized as follows:
     about \Surface as well as gradual IFC in general (\S~\ref{sec:future}).
     After that, I summarize the entire dissertation (\S~\ref{sec:conclusion}).
 \end{itemize}
-
-\clearpage
 
 \section{Data Availability}
 
