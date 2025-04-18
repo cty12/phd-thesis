@@ -446,7 +446,11 @@ Chapter~\ref{ch:sem}. The evaluation function is of form $\mathit{eval}(M,b)=r$.
 It takes a well-typed \Surface term $(x{:}\Bool_{\high}) ; \low \vdash M : A$
 and a boolean constant $b \in \{\true, \false\}$ as input. The evaluation of $M$
 either produces the observation of a value $\mathit{obs}(V)$, or diverges, or
-gets stuck.
+gets stuck. We include runtime errors as a part of \textit{diverge}: in the
+context of IFC, one may not want blame to be observable in a production system
+as it could reveal information. We may force the program to diverge whenever
+blame is detected and send a private error message to the software developer for
+debugging purposes.
 
 \subsection{\Surface Programs}
 
