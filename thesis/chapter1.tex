@@ -539,12 +539,9 @@ among runtime security labels:
 \fbox{
 	\parbox{0.9\linewidth}{\textbf{\large \ul{My thesis:}\\ It is possible to
       design a gradual IFC programming language that satisfies both
-      noninterference and the gradual guarantee, by excluding the unknown label
-      \unk from runtime security labels.}
-    %% \textbf{\large \Surface satisfies both noninterference and the
-    %% gradual guarantee and enables type-based reasoning at the
-    %% same time, by excluding the statically unknown label \unk
-    %% from runtime security labels. }
+      noninterference and the gradual guarantee while supporting type-based
+      reasoning, by excluding the unknown label \unk from runtime security
+      labels and using security coercions to represent casts.}
   }
 }
 
@@ -587,7 +584,7 @@ again at runtime. On the contrary, the AGT mechanism for dynamic checking
 In summary, my dissertation makes the following technical contributions:
 
 \begin{enumerate}
-\item I identify the real cause of the tension between information flow security
+\item I identify the main cause of the tension between information flow security
   and the gradual guarantee in \GSLRef: the inclusion of \unk in the runtime
   security levels.
 \item I design two coercion calculi that serve as the runtime IFC monitor: a
@@ -613,19 +610,22 @@ The rest of this dissertation is organized as follows:
 
 \begin{itemize}
   \item In Chapter~\ref{ch:examples}, I introduce the gradual IFC language
-    \Surface. I demonstrate how \Surface works using examples. Finally, I define
-    the static and the dynamic extremes of \Surface.
-  \item In Chapter~\ref{ch:sem}, I formalize the operational semantics of
-    \Surface. I take a three-step approach. First, I define a coercion calculus
-    on security labels. Using this coercion calculus, I define security label
-    expressions. Label expressions serve as my model of the program counter (PC)
-    that restricts the security of memory locations where write operations are
-    allowed to happen. Next, I define a second coercion calculus, whose purpose
-    is to cast a program value from one type to another type. This coercion
-    calculus serves as the representation of casts in the intermediate language
-    \CC. Finally, I present the design of my intermediate language, the cast
-    calculus \CC. I define the syntax, the type system, and the operational
-    semantics for \CC.
+    \Surface. I first define security labels and types
+    (\S~\ref{sec:labels-and-types}). I then present the syntax
+    (\S~\ref{sec:surface-syntax}), type system (\S~\ref{sec:surface-typing}),
+    and semantics of \Surface (\S~\ref{sec:surface-semantics}). After that, I
+    demonstrate how \Surface works using examples (\S~\ref{sec:examples}).
+    Finally, I define the static and the dynamic extremes of \Surface
+    (\S~\ref{sec:embedding}). The dynamic extreme, called \DynIFC, is the more
+    interesting one, so I compare \DynIFC to other dynamic IFC languages in the
+    literature, such as \laminfo and LIO (\S~\ref{sec:compare-dynifc}).
+  \item In Chapter~\ref{ch:sem}, I present the design of a new IFC cast calculus
+    \CC. In \CC, we use security coercions as our cast representation; I first
+    explain the benefits of using coercions to model security checks
+    (\S~\ref{sec:why-coercions}). I then introduce two coercion calculi: one for
+    security labels (\S~\ref{sec:coercion-calc-labels}) and the other for the
+    values of \CC (\S~\ref{sec:coercion-calc-values}). Finally, I define the
+    syntax, type system, and semantics of \CC (\S~\ref{sec:cc}).
   \item In Chapter~\ref{ch:compile}, I define a type-preserving compilation from
     \Surface to \CC, so that the semantics of \Surface is given by \CC.
   \item In Chapter~\ref{ch:type-safety}, I prove type safety for \Surface. The
