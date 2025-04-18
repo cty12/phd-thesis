@@ -592,18 +592,11 @@ In summary, my dissertation makes the following technical contributions:
   values.
 \item A cast calculus \CC with IFC that defines the dynamic semantics of
   \Surface.
-\item The Agda formalization of \Surface and its cast calculus \CC. I mechanized
-  the proofs for (1) the gradual guarantee of \Surface, (2)
-  compilation from \Surface to \CC preserves types, and (3) type safety
-  of \CC by progress and preservation.
+\item The Agda formalization of \Surface and its cast calculus \CC.
 \item A proof of noninterference for \Surface through the simulation between its
   cast calculus \CC and a dynamic IFC programming language \DynIFC.
 \item \Surface, the first gradual IFC language with type-guided
   classification that satisfies the gradual guarantee.
-\item To explore the design space of gradual IFC, I also present \SurfaceOld, a
-  gradual IFC language design without type-guided classification but otherwise
-  similar to \Surface. From \SurfaceOld I derive \DynIFC, the dynamic extreme of
-  both \SurfaceOld and \Surface.
 \end{enumerate}
 
 The rest of this dissertation is organized as follows:
@@ -627,31 +620,55 @@ The rest of this dissertation is organized as follows:
     values of \CC (\S~\ref{sec:coercion-calc-values}). Finally, I define the
     syntax, type system, and semantics of \CC (\S~\ref{sec:cc}).
   \item In Chapter~\ref{ch:compile}, I define a type-preserving compilation from
-    \Surface to \CC, so that the semantics of \Surface is given by \CC.
-  \item In Chapter~\ref{ch:type-safety}, I prove type safety for \Surface. The
-    type safety proof is mechanized in the Agda proof assistant.
+    \Surface to its cast calculus \CC, so that the semantics of \Surface can be
+    given by \CC. I first present the coerce functions that produce coercions
+    between security labels and types (Section~\ref{sec:coerce-func}). I then
+    define the compilation function from \Surface to \CC
+    (Section~\ref{sec:compile-func}).
+  \item In Chapter~\ref{ch:type-safety}, I prove type safety for \Surface, so
+    untrapped errors (or ``undefined behaviors'') never occur in \Surface. The
+    proof follows a three-step approach. I first prove type safety for the cast
+    calculus \CC by progress and preservation (\S~\ref{sec:cc-type-safety}). I
+    then prove that compiling from \Surface to \CC preserves types
+    (\S~\ref{sec:compile-pres}). Finally, I prove type safety for \Surface,
+    which says that the evaluation result of a \Surface program is always
+    well-typed (\S~\ref{sec:surface-type-safety}).
   \item In Chapter~\ref{ch:gg}, I prove the gradual guarantee for \Surface. The
-    proof for gradual guarantee is also mechanized in Agda.
-  \item In Chapter~\ref{ch:noninterference}, I prove the noninterference theorem
-    for \Surface, by simulating its cast calculus \CC with the dynamic extreme
-    of \Surface, namely \DynIFC. The noninterference of \DynIFC can be proved
-    using the standard erasure technique.
-  %% \item In Chapter~\ref{ch:alt-design}, I explore the design space of gradual
-  %%   IFC by presenting \SurfaceOld and its cast calculus \CCOld. The semantics of
-  %%   \SurfaceOld differs from that of \Surface in that the former does not
-  %%   support type-guided classification.
-    %% The noninterference of \CCOld can be
-    %% proved using the standard erasure technique.
-    %% From \SurfaceOld I derive a
-    %% dynamic IFC language with labeled heap, namely \DynIFC. I prove the
-    %% noninterference for \DynIFC using the same technique. I mechanized both
-    %% noninterference proofs in Agda.
-  \item In Chapter~\ref{ch:conclusion}, I summarize this dissertation
-    and discuss future research directions in gradual IFC.
+    proof follows a three-step approach. I first prove a simulation lemma
+    between more and less precise security coercion sequences
+    (\S~\ref{sec:sim-cexpr}). I then prove another simulation lemma, between \CC
+    terms of different precision (\S~\ref{sec:simulation}). I also prove that
+    compiling from \Surface to \CC preserves precision. Finally, I prove the
+    gradual guarantee of \Surface by using the simulation lemma of \CC
+    (\S~\ref{sec:gg}).
+  \item In Chapter~\ref{ch:noninterference}, I prove noninterference for
+    \Surface by simulating its cast calculus with the dynamic extreme. I first
+    show that security coercions can check information flow, because coercion
+    sequences strongly normalize and the normalization is deterministic
+    (\S~\ref{sec:norm-IF}). I then present the proof of noninterference, which
+    again follows a three-step approach. In the first step, I prove
+    noninterference for the dynamic extreme, \DynIFC (\S~\ref{sec:NI-dynifc}).
+    This proof for \DynIFC follows the standard erasure technique. In the second
+    step, I prove a simulation lemma between \CC and \DynIFC, which says that a
+    \CC term always produces a value that is as secure as the one produced by
+    its related \DynIFC term (\S~\ref{sec:sim-cc-dynifc}). The noninterference
+    property of \CC follows directly from the simulation lemma and the
+    noninterference of \DynIFC. Finally, in the third step, I prove
+    noninterference for \Surface as a corollary of the noninterference result of
+    \CC (\S~\ref{sec:NI}).
+  \item In Chapter~\ref{ch:conclusion}, I discuss future research directions
+    about \Surface as well as gradual IFC in general (\S~\ref{sec:future}).
+    After that, I summarize the entire dissertation (\S~\ref{sec:conclusion}).
 \end{itemize}
 
-The Agda code of the mechanization of \Surface is available at:
+\clearpage
+
+\section{Data Availability}
+
+The accompanying Agda development, which contains the mechanization of \Surface and its
+cast calculus \CC, is available online in the following software repository:
 \begin{center}
+  \large
   \url{https://github.com/Gradual-Typing/LambdaIFCStar}
   %\quad at release \texttt{v2.0 (PLDI 2024)}
 \end{center}
