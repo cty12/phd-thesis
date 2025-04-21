@@ -3,8 +3,9 @@
 
 %%\todo[inline]{Add a scientific story about our experiments of different design choices}
 {\color{NavyBlue} %%%% new text
-I started the journey by retrofitting GLIO with vigilance. As discussed in
-Chapter~\ref{ch:intro}, there are two major differences between
+
+I started the journey by retrofitting GLIO with
+vigilance~\parencite{Gierczak:2024ab}. There are two major differences between
 \GSLRef~\parencite{Toro:2018aa}, which satisfies noninterference but not the
 gradual guarantee, and GLIO~\parencite{Amorim:2020aa}, which satisfies both.
 First, \GSLRef supports type-guided classification, but GLIO does not. Second,
@@ -12,10 +13,15 @@ First, \GSLRef supports type-guided classification, but GLIO does not. Second,
 GLIO does not. \textcite{Amorim:2020aa} identify the exclusion of type-guided
 classification (the first difference) as the reason that GLIO is able to
 reconcile noninterference and the gradual guarantee. Following
-\textcite{Amorim:2020aa}, I created a language called \SurfaceOld~\parencite{Chen:2022aa}.
-Like GLIO, \SurfaceOld leaves out type-guided classification and excludes \unk from runtime
-security labels. However, unlike GLIO, \SurfaceOld is vigilant: \SurfaceOld
-errors when the casts applied to a value are inconsistent while GLIO does not.
+\textcite{Amorim:2020aa}, I created a language called
+\SurfaceOld~\parencite{Chen:2022aa}. Like GLIO, \SurfaceOld leaves out
+type-guided classification and excludes \unk from runtime security labels.
+However, unlike GLIO, \SurfaceOld is vigilant: \SurfaceOld errors when the casts
+applied to a value are inconsistent while GLIO does not. In gradually typed
+languages, it is generally accepted that vigilance is a good property to have
+because it detects inconsistencies between type annotations in different parts
+of a program. These inconsistencies have to be fixed eventually in order for the
+program to be statically typed.
 
 During the development of \SurfaceOld, I realized that including \unk in runtime
 labels (the second difference) should instead be root cause of the tension
@@ -35,8 +41,10 @@ justifies the heap policy that the memory location to write is at least as
 secure as PC. As a result, each memory location must also be associated with a
 specific security label, so that the target of a cast for NSU is always
 specific. I came up with a new IFC language \Surface~\parencite{chen2024quest}.
-Like GLIO and unlike \GSLRef, \Surface satisfies the gradual guarantee.
-Like \GSLRef and unlike GLIO, \Surface supports type-guided classification.
+Like GLIO and unlike \GSLRef, \Surface satisfies the gradual guarantee. Like
+\GSLRef and unlike GLIO, \Surface supports both type-guided classification and
+vigilance, so \Surface enjoys the same type-based reasoning capabilities through
+free theorems as \GSLRef.
 
 The rest of this chapter is organized as follows. I first define the gradual IFC
 surface language \Surface, by presenting its syntax, type system, and semantics
