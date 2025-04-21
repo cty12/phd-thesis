@@ -12,17 +12,16 @@ First, \GSLRef supports type-guided classification, but GLIO does not. Second,
 GLIO does not. \textcite{Amorim:2020aa} identify the exclusion of type-guided
 classification (the first difference) as the reason that GLIO is able to
 reconcile noninterference and the gradual guarantee. Following
-\textcite{Amorim:2020aa}, I created a language called \SurfaceOld. Like GLIO,
-\SurfaceOld leaves out type-guided classification and excludes \unk from runtime
+\textcite{Amorim:2020aa}, I created a language called \SurfaceOld~\parencite{Chen:2022aa}.
+Like GLIO, \SurfaceOld leaves out type-guided classification and excludes \unk from runtime
 security labels. However, unlike GLIO, \SurfaceOld is vigilant: \SurfaceOld
-errors when the casts applied to a value are inconsistent while GLIO does not. I
-will present the design of \SurfaceOld in Chapter~\ref{ch:alt-design}.
+errors when the casts applied to a value are inconsistent while GLIO does not.
 
 During the development of \SurfaceOld, I realized that including \unk in runtime
 labels (the second difference) should instead be root cause of the tension
 between noninterference and the gradual guarantee. NSU checking can be expressed
 as casts. However long the chain of casts is, the source of the first cast and
-the target of the last cast must be specific, that is, \low or \high. The key of
+the target of the last cast must be specific (\low or \high). The key of
 designing a gradual security-typed language is to identify the source of an
 injection and the target of a projection. Injection happens when a value is cast
 from some specific security label to \unk. A constant must be associated a
@@ -35,9 +34,9 @@ security level of the memory location to write. If successful, the projection
 justifies the heap policy that the memory location to write is at least as
 secure as PC. As a result, each memory location must also be associated with a
 specific security label, so that the target of a cast for NSU is always
-specific. I came up with a new IFC language \Surface. Like GLIO and unlike
-\GSLRef, \Surface satisfies the gradual guarantee. Like \GSLRef and unlike GLIO,
-\Surface supports type-guided classification.
+specific. I came up with a new IFC language \Surface~\parencite{chen2024quest}.
+Like GLIO and unlike \GSLRef, \Surface satisfies the gradual guarantee.
+Like \GSLRef and unlike GLIO, \Surface supports type-guided classification.
 
 The rest of this chapter is organized as follows. I first define the gradual IFC
 surface language \Surface, by presenting its syntax, type system, and semantics
