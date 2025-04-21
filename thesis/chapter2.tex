@@ -724,17 +724,17 @@ following reduction shows the highlights of running this program with input
 \end{align*}}
 
 First, the $\lambda$ is bound to \texttt{flip} and the input \texttt{true} is
-bound to the \texttt{input} variable. We then inject the input, producing the
-value $(\cccast{\true_{\high}}{\inj{\high}})$. We call \texttt{flip} and the
+bound to the user input value. We then inject the input, producing the
+value $(\cccast{\true}{\inj{\high}})$. We call \texttt{flip} and the
 $\mathtt{if}\star$ branches on this injected boolean, evaluating the ``then''
-branch to the result $(\cccast{\false_{\low}}{\inj{\low}})$ and then, to protect
+branch to the result $(\cccast{\false}{\inj{\low}})$ and then, to protect
 against implicit flows, the $\mathtt{if}\star$ upgrades the result to $\high$ to
 match the runtime security level of the condition
-$(\cccast{\true_{\high}}{\inj{\high}})$, producing
-$(\cccast{\false_{\low}}{\up\seq\inj{\high}})$. The subtype coercion $\up$ sends
+$(\cccast{\true}{\inj{\high}})$, producing
+$(\cccast{\false}{\up\seq\inj{\high}})$. The subtype coercion $\up$ sends
 the security level of \texttt{false} from $\low$ to $\high$. The last step in
 the body of \texttt{flip} is to apply the coercion \texttt{\proj{\low}{p}} to
-the value $(\cccast{\false_{\low}}{\up\seq\inj{\high}})$, which errors because
+the value $(\cccast{\false}{\up\seq\inj{\high}})$, which errors because
 $\high$ is greater than $\low$.
 
 \subsection{Implicit Flow, NSU Checks, Unknown Security, and the Gradual Guarantee}
