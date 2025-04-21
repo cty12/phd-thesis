@@ -3,14 +3,13 @@
 
 \section{Security Is Important, and Programming Languages Can Help!}
 
-With the development of digital society, people are increasingly concerned about
-the confidentiality of their personal data and the integrity of their online
-assets. Increasingly relying on computing devices and the Internet in their
-daily life, people fear that sensitive personal information, such as social
-security numbers, medical records, bank account balances... may be revealed to
-malicious third parties. People also worry that their digital photo albums,
-signatures on online legal documents, spreadsheets in cloud storage... may be
-tampered and manipulated by potential attackers.
+Increasingly relying on computing devices and the Internet in their daily lives,
+people are more and more concerned about the confidentiality of their personal
+data and the integrity of their online assets. People fear that sensitive
+personal information, such as social security numbers, medical records, bank
+account balances, etc., may be revealed to malicious third parties. People also
+worry that their digital photo albums, signatures on online legal documents,
+spreadsheets in cloud storage, etc., may be manipulated by potential attackers.
 
 Indeed, the fears are justified by recent news events. In 2018, the Cambridge
 Analytica scandal hit the world headlines, where the data collected from 87
@@ -169,7 +168,7 @@ IFC in Section~\ref{sec:intro-static-ifc} and Section~\ref{sec:intro-dyn-ifc}
 respectively. We then review dynamic IFC enforcement with static pre-processing
 in Section~\ref{sec:intro-dyn-static}. Finally in
 Section~\ref{sec:intro-hybrid}, we briefly review the hybrid technique
-by~\textcite{Buiras:2015aa}, which offers the programmer control over the
+of~\textcite{Buiras:2015aa}, which offers the programmer control over the
 regions where IFC is enforced statically versus dynamically in a single program.
 
 \subsection{Static IFC in Programming Languages}
@@ -182,14 +181,20 @@ flow model using a lattice of security labels and
 \textcite{denning1977certification} describe a static analysis for information
 flow, with a proof that a certified program will not transmit confidential input
 to non-confidential output. They distinguish between two types of information
-flows: explicit flow and implicit flow. Consider the assignment \texttt{x := y +
-  z}, there are explicit flows from \key{y} to \key{x} and from \key{z} to
+flows: explicit flow and implicit flow. Consider the assignment
+\begin{verbatim}
+  x := y + z
+\end{verbatim}
+\noindent There are explicit flows from \key{y} to \key{x} and from \key{z} to
 \key{x}, because both \key{y} and \key{z} affect the value that \key{x} is
 assigned to. The certification checks whether the join (least upper bound) of
 the security of \key{y} and {z} is less than or equal to the security of
 \key{x}. Implicit flows, on the other hand, arise from the branching structure
-of a program. Consider the program \texttt{if x then y := y + 1 else ()}. An
-observer is able to learn whether \key{x} is true or false, by inspecting
+of a program. Consider the program
+\begin{verbatim}
+  if x then y := y + 1 else ()
+\end{verbatim}
+\noindent An observer is able to learn whether \key{x} is true or false, by inspecting
 whether \key{y} increments. To control the implicit flow, the certification
 checks whether the security of \key{x} is less than or equal to that of \key{y}.
 %% \todo[inline]{What are the main ideas for how this static analysis works? -Jeremy}
@@ -214,14 +219,14 @@ examples. Consider two IO functions: \texttt{private-input} and
 sensitive user input information; the latter takes a low-security boolean and
 publishes it into a publicly visible channel.
 
-\paragraph{Explicit flow} Consider the program with an illegal explicit flow
+\paragraph{Explicit flow} Consider the following program with an illegal explicit flow
 from private input to public output:
 \begin{verbatim}
   let input = private-input () in publish (¬ input)
 \end{verbatim}
-The program is rejected by the type checker, because \texttt{(¬ input)} is typed
+The program is rejected by the type checker because \texttt{(¬ input)} is typed
 at $\Bool_{\high}$ but \texttt{publish} expects its argument to be of
-$\Bool_{\low}$, $\high \npreccurlyeq \low$. As a result, the type system
+$\Bool_{\low}$ and $\high \npreccurlyeq \low$. As a result, the type system
 prevents information from leaking through explicit flow. On the other hand, the
 program
 \begin{verbatim}
