@@ -14,25 +14,32 @@
 \vspace{1.5\baselineskip}
 
 Ensuring the security and privacy of personal data typically involves tracking
-and checking the flow of information. Languages with gradual information-flow
-control combine static and dynamic techniques to prevent security leaks. Gradual
-languages should satisfy the gradual guarantee: programs that only differ in the
-precision of their type annotations should behave the same modulo cast errors.
-Unfortunately, Toro et al. [2018] identify a tension between the gradual
-guarantee and information security. They conjecture that it is not possible to
-enforce noninterference and satisfy the gradual guarantee.
+and checking the flow of information, which can be performed either statically
+using a type system or dynamically using runtime monitoring. The dynamic
+approach of information-flow control (IFC) requires less effort from the
+programmer while the static approach provides stronger guarantees and less
+runtime overhead. Languages with gradual IFC combine static and dynamic
+techniques to prevent security leaks, so the programmer can choose when it is
+appropriate to increase the precision of the type annotations and put in the
+effort to pass the static checks and when it is appropriate to reduce the
+precision of type annotations, deferring the enforcement to runtime. Gradual
+programming languages should satisfy the gradual guarantee: programs that only
+differ in the precision of their type annotations should behave the same modulo
+cast errors. Unfortunately, Toro et al. [2018] identify a tension between the
+gradual guarantee and information security. They conjecture that it is not
+possible to enforce noninterference and satisfy the gradual guarantee.
 
 In my PhD dissertation, I harmoniously combine static and dynamic enforcement of
-information-flow control (IFC) in one programming language, \Surface. \Surface
-satisfies both noninterference and the gradual guarantee at the same time
-without making any sacrifices. \Surface (1) enforces information flow security,
-(2) satisfies the gradual guarantee, (3) supports type-based reasoning, and (4)
-requires no extra static analysis prior to program execution. The key to the
-design of \Surface is to exclude the unknown label from runtime security labels.
-On the technical side, the semantics of \Surface is the first gradual
-information-flow control language to be specified using coercion calculi (a la
-Henglein). Casts in \Surface are represented by security coercions, which
-enforce the flow of information while satisfying the gradual guarantee.
+IFC in one programming language, \Surface, which satisfies both noninterference
+and the gradual guarantee at the same time without making any
+sacrifices. \Surface (1) enforces information flow security, (2) satisfies the
+gradual guarantee, (3) supports type-based reasoning, and (4) requires no extra
+static analysis prior to program execution. The key to the design of \Surface is
+to exclude the unknown label from runtime security labels. On the technical
+side, the semantics of \Surface is the first gradual information-flow control
+language to be specified using coercion calculi (a la Henglein). Casts
+in \Surface are represented by security coercions, which enforce the flow of
+information while satisfying the gradual guarantee.
 
 I mechanize the proofs of type safety and the gradual guarantee for \Surface in
 the Agda proof assistant. I prove noninterference for \Surface by simulating
