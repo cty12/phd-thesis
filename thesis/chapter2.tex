@@ -57,8 +57,9 @@ the static and dynamic extremes that it embeds.
 This section is organized as follows. I first define security labels and types
 in Section~\ref{sec:labels-and-types}. I then present the syntax of \Surface in
 Section~\ref{sec:surface-syntax} and the type system for \Surface in
-Section~\ref{sec:surface-typing}. Finally, I discuss the semantics of \Surface
-by defining \texttt{eval} in Section~\ref{sec:surface-semantics}.
+Section~\ref{sec:surface-typing}. I discuss the semantics of \Surface by
+defining \texttt{eval} in Section~\ref{sec:surface-semantics}. Finally, I define
+whole programs of \Surface in Section~\ref{sec:surface-programs}.
 
 \subsection{Security Labels and Types}
 \label{sec:labels-and-types}
@@ -452,6 +453,7 @@ blame is detected and send a private error message to the software developer for
 debugging purposes.
 
 \subsection{\Surface Programs}
+\label{sec:surface-programs}
 
 A \Surface program is defined as a \Surface term that takes a high-security
 boolean input and returns a low-security boolean output:
@@ -473,9 +475,9 @@ a gradual transition between static and dynamic IFC. In
 Section~\ref{sec:example2}, I review the counterexamples of
 \textcite{Toro:2018aa} and demonstrate that the tension between security and the
 gradual guarantee can be solved by removing \unk from the runtime security
-labels. Finally, I show that \Surface enables the same type-based reasoning
-capabilities through free theorems as \GSLRef, because \Surface is vigilant and
-performs type-guided classification.
+labels. Finally, in Section~\ref{sec:example3}, I show that \Surface enables the
+same type-based reasoning capabilities through free theorems as \GSLRef, because
+\Surface is vigilant and performs type-guided classification.
 
 \subsection{The Gradual Transition Between Static and Dynamic IFC in \Surface}
 \label{sec:example1}
@@ -1068,9 +1070,9 @@ In the dynamic extreme of \GSLRef, all security labels in types are unknown
 named \DynIFC, where every memory location is associated with a fixed security
 level. \DynIFC is particularly useful for the noninterference proof in
 Chapter~\ref{ch:noninterference}. The proof is by simulation between \CC and
-\DynIFC. I present the formal definition of \DynIFC in
-Section~\ref{sec:def-dynifc} and compare \DynIFC to dynamic IFC languages in the
-literature in Section~\ref{sec:compare-dynifc}.
+\DynIFC. In the rest of this section, I present the formal definition of \DynIFC
+in Section~\ref{sec:def-dynifc} and compare \DynIFC to dynamic IFC languages in
+the literature in Section~\ref{sec:compare-dynifc}.
 
 \subsection{Formal Definition of \DynIFC}
 \label{sec:def-dynifc}
