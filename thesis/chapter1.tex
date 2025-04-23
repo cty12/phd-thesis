@@ -307,26 +307,25 @@ the label against \low, $\high \npreccurlyeq \low$, so it results in a runtime
 error.
 
 \textcite{li2006encoding,LI20101974} study dynamic IFC for purely functional
-languages (no mutable states). They add dynamic checking of information flow
-control to Haskell, by utilizing existing language features, specifically arrows
-and typeclasses.
+languages. They add dynamic checking of information flow control to Haskell by
+utilizing arrows and typeclasses.
 
-\textcite{austin2009efficient} consider IFC for Javascript, a language with
+\textcite{austin2009efficient} consider IFC for JavaScript: a language with
 mutable references. They propose a dynamic approach called
 \textit{no-sensitive-upgrade} (NSU) checking, which guards against illegal
 implicit flows through the heap. During execution, the language runtime keeps
-track of a special security label, namely program counter. The program counter
-starts from low and is updated to high when the program branches on a
+track of a special security label called the ``program counter''. The program
+counter starts from low and is updated to high when the program branches on a
 high-security value. NSU terminates the execution whenever the program attempts
 to modify a low-security memory location under a high-security program counter.
 %% \todo[inline]{need to explain ``high-security context''}
 \textcite{austin2010permissive} study a sound yet more flexible enforcement
 strategy called \textit{permissive-upgrade}. Compared to NSU, permissive-upgrade
-allows more programs to run to completion.
-\textcite{austin2012multiple,Austin:2017uh} propose \textit{faceted values},
-another approach to dynamically handle implicit flows by simulating
-multi-execution in a single process, which, unlike no-sensitive-upgrade and
-permissive-upgrade, avoids conservative monitor failures.
+allows more programs to run to completion. \textcite{austin2012multiple} propose
+\textit{faceted values}, another approach to dynamically handle implicit flows
+by simulating multi-execution in a single process. Compared with
+no-sensitive-upgrade and permissive-upgrade, this faceted execution approach
+avoids conservative monitor failures~\parencite{Austin:2017uh}.
 
 \textcite{stefan2011flexible,stefan2012flexible,STEFAN:2017ta} design a Haskell
 library called LIO. LIO is implemented as a domain specific language (DSL)
