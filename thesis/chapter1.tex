@@ -34,11 +34,11 @@ size enterprises~\parencite{sirur2018we,freitas2018gdpr,harting2021impacts}.
     \langle \mathit{RECORD} \rangle ::= & {\color{green} \textbf{\{FirstName=}} \langle \mathit{ID} \rangle {\color{green} \textbf{;}} \\
                                & \enspace {\color{green} \textbf{LastName=}} \langle \mathit{ID} \rangle {\color{green} \textbf{;}} \\
                                & \enspace {\color{green} \textbf{SSN=}} \langle \mathit{SSN} \rangle {\color{green} \textbf{\}}} \\
-    \langle \mathit{ID} \rangle     ::= & w , w \in \{ {\color{green} \textbf{A}}, ... {\color{green} \textbf{Z}}, {\color{green} \textbf{a}}, ... {\color{green} \textbf{z}} \}^{+} \\
+    \langle \mathit{ID} \rangle     ::= & w , w \in \{ {\color{green} \textbf{A}}, ..., {\color{green} \textbf{Z}}, {\color{green} \textbf{a}}, ..., {\color{green} \textbf{z}} \}^{+} \\
     \langle \textit{SSN} \rangle    ::= & \langle D \rangle \langle D \rangle \langle D \rangle {\color{green} \textbf{-}}
                                  \langle D \rangle \langle D \rangle {\color{green} \textbf{-}}
                                  \langle D \rangle \langle D \rangle \langle D \rangle \langle D \rangle \\
-    \langle D \rangle      ::= & d , d \in \{ {\color{red} \textbf{0}}, ... {\color{red} \textbf{9}} \}
+    \langle D \rangle      ::= & d , d \in \{ {\color{red} \textbf{0}}, ..., {\color{red} \textbf{9}} \}
   \end{align*}
   \caption{The user input grammar for a hypothetical application}
   \label{fig:grammar}
@@ -47,39 +47,39 @@ size enterprises~\parencite{sirur2018we,freitas2018gdpr,harting2021impacts}.
 From a technical perspective, ensuring the security and privacy of personal data
 typically involves tracking and checking the flow of information. To ensure
 confidentiality, data must not flow to inappropriate destinations, so that
-sensitive personal information is not revealed; dually, to ensure integrity,
-data must not flow from inappropriate sources, so that valuable digital assets
+sensitive personal information is not revealed. Dually, to ensure integrity,
+data must not flow from inappropriate sources so that valuable digital assets
 are not corrupted~\cite{sabelfeld2003language,biba1977integrity}. In practice,
 such enforcement of the flow of information is often difficult to implement.
 Take confidentially for example, software applications accept user input where
 selected fields are sensitive, whose confidentiality is required during their
-entire life cycle including both parsing and data processing. To rule out
-information leaks, neither the sensitive fields, nor any data that depends on
-those fields, is allowed to be revealed to a low-privilege observer. Consider a
-web application that receives three fields from its user: (1) first name
-(2) last name (3) social security number, the grammar of which
-is defined in Figure~\ref{fig:grammar}, where terminals are divided into
-low-security and high-security. The digits $d$ for social security number, being
-confidential to users of the web application, are of high-security, so they are
-marked {\color{red} red}, while other terminals, such as the keys of the record
-and the strings $w$ for first name / last name, being safe to disclose, are all
-of low-security, marked in {\color{green} green}. Consider the following user
+entire life cycle, including both parsing and data processing. To rule out
+information leaks, neither the sensitive fields nor any data that depends on
+those fields can be revealed to a low-privilege observer. Consider a web
+application that receives three fields from its user: (1) first name, (2) last
+name, and (3) social security number, the grammar of which is defined in
+Figure~\ref{fig:grammar}, where terminals are divided into low-security and
+high-security. The digits $d$ for social security number, being confidential to
+users of the web application, are of high-security, so they are marked
+{\color{red} red}. Other terminals, such as the keys of the record and the
+strings $w$ for first name/last name, being safe to disclose, are of
+low-security, marked in {\color{green} green}. Consider the following user
 input:
 
 \begin{lstlisting}[numbers=none,xleftmargin=0.15\textwidth]
 {FirstName=Mad;LastName=Hatter;SSN=012-34-5678}
 \end{lstlisting}
 
-\noindent It is tedious for the developer of this imaginary web application to track the
-security level of data and check for information leaks. Software developers tend
-to focus more on functionality in order to meet the tight software release
-schedule and budget, thus software security usually only comes as an
+\noindent It is tedious for the developer of this imaginary web application to
+track the security level of data and then check for information leaks. Software
+developers tend to focus more on functionality in order to meet the tight
+software release schedule and budget, thus software security comes as an
 afterthought
 ~\parencite{assal2018security,sharma2017aspects,steward2012software}.
 Retrofitting security-related code often requires extensive modification to an
-existing code-base and it relies on the programmers' skills and experience to
-decide when and where such code should be placed. Furthermore, such modification
-is error-prone: one single missing check could undermine the security of the
+existing code-base and relies on the programmers' skills and experience to
+decide when and where such code should be placed. Furthermore, this modification
+is error-prone: a single missing check could undermine the security of the
 entire application.
 
 \begin{figure*}[tbp]
@@ -118,22 +118,22 @@ entire application.
 \end{figure*}
 
 Alternatively, the author of the web application could implement a parser for
-the grammar in Figure~\ref{fig:grammar} in a programming language that enforces
-information-flow security. Each terminal in the grammar would be labeled with a
-security level and the programming language, instead of some ad-hoc checks
-implemented by the programmer of the web application, would guarantee that the
-high-security information is only present in those parts of the output parse
-tree that are marked as high-security. For example, according to the grammar in
-Figure~\ref{fig:grammar}, the example user input string is parsed into the parse
-tree in Figure~\ref{fig:parsetree}, where the terminal nodes that represent
-digits of the social security number are of {\color{red} high-security}, while
-the terminals that compose the rest of the input string are of {\color{green}
-  low-security}. The confidentiality of SSN is guaranteed during data processing
-by the programming language itself. When the web application interacts with the
-outside world, such as making a foreign function interface (FFI) call or storing
-into a database, the conceptual language should encrypt whatever values labeled
-as high security before they are passed into a foreign routine. The programming
-language-based approach of information-flow
+the grammar in Figure~\ref{fig:grammar} with a programming language that
+enforces information-flow security. Each terminal in the grammar would be
+labeled with a security level, and the programming language, instead of ad-hoc
+checks implemented by the programmer of the web application, would guarantee
+that high-security information is only present in those parts of the output
+parse tree that are marked as high-security. For example, according to the
+grammar in Figure~\ref{fig:grammar}, the example user input string is parsed
+into the parse tree in Figure~\ref{fig:parsetree}, where the terminal nodes that
+represent digits of the social security number are of {\color{red}
+  high-security}, while the terminals that compose the rest of the input string
+are of {\color{green} low-security}. The confidentiality of SSN is guaranteed
+during data processing by the programming language itself. When the web
+application interacts with the outside world, such as making a foreign function
+interface (FFI) call or storing into a database, the conceptual language should
+encrypt whatever values labeled as high security before they are passed into a
+foreign routine. The programming language-based approach of information-flow
 security~\parencite{sabelfeld2003language} alleviates the security burden of
 software development, because it forms an abstraction over the flows of
 information and decouples security from the functionality of a software
