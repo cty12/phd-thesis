@@ -154,34 +154,36 @@ monitoring~\parencite{Askarov:2009vq,austin2009efficient,Devriese:2010up,stefan2
 or using static analysis to pre-compute information that facilitates runtime
 monitoring
 ~\parencite{le2005monitoring,le2007automaton,Chandra:2007we,Shroff:2007tg,russo2010dynamic,moore2011static}.
-The static and dynamic approaches have complementary strengths and weaknesses;
-the dynamic approach requires less effort from the programmer while the static
-approach provides stronger guarantees and less runtime overhead. The main
-theorem of an IFC system is \textit{noninterference}~\cite{goguen1982security}.
-Informally, noninterference states that, if the secretive user input varies, the
-public output of the program must stay the same.
+The static and dynamic approaches each have complementary strengths and
+weaknesses; the static approach provides stronger guarantees and less runtime
+overhead while the dynamic approach requires less effort from the programmer.
+The main theorem of an IFC system is
+\textit{noninterference}~\cite{goguen1982security}. Informally, noninterference
+states that, if the secretive user input varies, the public output of the
+program must stay the same.
 
 %% \todo[inline]{add another sentence that explicitly road-maps the rest of this
 %%   section. -Jeremy}
-We are going to review the literature about static and dynamic enforcement of
-IFC in Section~\ref{sec:intro-static-ifc} and Section~\ref{sec:intro-dyn-ifc}
-respectively. We then review dynamic IFC enforcement with static pre-processing
-in Section~\ref{sec:intro-dyn-static}. Finally in
-Section~\ref{sec:intro-hybrid}, we briefly review the hybrid technique
-of~\textcite{Buiras:2015aa}, which offers the programmer control over the
-regions where IFC is enforced statically versus dynamically in a single program.
+In Section~\ref{sec:intro-static-ifc} and Section~\ref{sec:intro-dyn-ifc}, we
+review the literature about static and dynamic enforcement of IFC . We then
+review dynamic IFC enforcement with static pre-processing in
+Section~\ref{sec:intro-dyn-static}. Finally in Section~\ref{sec:intro-hybrid},
+we briefly review the hybrid technique of~\textcite{Buiras:2015aa}, which offers
+the programmer control over the regions where IFC is enforced statically versus
+dynamically in a single program.
 
 \subsection{Static IFC in Programming Languages}
 \label{sec:intro-static-ifc}
 
-The interest in enforcing confidentiality and regulating the flow of information
-in a computer program arose with applications to defense in the 1970s
-\autocite{bell1976secure}. \textcite{denning1976lattice} builds an information
-flow model using a lattice of security labels and
-\textcite{denning1977certification} describe a static analysis for information
-flow, with a proof that a certified program will not transmit confidential input
-to non-confidential output. They distinguish between two types of information
-flows: explicit flow and implicit flow. Consider the assignment
+In the 1970s, the interest in enforcing confidentiality and regulating the flow
+of information in a computer program arose with applications in a military or
+government setting \autocite{bell1976secure,lester2016information}.
+\textcite{denning1976lattice} builds an information flow model using a lattice
+of security labels. \textcite{denning1977certification} describe a static
+analysis for information flow and prove that a certified program will not
+transmit confidential input to non-confidential output. They distinguish between
+two types of information flows: explicit flow and implicit flow. Consider the
+assignment
 \begin{verbatim}
   x := y + z
 \end{verbatim}
@@ -200,8 +202,8 @@ checks whether the security of \key{x} is less than or equal to that of \key{y}.
 %% \todo[inline]{What are the main ideas for how this static analysis works? -Jeremy}
 
 \textcite{volpano1996sound} further develop the static enforcement and propose a
-typed-based approach to IFC, by defining a type system for an imperative
-programming language and proving its security with a type soundness proof. The
+typed-based approach to IFC by defining a type system for an imperative
+programming language, then prove its security with a type soundness proof. The
 type system approach benefits IFC enforcement because it is compositional: the
 security of the entire program is determined from the security of its
 constituent components; secure components form a larger secure system as long as
@@ -219,16 +221,17 @@ examples. Consider two IO functions: \texttt{private-input} and
 sensitive user input information; the latter takes a low-security boolean and
 publishes it into a publicly visible channel.
 
-\paragraph{Explicit flow} Consider the following program with an illegal explicit flow
+\paragraph{Explicit flow.} Consider the following program with an illegal explicit flow
 from private input to public output:
 \begin{verbatim}
   let input = private-input () in publish (¬ input)
 \end{verbatim}
 The program is rejected by the type checker because \texttt{(¬ input)} is typed
-at $\Bool_{\high}$ but \texttt{publish} expects its argument to be of
-$\Bool_{\low}$ and $\high \npreccurlyeq \low$. As a result, the type system
-prevents information from leaking through explicit flow. On the other hand, the
-program
+at high security ($\Bool_{\high}$) but \texttt{publish} expects its argument to
+be of low security ($\Bool_{\low}$). High-security information must not flow
+into a low-security sink ($\high \npreccurlyeq \low$). As a result, the type
+system prevents information from leaking through explicit flow. On the other
+hand, the program
 \begin{verbatim}
   let input = private-input () in publish (¬ true)
 \end{verbatim}
@@ -236,11 +239,12 @@ is accepted by the type checker, because \texttt{(¬ true)} is typed at
 $\Bool_{\low}$, which can flow into \texttt{publish}. Indeed, the output remains
 constant regardless of user input, so no information leaks through the output.
 
-\paragraph{Implicit flow} Guarding against illegal implicit flows is
+\paragraph{Implicit flow.} Guarding against illegal implicit flows is
 more involved: the type system estimates the security of an if-conditional by
 joining the security of its branches with that of the branch condition (often
-referred to as type stamping). Consider the following program with an illegal
-information flow from private input to public output:
+referred to as stamping~\parencite{zdancewic2002programming}). Consider the
+following program with an illegal information flow from private input to public
+output:
 \begin{verbatim}
   let input = private-input () in
     publish (if input then false else true)
@@ -249,19 +253,19 @@ The input influences the output through the branching structure of the program:
 if input is true, the then-branch is taken and the output is false; if input is
 false, the else-branch is taken and the output is true. The branch condition is
 typed at $\Bool_{\high}$ and the branches are typed at $\Bool_{\low}$, so the
-entire \texttt{if} has type $\Bool_{\low \curlyvee \high} = \Bool_{\high}$.
-Again, \texttt{publish} expects $\Bool_{\low}$, so the program is rejected.
-Consequently, the type system guards against the information leak through
-implicit flow.
+entire \texttt{if} has type $\Bool_{\low \curlyvee \high} = \Bool_{\high}$
+because of stamping. Again, \texttt{publish} expects $\Bool_{\low}$, so the
+program is rejected. Consequently, the type system guards against the
+information leak through implicit flow.
 
 \textcite{heintze1998slam} and~\textcite{zdancewic2002programming} further
-develop the type system approach to IFC and add support for higher-order
+develop the type system approach to IFC by adding support for higher-order
 functions. Researchers also build IFC type systems for bytecode intermediate
 languages \autocite{barthe2005non}, for object-oriented languages
 \autocite{amtoft2006logic}, and for reactive programming languages
 \autocite{bohannon2009reactive}. Although the aforementioned languages are
 mostly theoretical, efforts have also been made to integrate information flow
-control into off-the-shelf programming languages, such as Jif for Java
+control into off-the-shelf programming languages such as Jif for Java
 \autocite{myers1999jflow} and Flow Caml for OCaml
 \autocite{pottier2002information, simonet2003flow}.
 
@@ -281,7 +285,7 @@ IFC can also be enforced dynamically using runtime monitoring. Values typically
 have security labels associated with them and the runtime monitor tracks those
 labels during program execution. In the illegal explicit flow example
 \begin{verbatim}
-  let input = private-input () in publish (¬ true)
+  let input = private-input () in publish (¬ input)
 \end{verbatim}
 the value of \texttt{input} is tagged with \high and so is its negation. When
 \texttt{publish} is called, the function checks whether the label on the
