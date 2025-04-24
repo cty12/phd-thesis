@@ -358,20 +358,19 @@ respectively), papers in this category do not aim at offering the programmer the
 \emph{control} over statically versus dynamically enforced regions in a single
 program.
 
-\textcite{le2005monitoring} explore a
-hybrid IFC monitor for sequential programs that combines runtime IFC with a
-static analysis that gathers information about the non-executed branches. This
-hybrid IFC accepts programs that are conservatively rejected by fully static
-IFC. They further show that it is possible to alter the behavior of executions
-that may be unsafe by resetting output values using the information from their
-hybrid analysis to reclaim confidentiality. \textcite{le2007automaton} extends
-this hybrid IFC approach to concurrent programs and prove noninterference for
-any execution. \textcite{Shroff:2007tg} build a runtime monitor augmented with a
-pre-computed fixed point of dependencies. Similar to
-\textcite{le2005monitoring}, they observe that this hybrid technique is less
-conservatively than a fully static system. They also show that their hybrid
-monitor is able to support user-defined policy, so that different policies can
-be applied to the same program.
+\textcite{le2005monitoring} explore a hybrid IFC monitor for sequential programs
+that combines runtime IFC with a static analysis that gathers information about
+the non-executed branches. This hybrid IFC accepts programs that are
+conservatively rejected by fully static IFC. They further show that it is
+possible to alter the behavior of executions that may be unsafe by resetting
+output values using the information from their hybrid analysis to reclaim
+confidentiality. \textcite{le2007automaton} extends this hybrid IFC approach to
+concurrent programs and prove noninterference for any execution.
+\textcite{Shroff:2007tg} build a runtime monitor augmented with a pre-computed
+fixed point of dependencies. Similar to \textcite{le2005monitoring}, they
+observe that this hybrid technique is less conservative than a fully-static
+system. They also show that their hybrid monitor is able to support user-defined
+policy, so that different policies can be applied to the same program.
 
 \textcite{Chandra:2007we} implement a hybrid monitor for the Java virtual
 machine. Their implementation add IFC annotations to a executable file using a
@@ -381,7 +380,7 @@ maintaining backward-compatibility with existing Java class files.
 
 \textcite{russo2010dynamic} study dynamic IFC in a flow-sensitive setting. They
 utilize a static analysis that detects variables in untaken branches whose
-security must be upgraded at runtime in order to prevent illegal implicit flows
+security must be upgraded at runtime to prevent illegal implicit flows
 through the heap. \textcite{moore2011static} improve the efficiency of the
 hybrid monitoring of \textcite{russo2010dynamic} by selectively tracking
 variables and incorporating memory abstractions.
@@ -390,18 +389,18 @@ variables and incorporating memory abstractions.
 \label{sec:intro-hybrid}
 
 Similar to gradual IFC and different from dynamic IFC with static
-pre-processing, Hybrid LIO (HLIO)~\cite{Buiras:2015aa} supports programmer's
+pre-processing, Hybrid LIO (HLIO)~\cite{Buiras:2015aa} supports the programmer's
 choice of static or dynamic IFC in different regions of a single program. By
 default, the checking is static, but a programmer can insert a \texttt{defer}
 clause to say that the security constraints should be checked at runtime. There
-are two major differences between HLIO and gradual IFC programming languages (we
-are going to discuss gradual IFC in the next section). In HLIO, the developer
-has to embed explicit \texttt{defer} into the program, while in a gradual
-language, the switch between static and dynamic is directed by types, with no
-\texttt{defer} or explicit casts needed. Moreover, there is no theorem about
-adding and removing \texttt{defer} in HLIO, while in a gradual language, the
-gradual guarantee theorem relates the runtime behavior of programs that differ
-only in the precision of their type annotations.
+are two major differences between HLIO and \textit{gradual} IFC programming
+languages (we are going to discuss gradual IFC in the next section). In HLIO,
+the developer has to embed explicit \texttt{defer} into the program, while in a
+gradual language, the switch between static and dynamic is directed by types,
+with no \texttt{defer} or explicit casts needed. Moreover, there is no theorem
+about adding and removing \texttt{defer} in HLIO, while in a gradual language,
+the gradual guarantee theorem relates the runtime behavior of programs that
+differ only in the precision of their type annotations.
 
 \section{The Tension Between Gradual Typing and Information-Flow Control}
 \label{sec:intro-gradual-ifc}
@@ -411,18 +410,18 @@ researchers have explored new ways to give programmers control over which parts
 of the program are secured statically versus dynamically, directed by
 \textit{type annotations}. In general, gradually typed languages support the
 seamless transition between static and dynamic enforcement through the
-\textit{precision} of type annotations. Gradual security is useful, because the
+\textit{precision} of type annotations. Gradual security is useful because the
 programmer is free to choose when it is appropriate to increase the precision of
-the type annotations and put in the effort to pass the static checks and when it
-is appropriate to reduce the precision of type annotations, deferring the
-enforcement to runtime.
+the type annotations and put in the effort to pass the static checks, versus
+when it is appropriate to reduce the precision of type annotations, thereby
+deferring the enforcement to runtime.
 
-The main challenge in the design of gradually typed languages is controlling the
+The main challenge in the design of gradually-typed languages is controlling the
 flow of values (and information) between the static and dynamic regions of code,
 which is accomplished using runtime casts. Typically source programs are
-compiled to an intermediate language, called a cast calculus, that includes
-explicit syntax for runtime casts. \textcite{Disney:2011fv} design a cast
-calculus with IFC for a pure lambda calculus and prove noninterference.
+compiled to an intermediate language (called a \textit{cast calculus}) that
+includes explicit syntax for runtime casts. \textcite{Disney:2011fv} design a
+cast calculus with IFC for a pure lambda calculus and prove noninterference.
 \textcite{Fennell:2013ab} design a cast calculus named ML-GS with mutable
 references using the no-sensitive-upgrade (NSU) runtime checks of
 \textcite{austin2009efficient}. \textcite{Fennell:2015aa} design a cast calculus
@@ -461,16 +460,16 @@ The main property of gradually typed languages is the \textit{gradual
 should not change the runtime behavior. Adding type annotations should also
 result in the same behavior except that it may introduce more trapped errors
 because those new type annotations may contain mistakes. Since the formulation
-of the gradual guarantee as a criterion for gradually typed
+of the gradual guarantee as a criterion for gradually-typed
 languages~\cite{Siek:2015ac}, researchers have explored the feasibility of
 satisfying both the gradual guarantee and noninterference.
 \textcite{Toro:2018aa} identify a tension between the gradual guarantee and
-security enforcement. They analyze the semantics of runtime casts through the
+security enforcement; they analyze the semantics of runtime casts through the
 lens of Abstracting Gradual Typing~\parencite{Garcia:2016aa} and propose a
 type-driven semantics for gradual security. However, \textcite{Toro:2018aa}
-discover counterexamples to the gradual guarantee in the \GSLRef language. They
-conjecture that it is not possible to enforce noninterference and satisfy the
-gradual guarantee at the same time.
+discover counterexamples to the gradual guarantee in the \GSLRef language.
+Therefore, they conjecture that it is not possible to enforce noninterference
+and satisfy the gradual guarantee at the same time.
 
 \textcite{Amorim:2020aa} conjecture one possible source of the tension: the
 \textit{type-guided classification} performed in
@@ -483,31 +482,32 @@ semantics.
 another possible source of the tension. As an alternative, they propose a hybrid
 approach that leverages static analysis ahead of program execution to determine
 the write effects in untaken branches. They study a simple imperative language
-with first-order stores and prove both noninterference and the gradual
-guarantee.
+with first-order stores (called \WHILEG) and prove both noninterference and the
+gradual guarantee for it.
 
-A ideal gradual IFC language (1) should enforce security by
-satisfying noninterference (2) should satisfy the gradual guarantee (3) should
-provide type-based reasoning through vigilance and type-guided classification
-(4) should not require addition static analyses prior to program execution.
-Contrary to the prior work, I am going to show in this dissertation that one
-does not have to give up on any of the four requirements to resolve the tension
-between noninterference and the gradual guarantee. Instead, the real source of
-the tension is that \GSLRef allows \unk as a \emph{runtime} security label. By
-walking back this usual design choice, I am going to present a gradual
-IFC programming language \Surface and prove that \Surface satisfies
-both noninterference and the gradual guarantee without any sacrifices.
+An ideal gradual IFC language (1) should enforce security by satisfying
+noninterference, (2) should satisfy the gradual guarantee, (3) should provide
+type-based reasoning through vigilance and type-guided classification, (4) and
+should not require addition static analyses prior to program execution. Contrary
+to the prior work, I will show in this dissertation that one does not have to
+give up on any of the four requirements to resolve the tension between
+noninterference and the gradual guarantee. Instead, the real source of the
+tension is that \GSLRef allows \unk as a \emph{runtime} security label. By
+walking back this usual design choice, I present a gradual IFC programming
+language \Surface and prove that \Surface satisfies both noninterference and the
+gradual guarantee without any sacrifices.
 
 \section{Key Enabling Insight}
 
 In \GSLRef{}, one can write a literal such as $\true_{\unk}$ in a program. At
 runtime, the literal becomes a value of unknown security level. I observe that
 allowing \unk as a \emph{runtime} security label is the main reason that \GSLRef
-violates the gradual guarantee. That design of \GSLRef was unusual because the
-unknown type $\unk$ is traditionally used in gradual languages to represent the
-lack of static information, not the lack of dynamic information. The design is
-also unusual when compared to dynamic systems for IFC, as those systems do not
-use an unknown security
+violates the gradual guarantee. That design choice of \GSLRef was unusual when
+compared to other gradually-typed languages, because the unknown type $\unk$ is
+traditionally used in gradual languages to represent the lack of static
+information, not the lack of dynamic information. The design is also unusual
+when compared to dynamic systems for IFC, as those systems do not use an unknown
+security
 level~\parencite{Askarov:2009vq,austin2009efficient,Devriese:2010up,stefan2011flexible,Austin:2017uh}.
 
 Based on this observation, I propose a new gradual, IFC language \Surface, which
@@ -542,11 +542,11 @@ high-security literals, such as passwords, in program text.
 \section{Thesis Statement}
 
 {\color{NavyBlue} %%% new text
-The main enabling insight leads us to the thesis of this dissertation. My thesis
-is that a gradual IFC programming language is able to satisfy the gradual
-guarantee while supporting type-based reasoning, as long as there is no \unk
-among runtime security labels, and the language uses security coercions as the
-representation for casts:
+
+A gradual IFC programming language is able to satisfy the gradual guarantee
+while supporting type-based reasoning, as long as there is no \unk among runtime
+security labels, and the language uses security coercions as the representation
+for casts:
 
 \vspace{20pt}
 \fbox{
@@ -579,17 +579,18 @@ a coercion in normal form models \textit{implicit flows}.
 
 Compared to prior work on gradual IFC languages, the \CC cast calculus supports
 an additional feature called \textit{blame tracking}~\parencite{Findler:2002eu}.
-Blame tracking is important because it enables modular runtime error messages,
-for example, they play an important role in production-quality languages such as
-Typed Racket~\parencite{Tobin-Hochstadt:2008lr,Preston-Tunnell-Wilson:2018aa}.
+Blame tracking is important because it enables modular runtime error messages.
+As an example of their practicality, they play an important role in
+production-quality languages such as Typed
+Racket~\parencite{Tobin-Hochstadt:2008lr,Preston-Tunnell-Wilson:2018aa}.
 
 Compared to prior work on gradual IFC based on abstracting gradual typing
-(AGT)~\parencite{Toro:2018aa}, my use of a cast calculus makes it clear where
-in the program there is runtime overhead from dynamic checking (the casts). This
-is important for the programmer to know because one may wish to avoid runtime
-overhead in hot regions of a programs. In the translation from \Surface to \CC,
-casts are only inserted where there is insufficient information during
-compilation to decide whether a security policy is enforced or not. In
+(AGT)~\parencite{Toro:2018aa}, my use of a cast calculus makes it clear where in
+the program there exists runtime overhead from dynamic checking (i.e., the
+casts). This is important for the programmer to know because one may wish to
+avoid runtime overhead in hot regions of a programs. In the translation from
+\Surface to \CC, casts are only inserted where there is insufficient information
+during compilation to decide whether or not a security policy is enforced. In
 particular, casts are not inserted in statically typed regions. In this way,
 information flows that are statically ensured to be safe will never be checked
 again at runtime. On the contrary, the AGT mechanism for dynamic checking
@@ -618,61 +619,60 @@ The rest of this dissertation is organized as follows:
 \begin{itemize}
   \item In Chapter~\ref{ch:examples}, I introduce the gradual IFC language
     \Surface. I first define security labels and types
-    (\S~\ref{sec:labels-and-types}). I then present the syntax
-    (\S~\ref{sec:surface-syntax}), type system (\S~\ref{sec:surface-typing}),
-    and semantics of \Surface (\S~\ref{sec:surface-semantics}). After that, I
-    demonstrate how \Surface works using examples (\S~\ref{sec:examples}).
+    (\S\ref{sec:labels-and-types}). I then present the syntax
+    (\S\ref{sec:surface-syntax}), type system (\S\ref{sec:surface-typing}),
+    and semantics of \Surface (\S\ref{sec:surface-semantics}). After that, I
+    demonstrate how \Surface works using examples (\S\ref{sec:examples}).
     Finally, I define the static and the dynamic extremes of \Surface
-    (\S~\ref{sec:embedding}). The dynamic extreme, called \DynIFC, is the more
+    (\S\ref{sec:embedding}). The dynamic extreme, called \DynIFC, is the more
     interesting one, so I compare \DynIFC to other dynamic IFC languages in the
-    literature, such as \laminfo and LIO (\S~\ref{sec:compare-dynifc}).
+    literature, such as \laminfo and LIO (\S\ref{sec:compare-dynifc}).
   \item In Chapter~\ref{ch:sem}, I present the design of a new IFC cast calculus
     \CC. In \CC, we use security coercions as our cast representation. I first
     explain the benefits of using coercions to model security checks
-    (\S~\ref{sec:why-coercions}). I then introduce two coercion calculi: one for
-    security labels (\S~\ref{sec:coercion-calc-labels}) and the other for the
-    values of \CC (\S~\ref{sec:coercion-calc-values}). Finally, I define the
-    syntax, type system, and semantics of \CC (\S~\ref{sec:cc}).
+    (\S\ref{sec:why-coercions}). I then introduce two coercion calculi: one for
+    security labels (\S\ref{sec:coercion-calc-labels}) and the other for the
+    values of \CC (\S\ref{sec:coercion-calc-values}). Finally, I define the
+    syntax, type system, and semantics of \CC (\S\ref{sec:cc}).
   \item In Chapter~\ref{ch:compile}, I define a type-preserving compilation from
     \Surface to its cast calculus \CC, so that the semantics of \Surface can be
     given by \CC. I first present the coerce functions that produce coercions
-    between security labels and types (Section~\ref{sec:coerce-func}). I then
+    between security labels and types (\S\ref{sec:coerce-func}). I then
     define the compilation function from \Surface to \CC
-    (Section~\ref{sec:compile-func}).
+    (\S\ref{sec:compile-func}).
   \item In Chapter~\ref{ch:type-safety}, I prove type safety for \Surface, so
     untrapped errors (or ``undefined behaviors'') never occur in \Surface. The
-    proof follows a three-step approach. I first prove type safety for the cast
-    calculus \CC by progress and preservation (\S~\ref{sec:cc-type-safety}). I
-    then prove that compiling from \Surface to \CC preserves types
-    (\S~\ref{sec:compile-pres}). Finally, I prove type safety for \Surface,
-    which says that the evaluation result of a \Surface program is always
-    well-typed (\S~\ref{sec:surface-type-safety}).
+    proof follows a three-step approach: first, I prove type safety for the cast
+    calculus \CC by progress and preservation (\S\ref{sec:cc-type-safety}).
+    Second, I prove that compiling from \Surface to \CC preserves types
+    (\S\ref{sec:compile-pres}). Finally, I prove type safety for \Surface, which
+    says that the evaluation result of a \Surface program is always well-typed
+    (\S\ref{sec:surface-type-safety}).
   \item In Chapter~\ref{ch:gg}, I prove the gradual guarantee for \Surface. The
-    proof follows a three-step approach. I first prove a simulation lemma
+    proof follows a three-step approach: first, I prove a simulation lemma
     between more and less precise security coercion sequences
-    (\S~\ref{sec:sim-cexpr}). I then prove another simulation lemma, between \CC
-    terms of different precision (\S~\ref{sec:simulation}). I also prove that
-    compiling from \Surface to \CC preserves precision. Finally, I prove the
-    gradual guarantee of \Surface by using the simulation lemma of \CC
-    (\S~\ref{sec:gg}).
+    (\S\ref{sec:sim-cexpr}). Second, I prove another simulation lemma, between
+    \CC terms of different precision (\S\ref{sec:simulation}). Finally, I prove
+    the gradual guarantee of \Surface by using the simulation lemma of \CC
+    (\S\ref{sec:gg}).
   \item In Chapter~\ref{ch:noninterference}, I prove noninterference for
     \Surface by simulating its cast calculus with the dynamic extreme. I first
     show that security coercions can check information flow, because coercion
     sequences strongly normalize and the normalization is deterministic
-    (\S~\ref{sec:norm-IF}). I then present the proof of noninterference, which
+    (\S\ref{sec:norm-IF}). I then present the proof of noninterference, which
     again follows a three-step approach. In the first step, I prove
-    noninterference for the dynamic extreme, \DynIFC (\S~\ref{sec:NI-dynifc}).
+    noninterference for the dynamic extreme, \DynIFC (\S\ref{sec:NI-dynifc}).
     This proof for \DynIFC follows the standard erasure technique. In the second
     step, I prove a simulation lemma between \CC and \DynIFC, which says that a
     \CC term always produces a value that is as secure as the one produced by
-    its related \DynIFC term (\S~\ref{sec:sim-cc-dynifc}). The noninterference
+    its related \DynIFC term (\S\ref{sec:sim-cc-dynifc}). The noninterference
     property of \CC follows directly from the simulation lemma and the
     noninterference of \DynIFC. Finally, in the third step, I prove
     noninterference for \Surface as a corollary of the noninterference result of
-    \CC (\S~\ref{sec:NI}).
+    \CC (\S\ref{sec:NI}).
   \item In Chapter~\ref{ch:conclusion}, I discuss future research directions
-    about \Surface as well as gradual IFC in general (\S~\ref{sec:future}).
-    After that, I summarize the entire dissertation (\S~\ref{sec:conclusion}).
+    about \Surface as well as gradual IFC in general (\S\ref{sec:future}). After
+    that, I summarize the entire dissertation (\S\ref{sec:conclusion}).
 \end{itemize}
 
 \section{Data Availability}
