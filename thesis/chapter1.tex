@@ -328,33 +328,33 @@ no-sensitive-upgrade and permissive-upgrade, this faceted execution approach
 avoids conservative monitor failures~\parencite{Austin:2017uh}.
 
 \textcite{stefan2011flexible,stefan2012flexible,STEFAN:2017ta} design a Haskell
-library called LIO. LIO is implemented as a domain specific language (DSL)
+library called LIO, which is implemented as a domain-specific language (DSL)
 embedded in Haskell. Even though Haskell itself is purely functional, it is
 worth noting that the LIO DSL does support mutable references (\key{LIORef}).
 Inspired by IFC operating systems
 ~\parencite{efstathopoulos2005labels,zeldovich2011making,krohn2007information,vandebogart2007labels},
-LIO makes two unique design choices: (1) coarse-grained labeling (2) a floating
-current label. LIO is ``coarse-grained'' in that not all values are labeled by
-default. A programmer need to use the \key{toLabeled} primitive to explicitly
-protect a value. In this way, a programmer may choose to label a value when it
-is necessary to impose flow control policies and omit the labels for
-security-insensitive parts of the program. In LIO, the ``current label'' serves
-as a security upper bound of all values. During program execution, the LIO
-runtime raises the current label to ``float'' above the security of all data
-read by the current computation. Similar to NSU, LIO performs dynamic checking
-on heap write operations and disallows writing to memory locations whose
-security is below the current label. Under the hood, LIO keeps track of the
-current label as a monad.
+LIO makes two unique design choices: (1) coarse-grained labeling and (2) a
+floating current label. LIO is ``coarse-grained'' in that not all values are
+labeled by default; a programmer need to use the \key{toLabeled} primitive to
+explicitly protect a value. Consequently, a programmer may choose to label a
+value when it is necessary to impose flow control policies and omit the labels
+for security-insensitive parts of the program. In LIO, the ``current label''
+serves as a security upper bound of all values. Under the hood, LIO keeps track
+of the current label as a monad. During program execution, the LIO runtime
+raises the current label to ``float'' above the security of all data read by the
+current computation. Similar to NSU, LIO performs dynamic checking on heap write
+operations and disallows writing to memory locations whose security is below the
+current label.
 
 \subsection{Dynamic IFC Augmented With Static Pre-processing}
 \label{sec:intro-dyn-static}
 
 Researchers have also explored facilitating runtime IFC monitors with static
-analyses prior to program execution, to achieves goals that are hard to
-accomplish by using dynamic IFC alone. It is worth noting that different from
+analyses prior to program execution to achieves goals that are hard to
+accomplish by using dynamic IFC alone. It is worth noting that, in contrast to
 user-controlled hybrid IFC and gradual IFC (which we are going to discuss in
 Section~\ref{sec:intro-hybrid} and Section~\ref{sec:intro-gradual-ifc}
-respectively), papers in this category do not aim at offering programmer the
+respectively), papers in this category do not aim at offering the programmer the
 \emph{control} over statically versus dynamically enforced regions in a single
 program.
 
