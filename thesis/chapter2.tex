@@ -4,59 +4,60 @@
 %%\todo[inline]{Add a scientific story about our experiments of different design choices}
 {\color{NavyBlue} %%%% new text
 
-I started the journey by retrofitting GLIO with
-vigilance~\parencite{Gierczak:2024ab}. There are two major differences between
-\GSLRef~\parencite{Toro:2018aa}, which satisfies noninterference but not the
-gradual guarantee, and GLIO~\parencite{Amorim:2020aa}, which satisfies both.
-First, \GSLRef supports type-guided classification, but GLIO does not. Second,
-\GSLRef includes the unknown security label \unk in runtime security labels, but
-GLIO does not. \textcite{Amorim:2020aa} identify the exclusion of type-guided
-classification (the first difference) as the reason that GLIO is able to
-reconcile noninterference and the gradual guarantee. Following
-\textcite{Amorim:2020aa}, I created a language called
-\SurfaceOld~\parencite{Chen:2022aa}. Like GLIO, \SurfaceOld leaves out
-type-guided classification and excludes \unk from runtime security labels.
-However, unlike GLIO, \SurfaceOld is vigilant: \SurfaceOld errors when the casts
-applied to a value are inconsistent while GLIO does not. In gradually typed
-languages, it is generally accepted that vigilance is a good property to have
-because it detects inconsistencies between type annotations in different parts
-of a program. These inconsistencies have to be fixed eventually in order for the
-program to be statically typed.
+I started the journey of designing the ideal gradual IFC language by
+retrofitting GLIO with vigilance~\parencite{Gierczak:2024ab}. There are two
+major differences between \GSLRef~\parencite{Toro:2018aa} and
+GLIO~\parencite{Amorim:2020aa}, where the former satisfies noninterference but
+not the gradual guarantee and the latter satisfies both. First, \GSLRef supports
+type-guided classification, but GLIO does not. Second, \GSLRef includes the
+unknown security label \unk in runtime security labels, but GLIO does not.
+\textcite{Amorim:2020aa} identify the exclusion of type-guided classification
+(the first difference) as the reason that GLIO is able to reconcile
+noninterference and the gradual guarantee. Following \textcite{Amorim:2020aa}, I
+created a language called \SurfaceOld~\parencite{Chen:2022aa}. Like GLIO,
+\SurfaceOld leaves out type-guided classification and excludes \unk from runtime
+security labels. However, unlike GLIO, \SurfaceOld is vigilant: \SurfaceOld
+errors when the casts applied to a value are inconsistent while GLIO does not.
+In gradually-typed languages, vigilance is a good property because it detects
+inconsistencies between type annotations in different parts of a program. These
+inconsistencies have to be fixed in order for the program to be statically
+typed.
 
 During the development of \SurfaceOld, I realized that including \unk in runtime
-labels (the second difference) should instead be root cause of the tension
+labels (the second difference) should instead be the root cause of the tension
 between noninterference and the gradual guarantee. NSU checking can be expressed
-as casts. However long the chain of casts is, the source of the first cast and
-the target of the last cast must be specific (\low or \high). The key of
-designing a gradual security-typed language is to identify the source of an
-injection and the target of a projection. Injection happens when a value is cast
-from some specific security label to \unk. A constant must be associated a
-specific security label, so that when the constant is injected, its label
-becomes the source of the injection. Implicit flow causes the program counter
-(PC) to be injected when branching on an injected branch condition. Projection,
-on the other hand, happens when an injected value is cast to a specific security
-label. NSU checking is a projection: the program counter (PC) is cast to the
-security level of the memory location to write. If successful, the projection
-justifies the heap policy that the memory location to write is at least as
-secure as PC. As a result, each memory location must also be associated with a
-specific security label, so that the target of a cast for NSU is always
-specific. I came up with a new IFC language \Surface~\parencite{chen2024quest}.
-Like GLIO and unlike \GSLRef, \Surface satisfies the gradual guarantee. Like
-\GSLRef and unlike GLIO, \Surface supports both type-guided classification and
-vigilance, so \Surface enjoys the same type-based reasoning capabilities through
-free theorems as \GSLRef.
+as a sequence of casts. The source of the first cast and the target of the last
+cast must be specific (\low or \high) no matter how long the sequence is.
+Consequently, the key to designing a gradual security-typed language is to
+identify the source of an injection and the target of a projection. Injection
+happens when a value is cast from some specific security label to \unk. A
+constant must be associated a specific security label so that when the constant
+is injected, its label becomes the source of the injection. Implicit flow causes
+the program counter (PC) to be injected when branching on an injected branch
+condition. Projection, on the other hand, happens when an injected value is cast
+to a specific security label. NSU checking is a projection: the program counter
+(PC) is cast to the security level of the memory location to write. If
+successful, the projection justifies the heap policy that the memory location to
+write is at least as secure as PC. As a result, each memory location must also
+be associated with a specific security label, so that the target of a cast for
+NSU is always specific. Therefore, I came up with a new IFC language
+\Surface~\parencite{chen2024quest}. Like GLIO and unlike \GSLRef, \Surface
+satisfies the gradual guarantee. Like \GSLRef and unlike GLIO, \Surface supports
+both vigilance and type-guided classification, so \Surface enjoys the same
+type-based reasoning capabilities through free theorems as \GSLRef.
 
 The rest of this chapter is organized as follows. I first define the gradual IFC
 surface language \Surface, by presenting its syntax, type system, and semantics
-in Section~\ref{sec:surface-def}. After that, I put \Surface into action in
-Section~\ref{sec:examples}. I present example programs to demonstrate how
+in \S\ref{sec:surface-def}. After that, I put \Surface into action in
+\S\ref{sec:examples}. I present example programs to demonstrate how
 \Surface enables a gradual and smooth transition between static and dynamic IFC,
 while supporting type-based reasoning and satisfying the gradual guarantee at
-the same time. Finally, in Section~\ref{sec:embedding}, I conclude the chapter
+the same time. Finally, in \S\ref{sec:embedding}, I conclude the chapter
 by discussing the static and the dynamic extremes of \Surface. The static
 extreme, \SSLRef, is a static IFC language. The dynamic extreme, \DynIFC is a
 dynamic IFC language. \Surface enables a continuum of IFC enforcement between
 the static and dynamic extremes that it embeds.
+
 }  %%%% end new text
 
 \section{The Gradual IFC Language \Surface}
@@ -449,15 +450,16 @@ M'$, which takes a well-typed \Surface term $M$ and returns a cast-calculus
 (\CC) term $M'$. I will define the $M \mid \mu \Downarrow N \mid \mu'$ operator,
 which evaluates a \CC term $M$ to a value or a blame, as well as the $M \mid \mu
 \Uparrow$ operator, which means the \CC term $M$ diverges, in
-Chapter~\ref{ch:sem}. The evaluation function is of form $\mathit{eval}(M,b)=r$.
-It takes a well-typed \Surface term $(x{:}\Bool_{\high}) ; \low \vdash M : A$
-and a boolean constant $b \in \{\true, \false\}$ as input. The evaluation of $M$
-either produces the observation of a value $\mathit{obs}(V)$, or diverges, or
-gets stuck. We treat runtime errors as a special case of \textit{diverge}. This
-is because in the context of IFC, one may not want blame information to be
-observable in a production system as it could reveal information. Instead, we
-may force the program to diverge whenever blame is detected and send a private
-error message to the software developer for debugging purposes.
+Chapter~\ref{ch:sem}. The evaluation function is of the form
+$\mathit{eval}(M,b)=r$. It takes a well-typed \Surface term $(x{:}\Bool_{\high})
+; \low \vdash M : A$ and a boolean constant $b \in \{\true, \false\}$ as input.
+The evaluation of $M$ either produces the observation of a value
+$\mathit{obs}(V)$, or diverges, or gets stuck. We treat runtime errors as a
+special case of \textit{diverge}. This is because in the context of IFC, one may
+not want blame information to be observable in a production system as it could
+reveal information. Instead, we may force the program to diverge whenever blame
+is detected and send a private error message to the software developer for
+debugging purposes.
 
 \subsection{\Surface Programs}
 \label{sec:surface-programs}
@@ -467,7 +469,7 @@ boolean input and returns a low-security boolean output:
 
 \begin{definition}[Whole programs of \Surface]
   \label{def:surface-program}
-  A \Surface program is a \Surface term which is well-typed at
+  A \Surface program is a \Surface term that is well-typed at
   $(x{:}\Bool_{\high});\low\vdash M : \Bool_{\low}$.
 \end{definition}
 
