@@ -2,15 +2,17 @@
 \label{ch:sem}
 
 {\color{NavyBlue} %%% new text
-In this chapter, I first motivate using coercion as the cast representation in
-Section~\ref{sec:why-coercions}. I present a coercion calculus for security
-labels in Section~\ref{sec:coercion-calc-labels}. I show that coercion on
-security labels can model both explicit and implicit information flows. I then
-define a second coercion calculus whose purpose is to cast a program value from
-one type to another type in Section~\ref{sec:coercion-calc-values}. I use this
-second coercion calculus to represent casts between security types in the
-intermediate language \CC. Finally, with both coercion calculi in hand, I
-present the full definition of \CC in Section~\ref{sec:cc}.
+
+In this chapter, I first describe the motivations of using coercion as the cast
+representation in Section~\ref{sec:why-coercions}. I then present a coercion
+calculus for security labels in Section~\ref{sec:coercion-calc-labels}. I show
+that coercion on security labels can model both explicit and implicit
+information flows. After that, I define a second coercion calculus whose purpose
+is to cast a program value from one type to another type in
+Section~\ref{sec:coercion-calc-values}. I use this second coercion calculus to
+represent casts between security types in the intermediate language \CC.
+Finally, with both coercion calculi in hand, I present the full definition of
+\CC in Section~\ref{sec:cc}.
 
 \section{Why Coercions?}
 \label{sec:why-coercions}

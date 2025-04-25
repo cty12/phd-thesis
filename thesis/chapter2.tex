@@ -457,7 +457,7 @@ The evaluation of $M$ either produces the observation of a value
 $\mathit{obs}(V)$, or diverges, or gets stuck. We treat runtime errors as a
 special case of \textit{diverge}. This is because in the context of IFC, one may
 not want blame information to be observable in a production system as it could
-reveal information. Instead, we may force the program to diverge whenever blame
+reveal information. Instead, we force the program to diverge whenever blame
 is detected and send a private error message to the software developer for
 debugging purposes.
 
@@ -1245,14 +1245,14 @@ program:
 \end{lstlisting}
 
 \noindent The \bluetext{more precise} program runs successfully. On line 3, the
-branch condition is injected to \unk, so an NSU check will happen during the
-assignment. On line 4, PC is promoted to high by the branch condition, and the
-program assigns to a high memory location, $\high \preccurlyeq \high$, so the
-NSU check is successful. On line 6, the program dereferences address \texttt{a},
-resulting in a high boolean that is the negation of the input.
+branch condition is injected, so NSU checking happens during assignment. On line
+4, PC is promoted to high by the branch condition. The program assigns to a high
+memory location, $\high \preccurlyeq \high$, so the NSU check is successful. On
+line 6, the program dereferences address \texttt{a}, resulting in a high boolean
+that is the negation of the input.
 
-If we change the annotation on reference creation, making the security of the
-memory location dynamically decided by PC:
+If we change the annotation on the reference creation (line 2) and make the
+security of the memory location decided by PC at runtime:
 
 \noindent
 \redtext{\small\textbf{(Less precise, more dynamic)}}
@@ -1267,12 +1267,14 @@ memory location dynamically decided by PC:
 
 \noindent The \redtext{less precise} program errors due to failed NSU. PC
 initially starts at low, so on line 2, a memory location of low security is
-created, storing \true. Similar to the more precise program, the branch
-condition is injected, so an NSU checking happens on line 4 to ensure that the
-security of the memory location assigning to is at least as high as that of PC.
-However, the program attempts to write to low memory under high PC, so the NSU
-check fails and signals a runtime error. The more precise program runs to
-completion but the less precise one errors, violating the gradual guarantee.
+created. The memory cell stores \texttt{true}. The branch condition is injected,
+so NSU checking happens on line 4 to ensure that the security of the memory
+location is at least as high as that of PC. The program attempts to write to low
+memory under high PC, so the NSU check fails and signals a runtime error. The
+more precise program runs to completion but the less precise one errors, which
+violates the gradual guarantee. This counterexample of the alternative design
+shows that the security of a memory location must be fixed in the syntax of
+reference creation, as opposed to being decided by PC.
 
 \subsubsection{Comparing \DynIFC to LIO}
 

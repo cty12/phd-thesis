@@ -2,16 +2,17 @@
 \label{ch:gg}
 
 {\color{NavyBlue} %%% new text
-In this chapter, I prove that \Surface satisfies that gradual guarantee: if a
-\Surface program successfully evaluates to some output value, then a variant of
-the program in which the type annotations are less precise must also evaluate to
-the same output value. In particular, in Section~\ref{sec:sim-cexpr}, I prove a
-simulation lemma between more and less precise coercion sequences: if the more
-precise side takes one step, the less precise side can take zero or more steps
-and be related by precision again. After that, in Section~\ref{sec:simulation},
-I prove a similar simulation lemma for the cast calculus \CC. Finally, in
-Section~\ref{sec:gg}, I prove the gradual guarantee for \Surface as a corollary
-of the simulation lemma for \CC.
+
+In this chapter, I prove that \Surface satisfies the gradual guarantee
+(Theorem~\ref{thm:gg}). The gradual guarantee says that if a \Surface program
+successfully evaluates to some value, then a variant of the program where the
+type annotations are less precise must also evaluate to the same value. In
+Section~\ref{sec:sim-cexpr}, I prove a simulation lemma between more and less
+precise coercion sequences: if the more precise side takes one step, the less
+precise side can take zero or more steps and be related by precision again.
+After that, in Section~\ref{sec:simulation}, I prove a similar simulation lemma
+for the cast calculus \CC. Finally, in Section~\ref{sec:gg}, I prove the gradual
+guarantee for \Surface as a corollary of the simulation lemma for \CC.
 
 The Agda proofs cited in the section are available at:
 \begin{center}
@@ -616,6 +617,7 @@ $$\precctx{\emptyset}{\emptyset}{\Sigma}{\Sigma'}{\low}{\low}{\low}{\low}\ccprec
 Finally, we state and prove the gradual guarantee of \Surface as a corollary of Lemma~\ref{lem:gg}:
 
 \begin{theorem}[Gradual guarantee of \Surface]
+  \label{thm:gg}
   Suppose $M$ and $M'$ are \Surface programs related by precision: $\vdash M \sqsubseteq M'$.
   If $\mathit{eval}(M', b_1)=b_2$, then $\mathit{eval}(M, b_1)=b_2$.
 \end{theorem}

@@ -498,6 +498,7 @@ language \Surface and prove that \Surface satisfies both noninterference and the
 gradual guarantee without any sacrifices.
 
 \section{Key Enabling Insight}
+\label{sec:insight}
 
 In \GSLRef{}, one can write a literal such as $\true_{\unk}$ in a program. At
 runtime, the literal becomes a value of unknown security level. I observe that
@@ -600,19 +601,27 @@ again at runtime. On the contrary, the AGT mechanism for dynamic checking
 In summary, my dissertation makes the following technical contributions:
 
 \begin{enumerate}
-\item Identify the main cause of the tension between information flow security
+\item I identify the main cause of the tension between information flow security
   and the gradual guarantee in \GSLRef: the inclusion of \unk in the runtime
-  security labels.
-\item Two coercion calculi that serve as the runtime IFC monitor: a coercion
-  calculus for security labels and a coercion calculus for secure values.
-\item A cast calculus \CC with IFC that defines the dynamic semantics of
-  \Surface.
-\item The Agda formalization of \Surface and its cast calculus \CC.
-\item A proof of noninterference for \Surface through the simulation between its
-  cast calculus \CC and a dynamic IFC programming language \DynIFC.
-\item \Surface, the first gradual IFC language with type-guided
-  classification that satisfies the gradual guarantee.
+  security labels. I discussed the key insights in \S\ref{sec:insight} and will
+  show example programs in \S\ref{sec:example2}.
+\item I define \Surface in \S\ref{sec:surface-def}. It is the first gradual IFC
+  language with type-based reasoning (\S\ref{sec:example3}) that satisfies both
+  noninterference and the gradual guarantee.
+\item I define two coercion calculi that serve as the runtime IFC monitor: a
+  coercion calculus for security labels (\S\ref{sec:coercion-calc-labels}) and a
+  coercion calculus for secure values (\S\ref{sec:coercion-calc-values}).
+\item I define a cast calculus \CC with IFC (\S\ref{sec:cc}) that defines the
+  dynamic semantics of \Surface.
+\item The Agda formalization of \Surface and its cast calculus \CC
+  (\S\ref{sec:code-repo}).
+\item I prove type safety for \Surface (Theorem~\ref{thm:type-safety}).
+\item I prove the gradual guarantee for \Surface (Theorem~\ref{thm:gg}).
+\item I prove noninterference for \Surface (Theorem~\ref{thm:NI-Surface}), by
+  simulating its cast calculus \CC with its dynamic extreme \DynIFC.
 \end{enumerate}
+
+\clearpage
 
 The rest of this dissertation is organized as follows:
 
@@ -676,6 +685,7 @@ The rest of this dissertation is organized as follows:
 \end{itemize}
 
 \section{Data Availability}
+\label{sec:code-repo}
 
 The accompanying Agda development, which contains the mechanization of \Surface and its
 cast calculus \CC, is available online in the following software repository:

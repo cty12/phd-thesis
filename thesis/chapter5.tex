@@ -2,12 +2,14 @@
 \label{ch:type-safety}
 
 {\color{NavyBlue} %%% new text
-In this chapter, I prove that untrapped errors (or ``undefined behaviors'')
-never occur in \Surface. In other words, the evaluation of a \Surface program
-will never reach the \textit{stuck} case of \textit{eval}. In
-Section~\ref{sec:cc-type-safety}, I prove that the cast calculus \CC satisfies
-progress and preservation. In Section~\ref{sec:compile-pres}, I prove that the
-compilation from \Surface to \CC preserves types. Finally, in
+
+In this chapter, I prove type safety for \Surface
+(Theorem~\ref{thm:type-safety}). Type safety says that untrapped errors (or
+``undefined behaviors'') never occur in \Surface. In other words, the evaluation
+of a \Surface program will never reach the \textit{stuck} case of \textit{eval}.
+In Section~\ref{sec:cc-type-safety}, I prove that the cast calculus \CC
+satisfies progress and preservation. In Section~\ref{sec:compile-pres}, I prove
+that the compilation from \Surface to \CC preserves types. Finally, in
 Section~\ref{sec:surface-type-safety}, I prove the type safety theorem for
 \Surface.
 
