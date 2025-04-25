@@ -170,27 +170,30 @@ We recursively compile the annotated term and insert one cast, which goes from
 the type of the term to the type annotation.
 
 \paragraph{Reference Creation.}
-If the current PC, $g'$, is specific, we can statically justify heap policy.
-(Recall that the security level of the newly created memory location is always
-specific, given the syntax of \texttt{ref} in \Surface.) As a result, we
-recursively compile sub-term $M$ and generate a static \texttt{ref}. We only
-need to insert one cast that goes from the type of $M$, $T_g$, to the type of
-the memory location, $T_{\ell}$. Otherwise if $g'$ is \unk, it is analogous
-except that we generate \texttt{ref?}, which incurs NSU checking that enforces
-heap policy at runtime.
+Recall that the security level of the newly-created memory location is given in
+the syntax of \texttt{ref} (always specific). If the current PC ($g'$) is
+specific, we can statically justify the heap-policy check. Consequently, we
+recursively compile the sub-term ($M$) and generate a static \texttt{ref}. We
+only need to insert one cast, which goes from $M$'s type ($T_g$) to the type of
+the memory location ($T_{\ell}$). Otherwise, if the current PC is \unk, we
+generate the dynamic version of reference creation (\texttt{ref?}), thus
+incurring an NSU check, which enforces the heap policy at runtime.
 
-\paragraph{Dereferencing.} We case on $g$, the label on the type of sub-term $M$.
-If $g$ is specific, we recursively compile $M$ and generate the static version
-of dereferencing without cast. If $g$ is \unk, we recursively compile $M$ and
-generate $\mathtt{!}{\star}$; furthermore, we cast both the label of the
-reference type and that of the referenced type to \unk.
+\paragraph{Dereferencing.}
+We case on $g$, which is the label on the type of the sub-term ($M$). If $g$ is
+specific, we recursively compile $M$ and generate the static version of
+dereference. On the other hand, if $g$ is unknown (\unk), we recursively compile
+$M$ and generate the dynamic version of dereference ($\mathtt{!}{\star}$). In
+addition, we cast the labels on both the reference type and the referenced type
+to \unk.
 
-\paragraph{Reference Assignment.} If $g$, $g'$, and $\hat{g}$ are
-specific, the check for heap policy can be statically justified. We recursively
-compile both $L$ and $M$ and generate a static \texttt{assign}. We cast $M'$
-using coercion $\bm{c_2}$, which casts from the type of $M'$ to the type of the
-memory cell. If at least one of the three security labels is \unk, the typing
-information is insufficient to justify the assignment. The compilation produces
-an \texttt{assign?} instead, whose semantics performs NSU checking at runtime.
+\paragraph{Reference Assignment.}
+If $g$, $g'$, and $\hat{g}$ are specific, the check for heap policy can be
+statically justified. We recursively compile both $L$ and $M$ and generate a
+static \texttt{assign}. We cast $M'$ using coercion $\bm{c_2}$, which casts from
+the type of $M'$ to the type of the memory cell. If at least one of the three
+security labels is \unk, the typing information is insufficient to justify the
+assignment. The compilation produces an \texttt{assign?} instead, whose
+semantics performs NSU checking at runtime.
 
 } %%% end new text
