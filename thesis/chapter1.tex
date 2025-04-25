@@ -31,14 +31,14 @@ size enterprises~\parencite{sirur2018we,freitas2018gdpr,harting2021impacts}.
 \begin{figure}[tbp]
   \small
   \begin{align*}
-    \langle \mathit{RECORD} \rangle ::= & {\color{green} \textbf{\{FirstName=}} \langle \mathit{ID} \rangle {\color{green} \textbf{;}} \\
-                               & \enspace {\color{green} \textbf{LastName=}} \langle \mathit{ID} \rangle {\color{green} \textbf{;}} \\
-                               & \enspace {\color{green} \textbf{SSN=}} \langle \mathit{SSN} \rangle {\color{green} \textbf{\}}} \\
-    \langle \mathit{ID} \rangle     ::= & w , w \in \{ {\color{green} \textbf{A}}, ..., {\color{green} \textbf{Z}}, {\color{green} \textbf{a}}, ..., {\color{green} \textbf{z}} \}^{+} \\
-    \langle \textit{SSN} \rangle    ::= & \langle D \rangle \langle D \rangle \langle D \rangle {\color{green} \textbf{-}}
-                                 \langle D \rangle \langle D \rangle {\color{green} \textbf{-}}
+    \langle \mathit{RECORD} \rangle ::= & {\color{green} \texttt{\{FirstName=}} \langle \mathit{ID} \rangle {\color{green} \texttt{;}} \\
+                               & \enspace {\color{green} \texttt{LastName=}} \langle \mathit{ID} \rangle {\color{green} \texttt{;}} \\
+                               & \enspace {\color{green} \texttt{SSN=}} \langle \mathit{SSN} \rangle {\color{green} \texttt{\}}} \\
+    \langle \mathit{ID} \rangle     ::= & w , w \in \{ {\color{green} \texttt{A}}, ..., {\color{green} \texttt{Z}}, {\color{green} \texttt{a}}, ..., {\color{green} \texttt{z}} \}^{+} \\
+    \langle \textit{SSN} \rangle    ::= & \langle D \rangle \langle D \rangle \langle D \rangle {\color{green} \texttt{-}}
+                                 \langle D \rangle \langle D \rangle {\color{green} \texttt{-}}
                                  \langle D \rangle \langle D \rangle \langle D \rangle \langle D \rangle \\
-    \langle D \rangle      ::= & d , d \in \{ {\color{red} \textbf{0}}, ..., {\color{red} \textbf{9}} \}
+    \langle D \rangle      ::= & d , d \in \{ {\color{red} \texttt{0}}, ..., {\color{red} \texttt{9}} \}
   \end{align*}
   \caption{The user input grammar for a hypothetical application}
   \label{fig:grammar}
@@ -89,24 +89,24 @@ entire application.
 \tikzset{level distance=50pt}
 \Tree [
   .{ $\langle \mathit{RECORD} \rangle$ }
-  {\color{green} \textbf{\{FirstName=}}
-  [ .{ $\langle \mathit{ID} \rangle$ } {\color{green} \textbf{Mad}} ]
-  {\color{green} \textbf{;LastName=}}
-  [ .{ $\langle \mathit{ID} \rangle$ } {\color{green} \textbf{Hatter}} ]
-  {\color{green} \textbf{;SSN=}}
+  {\color{green} \texttt{\{FirstName=}}
+  [ .{ $\langle \mathit{ID} \rangle$ } {\color{green} \texttt{Mad}} ]
+  {\color{green} \texttt{;LastName=}}
+  [ .{ $\langle \mathit{ID} \rangle$ } {\color{green} \texttt{Hatter}} ]
+  {\color{green} \texttt{;SSN=}}
                        [ .{ $\langle \mathit{SSN} \rangle$ }
-                         [ .{ $\langle D \rangle$ } {\color{red} \textbf{0}} ]
-                         [ .{ $\langle D \rangle$ } {\color{red} \textbf{1}} ]
-                         [ .{ $\langle D \rangle$ } {\color{red} \textbf{2}} ]
-                         {\color{green} \textbf{-}}
-                                [ .{ $\langle D \rangle$ } {\color{red} \textbf{3}} ]
-                                [ .{ $\langle D \rangle$ } {\color{red} \textbf{4}} ]
-                                {\color{green} \textbf{-}}
-                                       [ .{ $\langle D \rangle$ } {\color{red} \textbf{5}} ]
-                                       [ .{ $\langle D \rangle$ } {\color{red} \textbf{6}} ]
-                                       [ .{ $\langle D \rangle$ } {\color{red} \textbf{7}} ]
-                                       [ .{ $\langle D \rangle$ } {\color{red} \textbf{8}} ] ]
-                       {\color{green} \textbf{\}}}
+                         [ .{ $\langle D \rangle$ } {\color{red} \texttt{0}} ]
+                         [ .{ $\langle D \rangle$ } {\color{red} \texttt{1}} ]
+                         [ .{ $\langle D \rangle$ } {\color{red} \texttt{2}} ]
+                         {\color{green} \texttt{-}}
+                                [ .{ $\langle D \rangle$ } {\color{red} \texttt{3}} ]
+                                [ .{ $\langle D \rangle$ } {\color{red} \texttt{4}} ]
+                                {\color{green} \texttt{-}}
+                                       [ .{ $\langle D \rangle$ } {\color{red} \texttt{5}} ]
+                                       [ .{ $\langle D \rangle$ } {\color{red} \texttt{6}} ]
+                                       [ .{ $\langle D \rangle$ } {\color{red} \texttt{7}} ]
+                                       [ .{ $\langle D \rangle$ } {\color{red} \texttt{8}} ] ]
+                       {\color{green} \texttt{\}}}
 ]
 \end{tikzpicture}
 \caption{The parse tree generated from the example user input.
@@ -388,7 +388,7 @@ variables and incorporating memory abstractions.
 \subsection{Programmer-Controlled Hybrid IFC}
 \label{sec:intro-hybrid}
 
-Similar to gradual IFC and different from dynamic IFC with static
+Similar to gradual IFC but different from dynamic IFC with static
 pre-processing, Hybrid LIO (HLIO)~\cite{Buiras:2015aa} supports the programmer's
 choice of static or dynamic IFC in different regions of a single program. By
 default, the checking is static, but a programmer can insert a \texttt{defer}
