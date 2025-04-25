@@ -1,7 +1,7 @@
 \chapter{The Definition of the Cast Calculus \CC}
 \label{ch:sem}
 
-{\color{NavyBlue} %%% new text
+%{\color{NavyBlue} %%% new text
 
 In this chapter, I first describe the motivations of using coercion as the cast
 representation in Section~\ref{sec:why-coercions}. I then present a coercion
@@ -42,7 +42,7 @@ modular reasoning. The main simulation lemma (Lemma~\ref{lem:sim}) depends on
 the simulation results of coercion sequences and label expressions, which are
 stated as separate lemmas and reasoned independently in our Agda code.
 
-} %%% end new text
+%} %%% end new text
 
 \section{A Coercion Calculus for Security Labels}
 \label{sec:coercion-calc-labels}
@@ -696,7 +696,7 @@ In the premises for sub-terms that do not immediately
 reduce, such as the body of a $\lambda$ and the branches of an
 \texttt{if}, we universally quantify the security level (as in
 $\forall \ell$), which helps us prove that
-compilation preserves types (Theorem~\ref{thm:compile-pres}).  The heap
+compilation preserves types (Lemma~\ref{lem:compile-pres}).  The heap
 context $\Sigma$ is mostly standard: looking up
 $\Sigma(\hat{\ell}, n)$, where $n$ is the index in part of the heap
 with security $\hat{\ell}$, gives us a raw type. Each memory cell is
@@ -1004,7 +1004,8 @@ The PC of \texttt{prot} does not matter in this case either, because
 applying a coercion is pure and does not produce side effects.
 
 %\todo[inline]{Define a down arrow and an up arrow (diverge)}
-{\color{NavyBlue}  %%%% new text
+%{\color{NavyBlue}  %%%% new text
+
 Finally, we define the evaluation of \CC using the reduction relation:
 {\small
 \begin{align*}
@@ -1017,4 +1018,4 @@ or more steps from the initial heap $\mu_1$ and \low PC. It is the same for
 blame. Term $M$ diverges if for all $L$ that $M$ reduces to, $L$ can always take
 an additional step.
 
-} %%%% end new text
+%} %%%% end new text

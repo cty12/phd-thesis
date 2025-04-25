@@ -19,15 +19,19 @@ using a type system or dynamically using runtime monitoring. The dynamic
 approach of information-flow control (IFC) requires less effort from the
 programmer while the static approach provides stronger guarantees and less
 runtime overhead. Languages with gradual IFC combine static and dynamic
-techniques to prevent security leaks, so the programmer can choose when it is
-appropriate to increase the precision of the type annotations and put in the
-effort to pass the static checks and when it is appropriate to reduce the
-precision of type annotations, deferring the enforcement to runtime. Gradual
-programming languages should satisfy the gradual guarantee: programs that only
-differ in the precision of their type annotations should behave the same modulo
-cast errors. Unfortunately, Toro et al. [2018] identify a tension between the
-gradual guarantee and information security. They conjecture that it is not
-possible to enforce noninterference and satisfy the gradual guarantee.
+techniques to prevent security leaks, so the programmer is free to choose when
+it is appropriate to increase the precision of type annotations and put in the
+effort to pass the static checks, versus when it is appropriate to reduce the
+precision of type annotations, thereby deferring the enforcement to runtime.
+%% the programmer can choose when it is
+%% appropriate to increase the precision of the type annotations and put in the
+%% effort to pass the static checks and when it is appropriate to reduce the
+%% precision of type annotations, deferring the enforcement to runtime.
+Gradual programming languages should satisfy the gradual guarantee: programs
+that only differ in the precision of their type annotations should behave the
+same modulo cast errors. Unfortunately, Toro et al. [2018] identify a tension
+between the gradual guarantee and information security. They conjecture that it
+is not possible to enforce noninterference and satisfy the gradual guarantee.
 
 In my PhD dissertation, I harmoniously combine static and dynamic enforcement of
 IFC in one programming language, \Surface, which satisfies both noninterference

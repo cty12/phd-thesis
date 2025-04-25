@@ -1,7 +1,7 @@
 \chapter{Gradual Guarantee of \Surface}
 \label{ch:gg}
 
-{\color{NavyBlue} %%% new text
+%{\color{NavyBlue} %%% new text
 
 In this chapter, I prove that \Surface satisfies the gradual guarantee
 (Theorem~\ref{thm:gg}). The gradual guarantee says that if a \Surface program
@@ -18,7 +18,8 @@ The Agda proofs cited in the section are available at:
 \begin{center}
   \url{https://github.com/Gradual-Typing/LambdaIFCStar}
 \end{center}
-} %%% end new text
+
+%} %%% end new text
 
 \section{Simulation Between More and Less Precise Coercion Sequences}
 \label{sec:sim-cexpr}
@@ -583,8 +584,9 @@ Figure~\ref{fig:surface-precision}. We first prove that the compilation from
   The proof is mechanized in \texttt{/src/Compile/Precision/CompilePrecision.agda}.
 \end{proof}
 
-{\color{NavyBlue} %%% new text
-We prove the following lemma about \Surface that is a corollary of
+%{\color{NavyBlue} %%% new text
+
+We prove the following lemma about \Surface, which is a corollary of
 Lemma~\ref{lem:sim}:
 
 \begin{lemma}
@@ -625,7 +627,7 @@ Finally, we state and prove the gradual guarantee of \Surface as a corollary of 
   By Definition~\ref{def:surface-program} (whole programs of \Surface),
   $(x{:}\Bool_{\high});\low\vdash M : \Bool_{\low}$ and
   $(x{:}\Bool_{\high});\low\vdash M' : \Bool_{\low}$. By $\mathit{eval}(M',
-  b_1)=b_2$ and inversion on the definition of \textit{eval}
+  b_1)=b_2$ and the definition of \textit{eval}
   (Figure~\ref{fig:eval}), we have
   $\reducemult{(\compile{M'})[x:=\ccconst{b_1}]}{\emptyset}{\low}{\ccconst{b_2}}{\mu'}$
   for some $\mu'$. By Lemma~\ref{lem:gg}, there exists some $V, \mu$ such that
@@ -635,4 +637,5 @@ Finally, we state and prove the gradual guarantee of \Surface as a corollary of 
   By inversion on the precision of \CC and by the canonical form of a value of $\Bool_{\low}$, $V = \ccconst{b_2}$.
   By the definition of \textit{eval}, $\mathit{eval}(M, b_1)=b_2$.
 \end{proof}
-} %%% end new text
+
+%} %%% end new text

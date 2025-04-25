@@ -1,7 +1,7 @@
 \chapter{Noninterference of \Surface}
 \label{ch:noninterference}
 
-{\color{NavyBlue} %%% new text
+%{\color{NavyBlue} %%% new text
 
 
 In this chapter, I prove that \Surface satisfies noninterference
@@ -36,7 +36,7 @@ Third, in Section~\ref{sec:NI}, I prove the noninterference theorem of \Surface
 (Theorem~\ref{thm:NI-Surface}) as a corollary of the noninterference property of
 \CC.
 
-} %%% end new text
+%} %%% end new text
 
 Similar to \GSLRef and GLIO, the statements of noninterference for both \DynIFC
 and \CC are \textit{termination-insensitive}. Thus, I will only consider
@@ -1075,12 +1075,13 @@ If for any boolean inputs $b_1,b_2$
 then the resulting values $V_1 = V_2$.
 \end{lemma}
 \begin{proof}
-By Theorem~\ref{thm:compile-pres} (Compilation preserves types),
+By Lemma~\ref{lem:compile-pres} (compilation preserves types),
 $(x{:}\Bool_{\high}) ; \emptyset ; \low ; \low \vdash M' \Leftarrow \Bool_{\low}$.
-By Lemma~\ref{lem:NI-CC} (Noninterference for \CC), $V_1 = V_2$.
+By Lemma~\ref{lem:NI-CC} (noninterference for \CC), $V_1 = V_2$.
 \end{proof}
 
-{\color{NavyBlue} %%% new text
+%{\color{NavyBlue} %%% new text
+
 Finally, we prove noninterference for \Surface as a direct corollary of
 Lemma~\ref{lem:NI-Surface}. Noninterference says that for any high-security,
 sensitive user input $b_1, b_2$, the low-security, publicly visible output will
@@ -1100,4 +1101,4 @@ always be the same:
   Applying Lemma~\ref{lem:NI-Surface}, $b_1'=b_2'$.
 \end{proof}
 
-} %%% end new text
+%} %%% end new text

@@ -2,7 +2,7 @@
 \label{ch:examples}
 
 %%\todo[inline]{Add a scientific story about our experiments of different design choices}
-{\color{NavyBlue} %%%% new text
+%{\color{NavyBlue} %%%% new text
 
 I started the journey of designing the ideal gradual IFC language by
 retrofitting GLIO with vigilance~\parencite{Gierczak:2024ab}. There are two
@@ -58,7 +58,7 @@ extreme, \SSLRef, is a static IFC language. The dynamic extreme, \DynIFC is a
 dynamic IFC language. \Surface enables a continuum of IFC enforcement between
 the static and dynamic extremes that it embeds.
 
-}  %%%% end new text
+%}  %%%% end new text
 
 \section{The Gradual IFC Language \Surface}
 \label{sec:surface-def}
@@ -85,7 +85,7 @@ whole programs of \Surface in Section~\ref{sec:surface-programs}.
     \text{types}                    & A, B      & ::= & T_g \\
   \end{array}
   \]}
-  \caption{Security Labels and Types}
+  \caption{Security labels and types}
   \label{fig:labels-and-types}
 \end{figure}
 
@@ -412,7 +412,7 @@ because it is newly created and cannot leak information.
 \label{sec:surface-semantics}
 
 %% foreshadow the semantics by defining the eval function
-{\color{NavyBlue}   %%%% new text
+%{\color{NavyBlue}   %%%% new text
 
   \begin{figure}[tbp]
     \raggedright
@@ -473,7 +473,7 @@ boolean input and returns a low-security boolean output:
   $(x{:}\Bool_{\high});\low\vdash M : \Bool_{\low}$.
 \end{definition}
 
-}  %%%% end new text
+%}  %%%% end new text
 
 \section{\Surface in Action}
 \label{sec:examples}
@@ -1056,7 +1056,8 @@ projection.
 \section{The Static and Dynamic Extremes of \Surface}
 \label{sec:embedding}
 
-{\color{NavyBlue}  %%%% new text
+%{\color{NavyBlue}  %%%% new text
+
 Gradual IFC embeds both static and dynamic IFC. In this section, we discuss the
 static and dynamic extremes of \Surface. We compare them to existing static and
 dynamic IFC languages in the literature.
@@ -1288,4 +1289,4 @@ produced at runtime. In comparison, in \Surface the programmer has to specify
 this security level during development. Implementing first-class labels in
 \Surface is left for future work.
 
-}  %%%% end new text
+%}  %%%% end new text
