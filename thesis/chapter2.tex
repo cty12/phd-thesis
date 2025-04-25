@@ -36,11 +36,11 @@ is injected, its label becomes the source of the injection. Implicit flow causes
 the program counter (PC) to be injected when branching on an injected branch
 condition. Projection, on the other hand, happens when an injected value is cast
 to a specific security label. NSU checking is a projection: the program counter
-(PC) is cast to the security level of the memory location to write. If
-successful, the projection justifies the heap policy that the memory location to
-write is at least as secure as PC. As a result, each memory location must also
-be associated with a specific security label, so that the target of a cast for
-NSU is always specific. Therefore, I came up with a new IFC language
+(PC) is cast to the security level of the memory location to write to. If
+successful, the projection justifies the heap policy that the memory location is
+at least as secure as PC. As a result, each memory location must also be
+associated with a specific security label, so that the target of a cast for NSU
+is always specific. Therefore, I came up with a new IFC language
 \Surface~\parencite{chen2024quest}. Like GLIO and unlike \GSLRef, \Surface
 satisfies the gradual guarantee. Like \GSLRef and unlike GLIO, \Surface supports
 both vigilance and type-guided classification, so \Surface enjoys the same
@@ -1063,8 +1063,8 @@ dynamic IFC languages in the literature.
 
 \subsection{The Static Extreme of \Surface: \SSLRef}
 
-Same as \GSLRef, the static extreme of \Surface is \SSLRef. In \SSLRef all
-security labels in types are statically known, and the type system alone
+Same as \GSLRef, the static extreme of \Surface is \SSLRef. In \SSLRef, all
+security labels in all the types are statically known; the type system alone
 enforces IFC. The type system of \SSLRef is standard and similar to other static
 IFC languages in the literature, such as $\lambda_{\text{SEC}}$ of
 ~\textcite{zdancewic2002programming} and SLam of~\textcite{heintze1998slam}.
@@ -1074,14 +1074,14 @@ IFC languages in the literature, such as $\lambda_{\text{SEC}}$ of
 %\todo[inline]{Compare with LambdaINFO and LIO. Discuss the reason}
 %\todo[inline]{Discuss GG. Also discuss how to work around}
 %\todo[inline]{Foreshadow that the dynamic extreme is used by the noninterference proof}
-In the dynamic extreme of \GSLRef, all security labels in types are unknown
-(\unk). The dynamic extreme of \GSLRef is a dynamic IFC programming language
-named \DynIFC, where every memory location is associated with a fixed security
-level. \DynIFC is particularly useful for the noninterference proof in
-Chapter~\ref{ch:noninterference}. The proof is by simulation between \CC and
-\DynIFC. In the rest of this section, I present the formal definition of \DynIFC
-in \S\ref{sec:def-dynifc} and compare \DynIFC to dynamic IFC languages in the
-literature in \S\ref{sec:compare-dynifc}.
+In the dynamic extreme of \GSLRef, all security labels in all the types are
+unknown (\unk). The dynamic extreme of \GSLRef is a dynamic IFC programming
+language named \DynIFC. In the dynamic extreme, every memory location is
+associated with a fixed security level. \DynIFC is particularly useful for the
+noninterference proof in Chapter~\ref{ch:noninterference}. The proof is by
+simulation between \CC and \DynIFC. In the rest of this section, I present the
+formal definition of \DynIFC in \S\ref{sec:def-dynifc} and compare \DynIFC to
+dynamic IFC languages in the literature in \S\ref{sec:compare-dynifc}.
 
 \subsection{Formal Definition of \DynIFC}
 \label{sec:def-dynifc}
@@ -1175,25 +1175,26 @@ through the heap.
 \end{figure}
 
 When creating a reference, we need to perform a runtime NSU check $\pc
-\preccurlyeq \ell$ so that the memory location to write to is at least as
-secure as the current PC (rule \textit{ref?-ok}). If the NSU check
-fails, the program errors (rule \textit{ref?-fail}). In this way, programs such
-as
+\preccurlyeq \ell$ so that the memory location to write to is at least as secure
+as the current PC (rule \textit{ref?-ok}); if the NSU check fails, the program
+errors (rule \textit{ref?-fail}). In this way, programs such as
 \begin{lstlisting}[style=tt,numbers=none]
 publish (! (if (input ()) (ref low false) (ref low true)))
 \end{lstlisting}
 will error at runtime due to NSU, guarding against illegal implicit information
 flows through the heap. When assigning to a reference, we perform the NSU check
-$\pc \curlyvee \ell \preccurlyeq \hat{\ell}$ (rule \textit{assign?-ok}). If the
+$\pc \curlyvee \ell \preccurlyeq \hat{\ell}$ (rule \textit{assign?-ok}); if the
 NSU check fails, the program errors (rule \textit{assign?-fail}). The NSU check
 on assignment is equivalent to $\pc \preccurlyeq \hat{\ell}$ and $\ell
-\preccurlyeq \hat{\ell}$. The first part, $\pc \preccurlyeq \hat{\ell}$, is
+\preccurlyeq \hat{\ell}$. The first part ($\pc \preccurlyeq \hat{\ell}$) is
 similar to the check on reference creation; it ensures that the security level
 ($\hat{\ell}$) of the memory location to write to is at least as high as the
-current PC ($\pc$). The second part, $\ell \preccurlyeq \hat{\ell}$ , ensures
+current PC ($\pc$). The second part ($\ell \preccurlyeq \hat{\ell}$) ensures
 that the memory location is at least as secure as the address itself. The second
 part is necessary because choosing which address to assign to may leak
-information. Consider the example:
+information.
+%
+Consider the example:
 \begin{lstlisting}[style=tt]
 let a1 = ref low true  in
 let a2 = ref low false in
@@ -1204,8 +1205,8 @@ let a2 = ref low false in
 the check succeeds. To prevent leaking information through the heap, we must
 also check the security of the address against the security of the memory
 location. In the example above, the address is high because the branch condition
-is of high, and we are assigning to low memory, so the NSU check fails, thereby
-preventing the information leak.
+is of high, and we are assigning to low memory, so the NSU check fails. The
+program errors, thereby preventing information leak.
 
 \subsection{Comparing \DynIFC to \laminfo and LIO}
 \label{sec:compare-dynifc}
@@ -1225,13 +1226,13 @@ during reference creation and remains unchanged throughout program execution. In
 by the current PC during reference creation and can increase monotonically as
 the program runs.
 
-I choose the label in the syntax of reference creation as the security of the
-memory location so that \Surface satisfies the gradual guarantee. Imagine a
-gradual IFC language that supports \unk as an annotation on reference creation.
-The term \refexp{\colorbox{highlight}{\unk}}{\true}{} would create a new memory
-location whose security is decided at run time by the current PC and store the
-value \true~in it, similar to the semantics of \laminfo. Consider the following
-program:
+I choose to specify the security of the memory location in the syntax of
+reference creation so that \Surface satisfies the gradual guarantee. Imagine a
+gradual IFC language that supports \unk as an annotation on reference creation,
+in which the term \refexp{\colorbox{highlight}{\unk}}{\true}{} would create a
+new memory location whose security is decided at run time by the current PC and
+store the value \true~in it (analogous to the semantics of \laminfo). Consider
+the following program:
 
 \noindent
 \bluetext{\small\textbf{(More precise, more static)}}
@@ -1244,12 +1245,12 @@ program:
   ! a
 \end{lstlisting}
 
-\noindent The \bluetext{more precise} program runs successfully. On line 3, the
-branch condition is injected, so NSU checking happens during assignment. On line
-4, PC is promoted to high by the branch condition. The program assigns to a high
-memory location, $\high \preccurlyeq \high$, so the NSU check is successful. On
-line 6, the program dereferences address \texttt{a}, resulting in a high boolean
-that is the negation of the input.
+\noindent This program runs successfully. On line 3, the branch condition is
+injected, so NSU checking happens during assignment. On line 4, PC is promoted
+to high by the branch condition. The program assigns to a high memory location,
+$\high \preccurlyeq \high$, so the NSU check is successful. On line 6, the
+program dereferences address \texttt{a}, resulting in a high boolean that is the
+negation of the input.
 
 If we change the annotation on the reference creation (line 2) and make the
 security of the memory location decided by PC at runtime:
@@ -1273,17 +1274,18 @@ location is at least as high as that of PC. The program attempts to write to low
 memory under high PC, so the NSU check fails and signals a runtime error. The
 more precise program runs to completion but the less precise one errors, which
 violates the gradual guarantee. This counterexample of the alternative design
-shows that the security of a memory location must be fixed in the syntax of
-reference creation, as opposed to being decided by PC.
+shows that to satisfy the gradual guarantee, the security of a memory location
+must be specified in the syntax of reference creation, as opposed to being
+decided by PC.
 
 \subsubsection{Comparing \DynIFC to LIO}
 
 \DynIFC is similar to LIO in that the security of a memory location stays the
-same during assignment. However, LIO supports an additional feature: first-class
-labels, which \DynIFC (or \Surface in general) does not currently support. When
-creating a reference in LIO, the security of the new memory location may come
-from a security label value produced at runtime. In comparison, in \Surface the
-programmer has to specify this security level during development. Implementing
-first-class labels in \Surface is left for future work.
+same during program execution. However, compared with \DynIFC, LIO supports an
+additional feature: first-class labels. When creating a reference in LIO, the
+security of the new memory location may come from a security-label value that is
+produced at runtime. In comparison, in \Surface the programmer has to specify
+this security level during development. Implementing first-class labels in
+\Surface is left for future work.
 
 }  %%%% end new text
