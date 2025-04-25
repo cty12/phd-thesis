@@ -1012,7 +1012,9 @@ Finally, we define the evaluation of \CC using the reduction relation:
   M \mid \mu_1 \Downarrow \blame{\bl{p}} \mid \mu_2 &\triangleq \reducemult{M}{\mu_1}{\low}{\blame{\bl{p}}}{\mu_2} \\
   M \Uparrow \mid \mu_1 &\triangleq \forall L\,\mu_2.\reducemult{M}{\mu_1}{\low}{L}{\mu_2} \text{~and~} \exists N\,\mu_3.\,\reduce{L}{\mu}{\low}{N}{\mu_3}
 \end{align*}}
-\noindent $M$ is a term in \CC. $M$ evaluates to a value $V$ if it reduces to
-$V$ in zero or more steps from the initial heap $\mu_1$ and \low PC. $M$ diverges
-if for all $L$ that $M$ reduces to, $L$ can always take one more step.
-}  %%%% end new text
+\noindent The \CC term $M$ evaluates to a value $V$ if it reduces to $V$ in zero
+or more steps from the initial heap $\mu_1$ and \low PC. It is the same for
+blame. Term $M$ diverges if for all $L$ that $M$ reduces to, $L$ can always take
+an additional step.
+
+} %%%% end new text

@@ -128,44 +128,46 @@ and
 
 {\color{NavyBlue} %%% new text
 
-The compile function takes the form $\compile{M} = M'$, where $M$ is a \Surface
-program and $M'$ is a \CC term. We discuss interesting cases: function
-application, if-conditional, annotation, reference creation, dereferencing, and
-reference assignment.
+The compile function takes the form $\compile{M} = M'$, where the input $M$ is a
+\Surface program and the output $M'$ is a \CC term. We discuss six interesting
+cases: function application, if-conditional, annotation, reference creation,
+dereferencing, and reference assignment.
 
 \paragraph{Function Application.}
 If the top-level labels of the function type, $g$ and \gc, as well as the
-current PC ($g'$), are all specific, we know that the constraint about PC can be
-statically justified. As a result, we recursively compile $L$ and $M$ and
-generate \texttt{app}, the static variant of function application. We cast the
-compiled function $L$ using $\bm{c_1}$, which adjusts the PC. We also cast
-compiled $M$ using $\bm{c_2}$, which casts from $A'$, the type of $M$, to $A$,
-the domain type of the function. Otherwise, if at least one of the three
-security labels is \unk, we cannot justify the constraint on PC. In this case,
-we recursively compile $L$ and $M$ and generate $\mathtt{app}{\star}$. We insert
-three casts: $\bm{c_1}$ casts both top level labels of the function type, as
-well as the top level label of the co-domain type, to \unk, $\bm{c_2}$ casts
-from $A'$, the type of $M$, to the domain type $A$, and $\bm{d}$ casts the result of
-function application, from $T_{\unk}$ ($T$ is the raw type part of the co-domain
-type $B$) to the result of stamping the co-domain with the label of the function
-type.
+current PC ($g'$) are all specific, the constraint on PC during function
+application can be statically justified. As a result, we recursively compile $L$
+and $M$ and generate \texttt{app}, the static variant of function application.
+We cast compiled $L$ using $\bm{c_1}$, which adjusts the PC part of the function
+type. We then cast compiled $M$ using $\bm{c_2}$, which goes from $A'$ (the type
+of $M$) to $A$ (the domain type of the function). Otherwise, if at least one of
+the three security labels is \unk, we cannot statically justify the constraint
+on PC. Consequently, we recursively compile $L$ and $M$ and generate
+$\mathtt{app}{\star}$, the dynamic variant of function application. We insert
+three casts: the first cast ($\bm{c_1}$) converts both top-level labels of the
+function type and the top-level label of the co-domain type to \unk. The second
+cast ($\bm{c_2}$) goes from $A'$ (the type of $M$) to the domain type $A$. The
+third cast ($\bm{d}$) casts the result of the function application, from
+$T_{\unk}$ (where $T$ is the raw type part of the co-domain type) to the result
+of stamping the label of the function type onto the co-domain.
 
 \paragraph{If-conditional.}
-If the label of the branch condition, $g$, and the current PC, $g'$, are both
-specific, we recursively compile the condition as well as the two branches and
-generate a static \texttt{if}. We insert one cast into each of the compiled
-branches, from the type of that branch to the consistent join of the types of
-the two branches ($A \consisjoin B$). If at least one label is \unk, we
+If the label of the branch condition ($g$) and the current PC ($g'$) are both
+specific, we recursively compile the branch condition as well as the two
+branches and generate a static \texttt{if}. We insert one cast into each of the
+compiled branches, from the type of that branch to the consistent join of the
+types of the two branches ($A \consisjoin B$). If at least one label is \unk, we
 recursively compile the sub-terms and generate $\mathtt{if}{\star}$. In this
-case, we need to insert four additional casts: $d_1$ casts the branch condition
-from $\Bool_g$ to $\Bool_{\unk}$, $d_2$ and $d_3$ cast the branches to
-$T_{\unk}$ ($T$ is the raw type part of $A \consisjoin B$), and $d_4$ casts the
-type of the if-conditional to the result of stamping $g$ onto $A \consisjoin B$,
+case, we need to insert four additional casts: the first cast $d_1$ converts the
+branch condition from $\Bool_g$ to $\Bool_{\unk}$. The second ($d_2$) and the
+third cast ($d_3$) convert their respective branches into $T_{\unk}$ (where $T$
+is the raw type part of $A \consisjoin B$). The fourth cast ($d_4$) casts the
+type of the if-conditional to the result of stamping $g$ onto $A \consisjoin B$
 to preserve types.
 
 \paragraph{Annotation.}
-We recursively compile the annotated term and insert one cast, from the term's
-type to the annotation.
+We recursively compile the annotated term and insert one cast, which goes from
+the type of the term to the type annotation.
 
 \paragraph{Reference Creation.}
 If the current PC, $g'$, is specific, we can statically justify heap policy.
