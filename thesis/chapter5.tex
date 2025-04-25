@@ -47,8 +47,8 @@ We show that \CC is type safe by proving progress and preservation. Progress
 says that a well-typed \CC term does not get stuck. The term is either a value
 or a blame, which does not reduce, or the term takes one reduction step.
 
-\begin{theorem}[Progress]
-\label{thm:progress}
+\begin{lemma}[Progress of \CC]
+\label{lem:progress}
 Suppose \PC is well-typed: $\vdash \PC \Leftarrow g$,
 $M$ is well-typed:
 \[
@@ -58,38 +58,38 @@ and the heap $\mu$ is also well-typed: $\Sigma \vdash \mu$.
 Then either (1) $M$ is a value or (2) $M$ is a blame: {\normalfont $M = \blame{p}$}
 or (3) $M$ can take a reduction step:
 $\reduce{M}{\mu}{\PC}{N}{\mu'}$ for some $N$ and $\mu'$.
-\end{theorem}
+\end{lemma}
 \begin{proof}
   The proof is fully mechanized in \texttt{progress} of \texttt{/src/CC2/Progress.agda}.
 \end{proof}
 
 The operation semantics of \CC preserves types and the well-typedness of heap:
 
-\begin{theorem}[Preservation]
-\label{thm:preservation}
+\begin{lemma}[Preservation of \CC]
+\label{lem:preservation}
 Suppose \PC is well-typed:  $\vdash \PC \Leftarrow g$,
 $M$ is well-typed: $\emptyset ; \Sigma ; g ; |\PC| \vdash M \Leftarrow A$
 and the heap $\mu$ is also well-typed: $\Sigma \vdash \mu$.
 If $\reduce{M}{\mu}{\PC}{N}{\mu'}$, there exists $\Sigma'$ s.t
 $\Sigma' \supseteq \Sigma$, $\emptyset ; \Sigma' ; g ; |\PC| \vdash N \Leftarrow A$,
 and $\Sigma' \vdash \mu'$.
-\end{theorem}
+\end{lemma}
 \begin{proof}
   The proof is fully mechanized in \texttt{pres} of \texttt{/src/CC2/Preservation.agda}.
 \end{proof}
 
-\section{Compilation From \CC to \Surface Preserves Types}
+\section{Compilation From \Surface to \CC Preserves Types}
 \label{sec:compile-pres}
 
 We prove that the compilation from \Surface to \CC (defined in
 Chapter~\ref{ch:compile}) preserves types:
 
-\begin{theorem}[Compilation preserves types]
-  \label{thm:compile-pres}
+\begin{lemma}[Compilation from \Surface to \CC preserves types]
+  \label{lem:compile-pres}
   If $M$ is a well-typed \Surface term: $\Gamma ; g \vdash M : A$, then the
   compiled \CC term is also well-typed: $\Gamma ; \emptyset ; g ; \low \vdash
   \compile{M} \Leftarrow A$.
-\end{theorem}
+\end{lemma}
 \begin{proof}
   The proof is fully mechanized in
   \texttt{/src/Compile/CompilationPresTypes.agda}.
@@ -122,7 +122,7 @@ Chapter~\ref{ch:compile}) preserves types:
 
 Leading to the type safety for \Surface, we first prove that multi-step
 reduction of \CC preserves types, which is a direct corollary of
-Theorem~\ref{thm:preservation}:
+Lemma~\ref{lem:preservation}:
 
 \begin{lemma}
   \label{lem:pres-mult}
@@ -162,7 +162,7 @@ We then prove the following lemma about the evaluation of \CC:
     \item \textbf{Otherwise, $M$ gets stuck:}
       $\reducemult{M}{\mu}{\low}{L}{\mu'}$, $L$ is neither a value nor a blame,
       and there is no $N$ such that $\reduce{L}{\mu'}{\low}{N}{\mu''}$ for some
-      $\mu''$, but that contradicts Theorem~\ref{thm:progress} (progress of \CC).
+      $\mu''$, but that contradicts Lemma~\ref{lem:progress} (progress of \CC).
   \end{itemize}
 \end{proof}
 
@@ -172,7 +172,7 @@ or the program may get stuck (Figure~\ref{fig:eval}). The well-typedness of
 evaluation results is defined in Figure~\ref{fig:wt-result}. The evaluation
 result being well-typed means that a \Surface program never gets stuck:
 
-\begin{theorem}[Type Safety of \Surface]
+\begin{theorem}[Type safety of \Surface]
   \label{thm:type-safety}
   If $M$ is a \Surface program and
   % If $M$ is a well-typed \Surface program: $(x{:}\Bool_{\high});\low \vdash M : \Bool_{\low}$
@@ -182,7 +182,7 @@ result being well-typed means that a \Surface program never gets stuck:
 \begin{proof}
   By Definition~\ref{def:surface-program} (\Surface programs),
   $(x{:}\Bool_{\high});\low \vdash M : \Bool_{\low}$. By
-  Theorem~\ref{thm:compile-pres} (compilation preserves types) and
+  Lemma~\ref{lem:compile-pres} (compilation preserves types) and
   Lemma~\ref{lem:subst-pres} (substitution preserves types), $\emptyset ;
   \emptyset ; \low ; \low \vdash (\compile{M})[x:=\ccconst{b}] \Leftarrow
   \Bool_{\low}$. Empty heap is trivially well-typed: $\emptyset \vdash
