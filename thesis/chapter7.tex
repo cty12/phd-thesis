@@ -13,8 +13,8 @@ sequences to their normal form in Section~\ref{sec:norm-IF}. After that, I
 present the full proof of noninterference for \Surface. This proof employs a
 three-step approach.
 
-First, in Section~\ref{sec:NI-dynifc}, I prove that the dynamic extreme of
-\Surface, \DynIFC, satisfies noninterference. This proof is a straightforward
+First, in Section~\ref{sec:NI-dynifc}, I prove that \DynIFC (the dynamic extreme
+of \Surface) satisfies noninterference. This proof is a straightforward
 adaptation of the noninterference proof from \textcite{Chen:2022aa}. The proof
 (Lemma~\ref{lem:NI-old}) uses a standard erasure-based
 approach~\parencite{LI20101974, stefan2011flexible, stefan2012flexible,
@@ -22,15 +22,15 @@ approach~\parencite{LI20101974, stefan2011flexible, stefan2012flexible,
 erased to an opaque value.
 
 Second, in Section~\ref{sec:sim-cc-dynifc}, I prove a simulation lemma between
-\CC and \DynIFC (Lemma~\ref{lem:sim-leq}). The main intuition of the simulation
-relation (Figure~\ref{fig:sim-rel-1} and~\ref{fig:sim-rel-2}) is that a \CC term
-always produces a value that is as secure as the one produced by its related
-\DynIFC term. I translate \CC terms to \DynIFC by (1) getting rid of all the
-casts and (2) converting static heap enforcement (\texttt{ref} and
-\texttt{assign}) to dynamic enforcement (NSU) (Figure~\ref{fig:cast-erase}). The
-noninterference property of \CC (Lemma~\ref{lem:NI-CC}) follows directly from
-the multi-step simulation lemma (Lemma~\ref{lem:sim-mult}) and the
-noninterference result of \DynIFC (Lemma~\ref{lem:NI-old}).
+\CC and \DynIFC (Lemma~\ref{lem:sim-leq}). The simulation relation is defined in
+Figures~\ref{fig:sim-rel-1} and~\ref{fig:sim-rel-2}; the intuition is that a \CC
+term always produces a value that is as secure as the one produced by its
+related \DynIFC term. I translate \CC terms to \DynIFC by (1) getting rid of all
+the casts and (2) converting static heap enforcement (\texttt{ref} and
+\texttt{assign}) to dynamic enforcement (NSU). The translation is defined in
+Figure~\ref{fig:cast-erase}. The noninterference property of \CC
+(Lemma~\ref{lem:NI-CC}) follows directly from the multi-step simulation lemma
+(Lemma~\ref{lem:sim-mult}) and the noninterference result of \DynIFC.
 
 Third, in Section~\ref{sec:NI}, I prove the noninterference theorem of \Surface
 (Theorem~\ref{thm:NI-Surface}) as a corollary of the noninterference property of
@@ -38,14 +38,13 @@ Third, in Section~\ref{sec:NI}, I prove the noninterference theorem of \Surface
 
 } %%% end new text
 
-Similar to \GSLRef and GLIO, the statements of noninterference for
-both \DynIFC and \CC are termination-insensitive.  Thus, I will only
-consider successful executions that produce values. In other words,
-I will not consider reduction rules that trigger IFC monitor failures,
-such as NSU errors in \DynIFC or cast errors in \CC.  As I explained
-in Section~\ref{sec:example1}, the programming language runtime can
-force the program to diverge whenever blame is detected, possibly
-sending a private error message to the software developer.
+Similar to \GSLRef and GLIO, the statements of noninterference for both \DynIFC
+and \CC are \textit{termination-insensitive}. Thus, I will only consider
+successful executions that produce values. In other words, I will not consider
+reduction rules that trigger IFC monitor failures, such as NSU errors in \DynIFC
+or cast errors in \CC. As I explained in Section~\ref{sec:example1}, the
+programming language runtime forces the program to diverge whenever blame is
+detected, possibly sending a private error message to the software developer.
 
 The Agda proofs cited in the section are available at:
 \begin{center}
