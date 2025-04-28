@@ -724,12 +724,18 @@ Removing \unk from the runtime labels enables the gradual guarantee.
 \begin{frame}
   \frametitle{The Syntax of \Surface}
 
+  We define a gradual IFC calculus \Surface with mutable
+  references, first-class functions, and conditionals.
+  \\[1ex]
   Highlighted security labels default to \low if omitted:
   \vspace{15pt}
   {\small \[
   \begin{array}{rcl}
     \ell & \in & \{\low,\high\}  \\
     g & \in & \{\low,\high,\unk\} \\
+    \iota     & ::= & \Unit \MID \Bool \\
+    T      & ::= & \iota \MID \Fun{A}{g}{A} \mid \Refer{(T_g)} \\
+    A      & ::= & T_g \\
     M & ::=  & x \MID \const{k}{\highlight{highlight}{\ell}} \MID \lam{g}{x}{A}{M}{\highlight{highlight}{\ell}} \MID \app{M}{M}{p} \\
       & \MID & \ifexp{M}{M}{M}{p} \\
       & \MID & \refexp{\highlight{highlight}{\ell}}{M}{p} \MID \deref{M}{p} \MID \assign{M}{M}{p}
@@ -833,6 +839,36 @@ Removing \unk from the runtime labels enables the gradual guarantee.
       \longrightarrow^{*} &
       \quad \blame{p}
   \end{align*}}
+
+\end{frame}
+
+%%%%%%%%%%% Technical Development %%%%%%%%%%%%%%%
+\begin{frame}
+  \frametitle{The Cast Calculus \CC}
+
+
+  The semantics of \Surface is by translation $\mathcal{C}$ to a cast
+  calculus \CC.
+  \\[1ex]
+  The casts are represented by coercions on types (a la Henglein) and
+  coercions on security labels.
+
+  \[
+  \footnotesize
+  \begin{array}{rcl}
+    c     & ::=  & \id{g} \MID \up \MID \inj{\ell} \MID \proj{\ell}{p} \MID \bot^{\bl{p}} \\
+    \bar{c} & ::=  & \id{g} \MID \err{g_1}{g_2}{p} \MID \bar{c} \seq c \\
+    e & ::= & \ell \MID \blame{p} \MID \cccast{e}{\bar{c}} \\
+    c_r  & ::=  & \id{\iota} \MID \refco{\bm{c}}{\bm{c}} \MID \left( \funco{\bar{c}}{\bm{c}}{\bm{c}} \right) \\
+    \bm{c} & ::= & \coerc{c_r}{\bar{c}} \\
+    M & ::=  & x \MID \ccconst{k} \MID \ccaddr{n} \MID \cclam{x}{M}\MID \cclet{x}{M}{A}{M}  \\
+                     & \MID & \ccapp{M}{M}{A}{B}{\ell} \MID \ccappstar{M}{M}{A}{T} \\
+                     & \MID & \ccif{M}{A}{\ell}{M}{M} \MID \ccifstar{M}{T}{M}{M} \\
+                     & \MID & \ccref{\ell}{M} \MID \ccrefproj{\ell}{M}{p} \MID \ccderef{M}{A}{\ell} \MID \ccderefstar{M}{T} \\
+                     & \MID & \ccassign{M}{M}{T}{\ell}{\ell} \MID \ccassignproj{M}{M}{T}{g}{p} \\
+                     & \MID & \ccprot{e}{\ell}{M}{A} \MID \cccast{M}{\bm{c}} \MID \blame{p}
+  \end{array}
+  \]
 
 \end{frame}
 
