@@ -246,10 +246,25 @@
     \item Explicit flow and implicit flow
     \item Information flow control (IFC): static, dynamic, and gradual
     \item The gradual guarantee and its tension with IFC
+    \item Source of the tension: including \unk in runtime labels
     \end{itemize}
-  \item Source of the tension: including \unk in runtime labels
-  \item Comparing \Surface with \GSLRef
-  \item Timeline of dissertation writing
+  \item \Surface: a gradual IFC calculus
+    \begin{itemize}
+      \item \Surface enforces IFC while satisfying gradual guarantee
+      \item \Surface supports type-based reasoning (free theorems)
+    \end{itemize}
+  \item Technical development
+    \begin{itemize}
+      \item Formal definition of \Surface
+      \item Coercion calculi for IFC
+      \item The IFC cast calculus \CC
+    \end{itemize}
+  \item Meta-theoretical results
+    \begin{itemize}
+      \item Type safety for \Surface
+      \item Gradual guarantee for \Surface
+      \item Noninterference for \Surface
+    \end{itemize}
   \end{itemize}
 \end{frame}
 
@@ -720,30 +735,6 @@ Removing \unk from the runtime labels enables the gradual guarantee.
   \end{lstlisting}
 \end{frame}
 
-%%%%%%%%%% Syntax %%%%%%%%%%%
-\begin{frame}
-  \frametitle{The Syntax of \Surface}
-
-  We define a gradual IFC calculus \Surface with mutable
-  references, first-class functions, and conditionals.
-  \\[1ex]
-  Highlighted security labels default to \low if omitted:
-  \vspace{15pt}
-  {\small \[
-  \begin{array}{rcl}
-    \ell & \in & \{\low,\high\}  \\
-    g & \in & \{\low,\high,\unk\} \\
-    \iota     & ::= & \Unit \MID \Bool \\
-    T      & ::= & \iota \MID \Fun{A}{g}{A} \mid \Refer{(T_g)} \\
-    A      & ::= & T_g \\
-    M & ::=  & x \MID \const{k}{\highlight{highlight}{\ell}} \MID \lam{g}{x}{A}{M}{\highlight{highlight}{\ell}} \MID \app{M}{M}{p} \\
-      & \MID & \ifexp{M}{M}{M}{p} \\
-      & \MID & \refexp{\highlight{highlight}{\ell}}{M}{p} \MID \deref{M}{p} \MID \assign{M}{M}{p}
-  \end{array}
-  \]}
-
-\end{frame}
-
 %%%%%%%%%%% Type-Based Reasoning %%%%%%%%%%%%
 \begin{frame}[containsverbatim]
   \frametitle{Vigilance: Type-Based Reasoning for Explicit Flows}
@@ -842,15 +833,69 @@ Removing \unk from the runtime labels enables the gradual guarantee.
 
 \end{frame}
 
+%%%%%%%%%% Syntax %%%%%%%%%%%
+\begin{frame}
+  \frametitle{The Syntax of \Surface}
+
+  We define a gradual IFC calculus \Surface with mutable references, first-class
+  functions, and conditionals. Highlighted security labels default to \low if
+  omitted:
+
+  {\small \[
+           \begin{array}{rcl}
+             \ell & \in & \{\low,\high\}  \\
+             g & \in & \{\low,\high,\unk\} \\
+             \iota     & ::= & \Unit \MID \Bool \\
+             T      & ::= & \iota \MID \Fun{A}{g}{A} \mid \Refer{(T_g)} \\
+             A      & ::= & T_g \\
+             M & ::=  & x \MID \const{k}{\highlight{highlight}{\ell}} \MID \lam{g}{x}{A}{M}{\highlight{highlight}{\ell}} \MID \app{M}{M}{p} \\
+             & \MID & \ifexp{M}{M}{M}{p} \\
+             & \MID & \refexp{\highlight{highlight}{\ell}}{M}{p} \MID \deref{M}{p} \MID \assign{M}{M}{p}
+           \end{array}
+           \]}
+
+  \vspace{10pt}
+  A \Surface program is a \Surface term that is well-typed at $(x{:}\Bool_{\high});\low\vdash M : \Bool_{\low}$.
+\end{frame}
+
+\begin{frame}
+  \frametitle{The Semantics \Surface}
+
+  The semantics of \Surface is by translation $\mathcal{C}$ to a cast calculus.
+
+  \begin{figure}[tbp]
+    \scriptsize
+    \raggedright
+        \[
+          \begin{array}{rcll}
+            \text{evaluation result}     & r & ::=  & k \MID \mathit{fun} \MID \mathit{addr} \MID \mathit{diverge} \MID \mathit{stuck}
+          \end{array}
+        \]
+        \fbox{$\mathit{obs}(V)=r$}
+        \begin{align*}
+          \mathit{obs}(\ccconst{k}) =&\, k \\
+          \mathit{obs}(\cccast{\ccconst{k}}{\bm{c}}) =&\, k \\
+          \mathit{obs}(\cclam{x}{N}) =&\, \mathit{fun} \\
+          \mathit{obs}(\cccast{(\cclam{x}{N})}{\bm{c}}) =&\, \mathit{fun} \\
+          \mathit{obs}(\ccaddr{n}) =&\, \mathit{addr} \\
+          \mathit{obs}(\cccast{(\ccaddr{n})}{\bm{c}}) =&\, \mathit{addr}
+        \end{align*}
+        \fbox{$\mathit{eval}(M, b)=r$}
+        \begin{align*}
+          \mathit{eval}(M, b) =&\, \mathit{obs}(V)\;&\text{if}\;(\compile{M})[x:=\ccconst{b}] \mid \emptyset \Downarrow V \mid \mu \\
+          \mathit{eval}(M, b) =&\, \mathit{diverge} \;&\text{if~}\;(\compile{M})[x:=\ccconst{b}] \mid \emptyset \Downarrow \blame{\bl{p}} \mid \mu \\
+                                                    & &\text{or}~ (\compile{M})[x:=\ccconst{b}] \mid \emptyset \Uparrow \\
+          \mathit{eval}(M, b) =&\, \mathit{stuck}\;&\text{otherwise}
+        \end{align*}
+  \end{figure}
+
+\end{frame}
+
 %%%%%%%%%%% Technical Development %%%%%%%%%%%%%%%
 \begin{frame}
   \frametitle{The Cast Calculus \CC}
 
-
-  The semantics of \Surface is by translation $\mathcal{C}$ to a cast
-  calculus \CC.
-  \\[1ex]
-  The casts are represented by coercions on types (a la Henglein) and
+  The casts in \CC are represented by coercions on types (a la Henglein) and
   coercions on security labels.
 
   \[
@@ -870,6 +915,60 @@ Removing \unk from the runtime labels enables the gradual guarantee.
   \end{array}
   \]
 
+\end{frame}
+
+%%%%%%%%%%% Type Safety %%%%%%%%%%%
+\begin{frame}
+
+  \begin{figure}[tbp]
+    \raggedright
+    \fbox{$\vdash r : A$}
+    \begin{gather*}
+      \small
+      \inference{k : \iota}{\vdash k : \iota_{\ell}}
+      \qquad
+      \inference{}{\vdash \mathit{addr} : (\Refer{A})_{g}}
+      \\[1ex]
+      \inference{}{\vdash \mathit{fun} : (\Fun{A}{g_2}{B})_{g_1}}
+      \qquad
+      \inference{}{\vdash \mathit{diverge} : A}
+    \end{gather*}
+  \end{figure}
+
+  \begin{theorem}[Type safety of \Surface]
+    If $M$ is a \Surface program and $\mathit{eval}(M,b)=r$ \\ then the
+    evaluation result is well-typed $\vdash r : \Bool_{\low}$.
+  \end{theorem}
+\end{frame}
+
+%%%%%%%%%%% Gradual Guarantee %%%%%%%%%%%
+\begin{frame}
+  \begin{theorem}[Gradual guarantee for \Surface]
+    Suppose $M$ and $M'$ are \Surface programs related by precision: $\vdash M \sqsubseteq M'$.
+    If
+    \[
+    \mathit{eval}(M', b_1)=b_2
+    \]
+    then
+    \[
+    \mathit{eval}(M, b_1)=b_2
+    \]
+  \end{theorem}
+\end{frame}
+
+%%%%%%%%%%% Noninterference %%%%%%%%%%
+\begin{frame}
+  \begin{theorem}[Noninterference for \Surface]
+    If $M$ is a \Surface program and
+    \[
+    \mathit{eval}(M,b_1)=b_1'
+    \]
+    and
+    \[
+    \mathit{eval}(M,b_2)=b_2'
+    \]
+    then $b_1' = b_2'$.
+  \end{theorem}
 \end{frame}
 
 %%%%%%%%%% The End %%%%%%%%%%%
