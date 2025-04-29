@@ -35,6 +35,8 @@
 \usepackage{makecell}
 \usepackage{epigraph}
 
+\hypersetup{colorlinks=true,linkcolor=Cyan,urlcolor=Cyan,citecolor=Cyan}
+
 \setlength{\multicolsep}{3pt}
 \setlength{\columnseprule}{0.5pt}
 
@@ -148,6 +150,7 @@
 \newcommand{\highlightred}[1]{\highlight{White!90!Maroon}{#1}}
 
 \definecolor{highlight}{gray}{0.9}
+\sethlcolor{highlight}
 
 \newunicodechar{ℒ}{\ensuremath{\McL}}
 \newunicodechar{𝕋}{\ensuremath{\mathbb{T}}}
@@ -218,7 +221,7 @@
     \includegraphics[width=4in]{acanthus}
   \end{center}
 
-  \footnotetext{Acanthus textiles. William Morris Gallery}
+  \footnotetext{Acanthus textiles. William Morris Gallery.}
 \end{frame}
 
 %%%%%%%%%% Statement %%%%%%%%%%%
@@ -286,7 +289,7 @@ let input = private-input () in
   \item[\yes] Yes!
   \item Witness at least two executions
   \item Output is the negation of input
-  \item \purpletext{Explicit flow}
+  \item \hl{Explicit flow}
   \end{itemize}
 }
 
@@ -308,7 +311,7 @@ let input = private-input () in
 \begin{itemize}
   \item[\yes] Also yes
   \item Again, output is the negation of input
-  \item \purpletext{Implicit flow}: input influences output through {\large\textit{branching}}
+  \item \hl{Implicit flow:} input influences output through \textit{branching}
 \end{itemize}
 }
 
@@ -332,6 +335,22 @@ let input = private-input () in
       \right.
       \)
   \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \begin{quote}
+    ``Another myth spread by security researchers is that the planet Earth
+    contains more than six programmers who can correctly use security labels and
+    information flow control (IFC). This belief requires one to assume that,
+    even though the most popular variable names are \lq thing\rq~and \lq
+    thing2,\rq~programmers will magically become disciplined software
+    architects when confronted with a Dungeons-and-Dragons-style type
+    system...''
+    \footnote{James Mickens.
+    \href{https://scholar.harvard.edu/files/mickens/files/thisworldofours.pdf}{\textit{This
+        World of Ours.}} Usenix ;login: 2014}
+  \end{quote}
 \end{frame}
 
 %%%%%%%%%% Static IFC, Explicit Flow %%%%%%%%%%%
@@ -565,9 +584,10 @@ let input = private-input () in
   \end{lstlisting}
 
   The assignments fail at runtime because the no-sensitive-upgrade (NSU)
-  mechanism \footnote{Austin and Flanagan. \textit{Efficient purely-dynamic information
-  flow analysis.} PLAS 2009.}
-  prevents writing to a \low security pointer in a \high security branch.
+  mechanism \footnote{Austin and Flanagan.
+  \href{https://doi.org/10.1145/1554339.1554353}{\textit{Efficient
+      purely-dynamic information flow analysis.}} PLAS 2009.} prevents writing
+  to a \low security pointer in a \high security branch.
 
 \end{frame}
 
@@ -596,8 +616,10 @@ let input = private-input () in
 
   \begin{itemize}
   \item[\yes] The \bluetext{more precise} program (right) runs successfully
-  \item[\no] But the \redtext{less precise} version (left) errors in \GSLRef\footnote{Toro, Garcia, Tanter.
-  \textit{Type-Driven Gradual Security with References.} TOPLAS 2018.}
+  \item[\no] But the \redtext{less precise} version (left) errors in
+    \GSLRef\footnote{Toro, Garcia, Tanter.
+    \href{https://doi.org/10.1145/3229061}{\textit{Type-Driven Gradual Security
+        with References.}} TOPLAS 2018.}
   \item The assignment fails because it is in a high-security branch and \GSLRef
     conservatively treats the reference's label ($\unk$) as if it were $\low$
   \end{itemize}
@@ -662,6 +684,22 @@ let input = private-input () in
 
 Removing \unk from the runtime labels enables the gradual guarantee.
 
+\end{frame}
+
+%%%%%%%%%% Road Map %%%%%%%%%%%
+\begin{frame}
+  \frametitle{Road Map}
+
+  \begin{itemize}
+  \item Background
+  \item[\ding{43}] \Surface: a gradual IFC calculus
+    \begin{itemize}
+      \item \Surface enforces IFC while satisfying gradual guarantee
+      \item \Surface supports type-based reasoning (free theorems)
+    \end{itemize}
+  \item Technical development
+  \item Meta-theoretical results
+  \end{itemize}
 \end{frame}
 
 %%%%%%%%%% Example in LambdaIFCStar %%%%%%%%%%%
@@ -833,6 +871,23 @@ Removing \unk from the runtime labels enables the gradual guarantee.
 
 \end{frame}
 
+%%%%%%%%%% Road Map %%%%%%%%%%%
+\begin{frame}
+  \frametitle{Road Map}
+
+  \begin{itemize}
+  \item Background
+  \item \Surface: a gradual IFC calculus
+  \item[\ding{43}] Technical development
+    \begin{itemize}
+    \item Formal definition of \Surface
+    \item Coercion calculi for IFC
+    \item The IFC cast calculus \CC
+    \end{itemize}
+  \item Meta-theoretical results
+  \end{itemize}
+\end{frame}
+
 %%%%%%%%%% Syntax %%%%%%%%%%%
 \begin{frame}
   \frametitle{The Syntax of \Surface}
@@ -859,7 +914,7 @@ Removing \unk from the runtime labels enables the gradual guarantee.
 \end{frame}
 
 \begin{frame}
-  \frametitle{The Semantics \Surface}
+  \frametitle{Semantics of \Surface}
 
   The semantics of \Surface is by translation $\mathcal{C}$ to a cast calculus.
 
@@ -915,6 +970,23 @@ Removing \unk from the runtime labels enables the gradual guarantee.
   \end{array}
   \]
 
+\end{frame}
+
+%%%%%%%%%% Road Map %%%%%%%%%%%
+\begin{frame}
+  \frametitle{Road Map}
+
+  \begin{itemize}
+  \item Background
+  \item \Surface: a gradual IFC calculus
+  \item Technical development
+  \item[\ding{43}] Meta-theoretical results
+    \begin{itemize}
+      \item Type safety for \Surface
+      \item Gradual guarantee for \Surface
+      \item Noninterference for \Surface
+    \end{itemize}
+  \end{itemize}
 \end{frame}
 
 %%%%%%%%%%% Type Safety %%%%%%%%%%%
@@ -976,10 +1048,11 @@ Removing \unk from the runtime labels enables the gradual guarantee.
   \frametitle{Conclusion}
 
   \begin{itemize}
-  \item Noninterference and the gradual guarantee can co-exist if we
-    keep \unk out of the runtime security labels.
+  \item It is possible to satisfy noninterference and the gradual guarantee
+    while supporting type-based reasoning.
   \item The security labels on constants and memory locations should default to
-    \low or \high instead of \unk.
+    \low or \high so that \unk is not included in runtime security labels.
+  \item Security checks can be modeled using coercions.
   \item The Agda mechanization of \Surface is at
     \begin{center}
       \url{https://github.com/Gradual-Typing/LambdaIFCStar}
