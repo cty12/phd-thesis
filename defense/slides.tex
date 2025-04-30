@@ -338,21 +338,6 @@ let input = private-input () in
 
 \end{frame}
 
-\begin{frame}
-  \begin{quote}
-    ``Another myth spread by security researchers is that the planet Earth
-    contains more than six programmers who can correctly use security labels and
-    information flow control (IFC). This belief requires one to assume that,
-    even though the most popular variable names are \lq thing\rq~and \lq
-    thing2,\rq~programmers will magically become disciplined software
-    architects when confronted with a Dungeons-and-Dragons-style type
-    system...''
-    \footnote{James Mickens.
-    \href{https://scholar.harvard.edu/files/mickens/files/thisworldofours.pdf}{\textit{This
-        World of Ours.}} Usenix ;login: 2014}
-  \end{quote}
-\end{frame}
-
 %%%%%%%%%% Static IFC, Explicit Flow %%%%%%%%%%%
 \begin{frame}[containsverbatim]
   \frametitle{\bluetext{Static IFC} Accepts \textcolor{Green}{Legal} Explicit Flow}
@@ -476,7 +461,22 @@ let input = private-input () in
 
 \end{frame}
 
-%%%%%%%%%% Dynamic IFC, Implicit Flow %%%%%%%%%%%
+\begin{frame}
+  \begin{quote}
+    ``Another myth spread by security researchers is that the planet Earth
+    contains more than six programmers who can correctly use security labels and
+    information flow control (IFC). This belief requires one to assume that,
+    even though the most popular variable names are \lq thing\rq~and \lq
+    thing2,\rq~programmers will magically become disciplined software
+    architects when confronted with a Dungeons-and-Dragons-style type
+    system...''
+    \footnote{James Mickens.
+    \href{https://scholar.harvard.edu/files/mickens/files/thisworldofours.pdf}{\textit{This
+        World of Ours.}} Usenix ;login: 2014}
+  \end{quote}
+\end{frame}
+
+%%%%%%%%%% Gradual IFC %%%%%%%%%%%
 \begin{frame}[containsverbatim]
   \frametitle{\purpletext{Gradual Typing} Bridges Static and Dynamic IFC}
 
@@ -890,7 +890,7 @@ Removing \unk from the runtime labels enables the gradual guarantee.
 
 %%%%%%%%%% Syntax %%%%%%%%%%%
 \begin{frame}
-  \frametitle{The Syntax of \Surface}
+  \frametitle{Syntax of \Surface}
 
   We define a gradual IFC calculus \Surface with mutable references, first-class
   functions, and conditionals. Highlighted security labels default to \low if
