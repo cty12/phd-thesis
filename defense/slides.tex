@@ -462,14 +462,11 @@ let input = private-input () in
 \end{frame}
 
 \begin{frame}
+  \frametitle{Static IFC Is Hard to Use}
   \begin{quote}
     ``Another myth spread by security researchers is that the planet Earth
     contains more than six programmers who can correctly use security labels and
-    information flow control (IFC). This belief requires one to assume that,
-    even though the most popular variable names are \lq thing\rq~and \lq
-    thing2,\rq~programmers will magically become disciplined software
-    architects when confronted with a Dungeons-and-Dragons-style type
-    system...''
+    information flow control (IFC).''
     \footnote{James Mickens.
     \href{https://scholar.harvard.edu/files/mickens/files/thisworldofours.pdf}{\textit{This
         World of Ours.}} Usenix ;login: 2014}
@@ -903,7 +900,7 @@ Removing \unk from the runtime labels enables the gradual guarantee.
              \iota     & ::= & \Unit \MID \Bool \\
              T      & ::= & \iota \MID \Fun{A}{g}{A} \mid \Refer{(T_g)} \\
              A      & ::= & T_g \\
-             M & ::=  & x \MID \const{k}{\highlight{highlight}{\ell}} \MID \lam{g}{x}{A}{M}{\highlight{highlight}{\ell}} \MID \app{M}{M}{p} \\
+             M & ::=  & x \MID k_{\highlight{highlight}{\ell}} \MID \lam{g}{x}{A}{M}{\highlight{highlight}{\ell}} \MID \app{M}{M}{p} \\
              & \MID & \ifexp{M}{M}{M}{p} \\
              & \MID & \refexp{\highlight{highlight}{\ell}}{M}{p} \MID \deref{M}{p} \MID \assign{M}{M}{p}
            \end{array}
@@ -928,8 +925,8 @@ Removing \unk from the runtime labels enables the gradual guarantee.
         \]
         \fbox{$\mathit{obs}(V)=r$}
         \begin{align*}
-          \mathit{obs}(\ccconst{k}) =&\, k \\
-          \mathit{obs}(\cccast{\ccconst{k}}{\bm{c}}) =&\, k \\
+          \mathit{obs}(k) =&\, k \\
+          \mathit{obs}(\cccast{k}{\bm{c}}) =&\, k \\
           \mathit{obs}(\cclam{x}{N}) =&\, \mathit{fun} \\
           \mathit{obs}(\cccast{(\cclam{x}{N})}{\bm{c}}) =&\, \mathit{fun} \\
           \mathit{obs}(\ccaddr{n}) =&\, \mathit{addr} \\
@@ -937,9 +934,9 @@ Removing \unk from the runtime labels enables the gradual guarantee.
         \end{align*}
         \fbox{$\mathit{eval}(M, b)=r$}
         \begin{align*}
-          \mathit{eval}(M, b) =&\, \mathit{obs}(V)\;&\text{if}\;(\compile{M})[x:=\ccconst{b}] \mid \emptyset \Downarrow V \mid \mu \\
-          \mathit{eval}(M, b) =&\, \mathit{diverge} \;&\text{if~}\;(\compile{M})[x:=\ccconst{b}] \mid \emptyset \Downarrow \blame{\bl{p}} \mid \mu \\
-                                                    & &\text{or}~ (\compile{M})[x:=\ccconst{b}] \mid \emptyset \Uparrow \\
+          \mathit{eval}(M, b) =&\, \mathit{obs}(V)\;&\text{if}\;(\compile{M})[x:=b] \mid \emptyset \Downarrow V \mid \mu \\
+          \mathit{eval}(M, b) =&\, \mathit{diverge} \;&\text{if~}\;(\compile{M})[x:=b] \mid \emptyset \Downarrow \blame{\bl{p}} \mid \mu \\
+                                                    & &\text{or}~ (\compile{M})[x:=b] \mid \emptyset \Uparrow \\
           \mathit{eval}(M, b) =&\, \mathit{stuck}\;&\text{otherwise}
         \end{align*}
   \end{figure}
@@ -956,17 +953,18 @@ Removing \unk from the runtime labels enables the gradual guarantee.
   \[
   \footnotesize
   \begin{array}{rcl}
-    c     & ::=  & \id{g} \MID \up \MID \inj{\ell} \MID \proj{\ell}{p} \MID \bot^{\bl{p}} \\
+    c     & ::=  & \id{g} \MID \highlight{highlight}{\up} \MID \inj{\ell} \MID \proj{\ell}{p} \MID \bot^{\bl{p}} \\
     \bar{c} & ::=  & \id{g} \MID \err{g_1}{g_2}{p} \MID \bar{c} \seq c \\
     e & ::= & \ell \MID \blame{p} \MID \cccast{e}{\bar{c}} \\
     c_r  & ::=  & \id{\iota} \MID \refco{\bm{c}}{\bm{c}} \MID \left( \funco{\bar{c}}{\bm{c}}{\bm{c}} \right) \\
-    \bm{c} & ::= & \coerc{c_r}{\bar{c}} \\
-    M & ::=  & x \MID \ccconst{k} \MID \ccaddr{n} \MID \cclam{x}{M}\MID \cclet{x}{M}{A}{M}  \\
-                     & \MID & \ccapp{M}{M}{A}{B}{\ell} \MID \ccappstar{M}{M}{A}{T} \\
-                     & \MID & \ccif{M}{A}{\ell}{M}{M} \MID \ccifstar{M}{T}{M}{M} \\
-                     & \MID & \ccref{\ell}{M} \MID \ccrefproj{\ell}{M}{p} \MID \ccderef{M}{A}{\ell} \MID \ccderefstar{M}{T} \\
-                     & \MID & \ccassign{M}{M}{T}{\ell}{\ell} \MID \ccassignproj{M}{M}{T}{g}{p} \\
-                     & \MID & \ccprot{e}{\ell}{M}{A} \MID \cccast{M}{\bm{c}} \MID \blame{p}
+    \bm{c} & ::= & (\coerc{c_r}{\bar{c}}) \\
+    M & ::=  & x \MID k \MID \cclam{x}{M}\MID \cclet{x}{M}{A}{M}  \\
+    & \MID & \ccaddr{n} \MID \ccprot{e}{\ell}{M}{A} \MID  \blame{p} \\
+    & \MID & \highlightred{\cccast{M}{\bm{c}}} \\
+    & \MID & M \cdot M \MID \highlight{highlight}{M \cdot^{\star} M} \\
+    & \MID & \key{if}\,M\,\key{then}\,M\,\key{else}\,M \MID \highlight{highlight}{\key{if}^{\star}\,M\,\key{then}\,M\,\key{else}\,M} \\
+    & \MID & \ccref{\ell}{M} \MID \highlightred{\ccrefproj{\ell}{M}{p}} \MID \ccsyntax{!}\,M \MID \highlight{highlight}{\ccsyntax{!}^\star\,M} \\
+    & \MID & M\,\ccsyntax{:=}\,M \MID \highlightred{M\,\ccsyntax{:=?}^{\bl{p}}\,M}
   \end{array}
   \]
 
