@@ -94,68 +94,6 @@ The Agda proofs cited in the section are available at:
   \label{fig:cexpr-prec}
 \end{figure}
 
-\begin{figure}[tbp]
-\raggedright
-  \fbox{$\bm{c} \sqsubseteq \bm{d}$}
-  {\small
-  \begin{gather*}
-    {\sqsubseteq}\textit{-base}~
-    \inference{\vdash \bar{c} \sqsubseteq \bar{c}'}
-              {(\coerc{\id{\iota}}{\bar{c}}) \sqsubseteq (\coerc{\id{\iota}}{\bar{c}'})}
-    \\[2ex]
-    {\sqsubseteq}\textit{-ref}~
-    \inference{\bm{c} \sqsubseteq \bm{c}' & \bm{d} \sqsubseteq \bm{d'} &
-               \vdash \bar{c} \sqsubseteq \bar{c}'}
-              {(\coerc{\refco{\bm{c}}{\bm{d}}}{\bar{c}}) \sqsubseteq (\coerc{\refco{\bm{c'}}{\bm{d'}}}{\bar{c}'})}
-    \quad
-    {\sqsubseteq}\textit{-fun}~
-    \inference{\vdash \bar{d} \sqsubseteq \bar{d}' & \vdash \bar{c} \sqsubseteq \bar{c}' \\
-               \bm{c} \sqsubseteq \bm{c'} & \bm{d} \sqsubseteq \bm{d'}}
-              {(\coerc{\funco{\bar{d}}{\bm{c}}{\bm{d}}}{\bar{c}}) \sqsubseteq
-                (\coerc{\funco{\bar{d}'}{\bm{c'}}{\bm{d'}}}{\bar{c}'})}
-  \end{gather*}}
-  %%%%%
-  \fbox{$\bm{c} \sqsubseteq A$}
-  {\small
-  \begin{gather*}
-    {\sqsubseteq}\textit{-base}~
-    \inference{\vdash \bar{c} \sqsubseteq_l g}
-              {(\coerc{\id{\iota}}{\bar{c}}) \sqsubseteq \iota_g}
-    \\[2ex]
-    {\sqsubseteq}\textit{-ref}~
-      \inference{\bm{c} \sqsubseteq A & \bm{d} \sqsubseteq A &
-        \vdash \bar{c} \sqsubseteq_l g}
-                {(\coerc{\refco{\bm{c}}{\bm{d}}}{\bar{c}}) \sqsubseteq (\Refer{A})_g}
-    \quad
-    {\sqsubseteq}\textit{-fun}~
-      \inference{\vdash \bar{d} \sqsubseteq_l g_1 & \vdash \bar{c} \sqsubseteq_l g_2 \\
-        \bm{c} \sqsubseteq A & \bm{d} \sqsubseteq B}
-    {(\coerc{\funco{\bar{d}}{\bm{c}}{\bm{d}}}{\bar{c}}) \sqsubseteq
-                  (\Fun{A}{g_1}{B})_{g_2}}
-  \end{gather*}}
-  %%%%%
-  \fbox{$A \sqsubseteq \bm{c}$}
-  {\small
-    \begin{gather*}
-      {\sqsubseteq}\textit{-base}~
-      \inference{\vdash g \sqsubseteq_r \bar{c}}
-                {\iota_g \sqsubseteq (\coerc{\id{\iota}}{\bar{c}})}
-      \\[2ex]
-      {\sqsubseteq}\textit{-ref}~
-      \inference{A \sqsubseteq \bm{c} & A \sqsubseteq \bm{d} &
-        \vdash g \sqsubseteq_r \bar{c}}
-                {(\Refer{A})_g \sqsubseteq (\coerc{\refco{\bm{c}}{\bm{d}}}{\bar{c}})}
-      \quad
-      {\sqsubseteq}\textit{-fun}~
-      \inference{\vdash g_1 \sqsubseteq_r \bar{d} & \vdash g_2 \sqsubseteq_r \bar{c} \\
-        A \sqsubseteq \bm{c} & B \sqsubseteq \bm{d}}
-                {(\Fun{A}{g_1}{B})_{g_2} \sqsubseteq
-                  (\coerc{\funco{\bar{d}}{\bm{c}}{\bm{d}}}{\bar{c}})  }
-       \end{gather*}}
-  \caption{Precision relation of coercions on values}
-  \label{fig:coercion-prec}
-\end{figure}
-
 Our end goal is to prove the gradual guarantee for \Surface.
 The proof depends on a simulation lemma between more and less precise terms of
 the cast calculus \CC . We use coercion sequences as the IFC monitor in \CC.
@@ -294,6 +232,101 @@ $\vdash \mathit{stamp!}\;\bar{c}\;\ell_1 \sqsubseteq \mathit{stamp}\;\bar{d}\;\e
 
 \section{Simulation Between \CC Terms of Different Precision}
 \label{sec:simulation}
+
+\begin{figure}[tbp]
+\raggedright
+  \fbox{$\bm{c} \sqsubseteq \bm{d}$}
+  {\small
+  \begin{gather*}
+    {\sqsubseteq}\textit{-base}~
+    \inference{\vdash \bar{c} \sqsubseteq \bar{c}'}
+              {(\coerc{\id{\iota}}{\bar{c}}) \sqsubseteq (\coerc{\id{\iota}}{\bar{c}'})}
+    \\[2ex]
+    {\sqsubseteq}\textit{-ref}~
+    \inference{\bm{c} \sqsubseteq \bm{c}' & \bm{d} \sqsubseteq \bm{d'} &
+               \vdash \bar{c} \sqsubseteq \bar{c}'}
+              {(\coerc{\refco{\bm{c}}{\bm{d}}}{\bar{c}}) \sqsubseteq (\coerc{\refco{\bm{c'}}{\bm{d'}}}{\bar{c}'})}
+    \quad
+    {\sqsubseteq}\textit{-fun}~
+    \inference{\vdash \bar{d} \sqsubseteq \bar{d}' & \vdash \bar{c} \sqsubseteq \bar{c}' \\
+               \bm{c} \sqsubseteq \bm{c'} & \bm{d} \sqsubseteq \bm{d'}}
+              {(\coerc{\funco{\bar{d}}{\bm{c}}{\bm{d}}}{\bar{c}}) \sqsubseteq
+                (\coerc{\funco{\bar{d}'}{\bm{c'}}{\bm{d'}}}{\bar{c}'})}
+  \end{gather*}}
+  %%%%%
+  \fbox{$\bm{c} \sqsubseteq A$}
+  {\small
+  \begin{gather*}
+    {\sqsubseteq}\textit{-base}~
+    \inference{\vdash \bar{c} \sqsubseteq_l g}
+              {(\coerc{\id{\iota}}{\bar{c}}) \sqsubseteq \iota_g}
+    \\[2ex]
+    {\sqsubseteq}\textit{-ref}~
+      \inference{\bm{c} \sqsubseteq A & \bm{d} \sqsubseteq A &
+        \vdash \bar{c} \sqsubseteq_l g}
+                {(\coerc{\refco{\bm{c}}{\bm{d}}}{\bar{c}}) \sqsubseteq (\Refer{A})_g}
+    \quad
+    {\sqsubseteq}\textit{-fun}~
+      \inference{\vdash \bar{d} \sqsubseteq_l g_1 & \vdash \bar{c} \sqsubseteq_l g_2 \\
+        \bm{c} \sqsubseteq A & \bm{d} \sqsubseteq B}
+    {(\coerc{\funco{\bar{d}}{\bm{c}}{\bm{d}}}{\bar{c}}) \sqsubseteq
+                  (\Fun{A}{g_1}{B})_{g_2}}
+  \end{gather*}}
+  %%%%%
+  \fbox{$A \sqsubseteq \bm{c}$}
+  {\small
+    \begin{gather*}
+      {\sqsubseteq}\textit{-base}~
+      \inference{\vdash g \sqsubseteq_r \bar{c}}
+                {\iota_g \sqsubseteq (\coerc{\id{\iota}}{\bar{c}})}
+      \\[2ex]
+      {\sqsubseteq}\textit{-ref}~
+      \inference{A \sqsubseteq \bm{c} & A \sqsubseteq \bm{d} &
+        \vdash g \sqsubseteq_r \bar{c}}
+                {(\Refer{A})_g \sqsubseteq (\coerc{\refco{\bm{c}}{\bm{d}}}{\bar{c}})}
+      \quad
+      {\sqsubseteq}\textit{-fun}~
+      \inference{\vdash g_1 \sqsubseteq_r \bar{d} & \vdash g_2 \sqsubseteq_r \bar{c} \\
+        A \sqsubseteq \bm{c} & B \sqsubseteq \bm{d}}
+                {(\Fun{A}{g_1}{B})_{g_2} \sqsubseteq
+                  (\coerc{\funco{\bar{d}}{\bm{c}}{\bm{d}}}{\bar{c}})  }
+       \end{gather*}}
+  \caption{Precision relation of coercions on values}
+  \label{fig:coercion-prec}
+\end{figure}
+
+\begin{figure}[tbp]
+\raggedright
+  \fbox{$\vdash e \sqsubseteq e' \Leftarrow g \sqsubseteq g'$}
+  {\small
+  \begin{gather*}
+    {\sqsubseteq}\textit{-l}~
+    \inference{}{\vdash \ell \sqsubseteq \ell \Leftarrow \ell \sqsubseteq \ell}
+    %%%%
+    \quad
+    {\sqsubseteq}\textit{-cast}~
+    \inference{\vdash e \sqsubseteq e' \Leftarrow g_1 \sqsubseteq g_1' &
+      \vdash \bar{c} \sqsubseteq \bar{c}' \\
+      \vdash \bar{c} : g_1 \Rightarrow g_2 & \vdash \bar{c}' : g_1' \Rightarrow g_2'}
+              {\vdash \cccast{e}{\bar{c}} \sqsubseteq \cccast{e'}{\bar{c}'} \Leftarrow g_2 \sqsubseteq g_2'}
+    \\[2ex]
+    {\sqsubseteq}\textit{-castl}~
+    \inference{\vdash e \sqsubseteq e' \Leftarrow g_1 \sqsubseteq g' \\
+               \vdash \bar{c} \sqsubseteq_l g' & \vdash \bar{c} : g_1 \Rightarrow g_2}
+              {\vdash \cccast{e}{\bar{c}} \sqsubseteq e' \Leftarrow g_2 \sqsubseteq g'}
+    \quad
+    {\sqsubseteq}\textit{-castr}~
+    \inference{\vdash e \sqsubseteq e' \Leftarrow g \sqsubseteq g_1' \\
+               \vdash g \sqsubseteq_r \bar{c}' & \vdash \bar{c}' : g_1' \Rightarrow g_2'}
+              {\vdash e \sqsubseteq \cccast{e'}{\bar{c}'} \Leftarrow g \sqsubseteq g_2'}
+    \\[2ex]
+    {\sqsubseteq}\textit{-blame}~
+    \inference{\vdash e \Leftarrow g & g \sqsubseteq g'}
+              {\vdash e \sqsubseteq \blame{p} \Leftarrow g \sqsubseteq g'}
+  \end{gather*}}
+  \caption{Precision relation of label expressions}
+  \label{fig:lexpr-prec}
+\end{figure}
 
 \begin{figure}[tbp]
 \raggedright
@@ -510,7 +543,9 @@ so there is a rule (${\sqsubseteq}\textit{-blame}$) that relates \blame{p} to
 any term $M$ on the less precise side as long as their types are in sync. We
 list the precision rules for the cast calculus \CC in
 Figure~\ref{fig:cc-prec-1},~\ref{fig:cc-prec-2},~\ref{fig:cc-prec-3},
-and~\ref{fig:cc-prec-4}.
+and~\ref{fig:cc-prec-4}. The precision rules for \CC use the precision relations
+for coercions on values and label expressions, which are defined in
+Figure~\ref{fig:coercion-prec} and Figure~\ref{fig:lexpr-prec} respectively.
 
 With the precision relation of \CC defined, we first state the catch-up lemma,
 which catches up to a more-precise value by multi-stepping on the less-precise
