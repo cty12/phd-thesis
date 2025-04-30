@@ -425,7 +425,7 @@ $\vdash \mathit{stamp!}\;\bar{c}\;\ell_1 \sqsubseteq \mathit{stamp}\;\bar{d}\;\e
               {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{\ccderefstar{M}{T}}{\ccderefstar{M'}{T'}}{T_{\unk}}{T'_{\unk}}}
   \\[3ex]
     {\sqsubseteq}\textit{-deref${\star}$l}~
-    \inference{\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell}{\ell'}\ccprec{M}{M'}{(\Refer{T_{\unk}})_{\unk}}{(\Refer{A'})_{\ell_2}} \\
+    \inference{\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell_1}{\ell_1'}\ccprec{M}{M'}{(\Refer{T_{\unk}})_{\unk}}{(\Refer{A'})_{\ell_2}} \\
                B' = \mathit{stamp}\;A'\;\ell_2}
               {\precctx{\Gamma}{\Gamma'}{\Sigma}{\Sigma'}{g}{g'}{\ell_1}{\ell_1'}\ccprec{\ccderefstar{M}{T}}{\ccderef{M'}{A'}{\ell_2}}{T_{\unk}}{B'}}
   \end{gather*}}
