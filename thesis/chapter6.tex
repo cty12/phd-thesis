@@ -90,8 +90,70 @@ The Agda proofs cited in the section are available at:
     \inference{g \sqsubseteq g_1 & g \sqsubseteq g_2}
               {\vdash g \sqsubseteq_r \err{g_1}{g_2}{p}}
   \end{gather*}}
-  \caption{Precision relation of the coercion calculus}
+  \caption{Precision relation of coercions on security labels}
   \label{fig:cexpr-prec}
+\end{figure}
+
+\begin{figure}[tbp]
+\raggedright
+  \fbox{$\bm{c} \sqsubseteq \bm{d}$}
+  {\small
+  \begin{gather*}
+    {\sqsubseteq}\textit{-base}~
+    \inference{\vdash \bar{c} \sqsubseteq \bar{c}'}
+              {(\coerc{\id{\iota}}{\bar{c}}) \sqsubseteq (\coerc{\id{\iota}}{\bar{c}'})}
+    \\[2ex]
+    {\sqsubseteq}\textit{-ref}~
+    \inference{\bm{c} \sqsubseteq \bm{c}' & \bm{d} \sqsubseteq \bm{d'} &
+               \vdash \bar{c} \sqsubseteq \bar{c}'}
+              {(\coerc{\refco{\bm{c}}{\bm{d}}}{\bar{c}}) \sqsubseteq (\coerc{\refco{\bm{c'}}{\bm{d'}}}{\bar{c}'})}
+    \quad
+    {\sqsubseteq}\textit{-fun}~
+    \inference{\vdash \bar{d} \sqsubseteq \bar{d}' & \vdash \bar{c} \sqsubseteq \bar{c}' \\
+               \bm{c} \sqsubseteq \bm{c'} & \bm{d} \sqsubseteq \bm{d'}}
+              {(\coerc{\funco{\bar{d}}{\bm{c}}{\bm{d}}}{\bar{c}}) \sqsubseteq
+                (\coerc{\funco{\bar{d}'}{\bm{c'}}{\bm{d'}}}{\bar{c}'})}
+  \end{gather*}}
+  %%%%%
+  \fbox{$\bm{c} \sqsubseteq A$}
+  {\small
+  \begin{gather*}
+    {\sqsubseteq}\textit{-base}~
+    \inference{\vdash \bar{c} \sqsubseteq_l g}
+              {(\coerc{\id{\iota}}{\bar{c}}) \sqsubseteq \iota_g}
+    \\[2ex]
+    {\sqsubseteq}\textit{-ref}~
+      \inference{\bm{c} \sqsubseteq A & \bm{d} \sqsubseteq A &
+        \vdash \bar{c} \sqsubseteq_l g}
+                {(\coerc{\refco{\bm{c}}{\bm{d}}}{\bar{c}}) \sqsubseteq (\Refer{A})_g}
+    \quad
+    {\sqsubseteq}\textit{-fun}~
+      \inference{\vdash \bar{d} \sqsubseteq_l g_1 & \vdash \bar{c} \sqsubseteq_l g_2 \\
+        \bm{c} \sqsubseteq A & \bm{d} \sqsubseteq B}
+    {(\coerc{\funco{\bar{d}}{\bm{c}}{\bm{d}}}{\bar{c}}) \sqsubseteq
+                  (\Fun{A}{g_1}{B})_{g_2}}
+  \end{gather*}}
+  %%%%%
+  \fbox{$A \sqsubseteq \bm{c}$}
+  {\small
+    \begin{gather*}
+      {\sqsubseteq}\textit{-base}~
+      \inference{\vdash g \sqsubseteq_r \bar{c}}
+                {\iota_g \sqsubseteq (\coerc{\id{\iota}}{\bar{c}})}
+      \\[2ex]
+      {\sqsubseteq}\textit{-ref}~
+      \inference{A \sqsubseteq \bm{c} & A \sqsubseteq \bm{d} &
+        \vdash g \sqsubseteq_r \bar{c}}
+                {(\Refer{A})_g \sqsubseteq (\coerc{\refco{\bm{c}}{\bm{d}}}{\bar{c}})}
+      \quad
+      {\sqsubseteq}\textit{-fun}~
+      \inference{\vdash g_1 \sqsubseteq_r \bar{d} & \vdash g_2 \sqsubseteq_r \bar{c} \\
+        A \sqsubseteq \bm{c} & B \sqsubseteq \bm{d}}
+                {(\Fun{A}{g_1}{B})_{g_2} \sqsubseteq
+                  (\coerc{\funco{\bar{d}}{\bm{c}}{\bm{d}}}{\bar{c}})  }
+       \end{gather*}}
+  \caption{Precision relation of coercions on values}
+  \label{fig:coercion-prec}
 \end{figure}
 
 Our end goal is to prove the gradual guarantee for \Surface.
