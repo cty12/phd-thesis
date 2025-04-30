@@ -262,7 +262,7 @@
       \item Coercion calculi for IFC
       \item The IFC cast calculus \CC
     \end{itemize}
-  \item Meta-theoretical results
+  \item Meta-theoretic results
     \begin{itemize}
       \item Type safety for \Surface
       \item Gradual guarantee for \Surface
@@ -698,7 +698,7 @@ Removing \unk from the runtime labels enables the gradual guarantee.
       \item \Surface supports type-based reasoning (free theorems)
     \end{itemize}
   \item Technical development
-  \item Meta-theoretical results
+  \item Meta-theoretic results
   \end{itemize}
 \end{frame}
 
@@ -789,8 +789,8 @@ Removing \unk from the runtime labels enables the gradual guarantee.
   \bigskip
 
   \ul{Free theorem:} The \texttt{mix} function either \textcircled{1} returns a
-  value that does not depend on \texttt{priv} or \redtext{\textcircled{2}
-    produces a runtime error}
+  value that does not depend on \texttt{priv} or \textcircled{2} produces a
+  runtime error
 
   \bigskip
 
@@ -817,8 +817,8 @@ Removing \unk from the runtime labels enables the gradual guarantee.
   \bigskip
 
   \ul{Free theorem:} The \texttt{smix} function either \textcircled{1} returns a
-  value that does not depend on \texttt{priv} or \redtext{\textcircled{2}
-    produces a runtime error}
+  value that does not depend on \texttt{priv} or \textcircled{2}
+    produces a runtime error
 
   %% {\footnotesize
   %%   (GLIO: \textcircled{1} not vigilant \textcircled{2} does not classify values using types
@@ -884,7 +884,7 @@ Removing \unk from the runtime labels enables the gradual guarantee.
     \item Coercion calculi for IFC
     \item The IFC cast calculus \CC
     \end{itemize}
-  \item Meta-theoretical results
+  \item Meta-theoretic results
   \end{itemize}
 \end{frame}
 
@@ -910,7 +910,7 @@ Removing \unk from the runtime labels enables the gradual guarantee.
            \]}
 
   \vspace{10pt}
-  A \Surface program is a \Surface term that is well-typed at $(x{:}\Bool_{\high});\low\vdash M : \Bool_{\low}$.
+
 \end{frame}
 
 \begin{frame}
@@ -980,7 +980,7 @@ Removing \unk from the runtime labels enables the gradual guarantee.
   \item Background
   \item \Surface: a gradual IFC calculus
   \item Technical development
-  \item[\ding{43}] Meta-theoretical results
+  \item[\ding{43}] Meta-theoretic results
     \begin{itemize}
       \item Type safety for \Surface
       \item Gradual guarantee for \Surface
@@ -1008,16 +1008,21 @@ Removing \unk from the runtime labels enables the gradual guarantee.
   \end{figure}
 
   \begin{theorem}[Type safety of \Surface]
-    If $M$ is a \Surface program and $\mathit{eval}(M,b)=r$ \\ then the
-    evaluation result is well-typed $\vdash r : \Bool_{\low}$.
+    If $M$ is a well-typed \Surface term: $(x{:}\Bool_{\high});\low\vdash M :
+    \Bool_{\low}$ and $\mathit{eval}(M,b)=r$ \\ then the evaluation result is
+    well-typed $\vdash r : \Bool_{\low}$.
   \end{theorem}
 \end{frame}
 
 %%%%%%%%%%% Gradual Guarantee %%%%%%%%%%%
 \begin{frame}
   \begin{theorem}[Gradual guarantee for \Surface]
-    Suppose $M$ and $M'$ are \Surface programs related by precision: $\vdash M \sqsubseteq M'$.
-    If
+    Suppose $M$ and $M'$ are well-typed \Surface terms:
+    \begin{align*}
+    (x{:}\Bool_{\high});\low\vdash& M : \Bool_{\low} \\
+    (x{:}\Bool_{\high});\low\vdash& M' : \Bool_{\low}
+    \end{align*}
+    and they are related by precision: $\vdash M \sqsubseteq M'$. If
     \[
     \mathit{eval}(M', b_1)=b_2
     \]
@@ -1031,7 +1036,7 @@ Removing \unk from the runtime labels enables the gradual guarantee.
 %%%%%%%%%%% Noninterference %%%%%%%%%%
 \begin{frame}
   \begin{theorem}[Noninterference for \Surface]
-    If $M$ is a \Surface program and
+    If $M$ is a well-typed \Surface term: $(x{:}\Bool_{\high});\low\vdash M : \Bool_{\low}$ and
     \[
     \mathit{eval}(M,b_1)=b_1'
     \]
