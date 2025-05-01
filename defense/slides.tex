@@ -487,17 +487,17 @@ let input = private-input () in
     \filldraw[Plum] (3,3) circle (2pt) node[anchor=west]{\purpletext{gradual}};
   \end{tikzpicture}
 
-  Principle of Locality: 90\% of execution time in 10\% of the
-  code \footnote{Dr. Ranjani Parthasarathi.
-  \href{https://www.cs.umd.edu/~meesh/411/CA-online/index.html}{\textit{Computer
-      Architecture: Engineering And Technology}}}
-
   In \purpletext{gradual IFC}, static type information is optional:
   \begin{itemize}
     \footnotesize
     \item Go static in parts of the application where performance matters
     \item Go dynamic when performance matters less, and ease-of-use matters more
   \end{itemize}
+
+  Principle of Locality: 90\% of execution time in 10\% of the
+  code \footnote{Dr. Ranjani Parthasarathi.
+  \href{https://www.cs.umd.edu/~meesh/411/CA-online/index.html}{\textit{Computer
+      Architecture: Engineering And Technology}}}
 
 \end{frame}
 

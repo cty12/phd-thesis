@@ -120,14 +120,14 @@ that gradual typing is indeed able to enable programmer-controlled
 migration between static and dynamic IFC in real-world applications.
 \begin{itemize}
 \item[] \textbf{Smart contracts}~ To support interactions between both users and
-  smart contracts on the Ethereum blockchain~\parencite{Wood:aa}, the Solidity
+  smart contracts on the Ethereum blockchain~\parencite{wood2014ethereum}, the Solidity
   programming language features two unique mechanisms, fallback functions and
   delegate calls~\parencite{dannen2017solidity}. Unfortunately, security flaws
   may arise from the sophisticated interaction between those two mechanism. For
   example, the Parity Multisig wallet bug \parencite{parity-bug-deep} enables
   the attacker to take full control of the victim's contract by setting its
   ownership through carefully crafted function calls. Recently,
-  \textcite{yaoscif} study the security challenges of smart contracts through
+  \textcite{yao2024scif} study the security challenges of smart contracts through
   the lens of IFC; they observe that in an open blockchain system, public
   callable functions cannot ensure the privilege of the caller statically, so
   dynamic checking is necessary in addition to static IFC. We are going to
@@ -137,7 +137,7 @@ migration between static and dynamic IFC in real-world applications.
   techniques against common smart contract security threats such as confused
   deputy attacks and re-entrancy attacks, by encoding the defense against the
   two types of attacks as information-flow properties in \SurfacePlus
-  following~\textcite{cecchetti2021compositional} and~\textcite{yaoscif}.
+  following~\textcite{cecchetti2021compositional} and~\textcite{yao2024scif}.
 \item[] \textbf{E-voting}~ We plan to reimplement part of the Civitas e-voting
   system~\parencite{clarkson2008civitas} in \SurfacePlus. This case study will
   demonstrate that \SurfacePlus is expressive enough for existing programs that
