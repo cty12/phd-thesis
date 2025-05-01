@@ -218,10 +218,11 @@
   \vspace{-45pt}
 
   \begin{center}
-    \includegraphics[width=4in]{acanthus}
+    \includegraphics[width=3in]{the_summons}
   \end{center}
 
-  \footnotetext{Acanthus textiles. William Morris Gallery.}
+  \footnotetext{\textit{The Summons}.The Holy Grail tapestries by Morris \& Co.
+    Birmingham Museum and Art Gallery}
 \end{frame}
 
 %%%%%%%%%% Statement %%%%%%%%%%%
@@ -464,6 +465,7 @@ let input = private-input () in
 \begin{frame}
   \frametitle{Static IFC Is Hard to Use}
   \begin{quote}
+    \large
     ``Another myth spread by security researchers is that the planet Earth
     contains more than six programmers who can correctly use security labels and
     information flow control (IFC).''
@@ -471,6 +473,32 @@ let input = private-input () in
     \href{https://scholar.harvard.edu/files/mickens/files/thisworldofours.pdf}{\textit{This
         World of Ours.}} Usenix ;login: 2014}
   \end{quote}
+\end{frame}
+
+\begin{frame}
+  \frametitle{\purpletext{Gradual IFC} Comes to the Rescue!}
+
+  \begin{tikzpicture}[scale=0.8]
+    \draw[loosely dotted,ultra thick,Plum] (1,4)--(4,1);
+    \draw[->,ultra thick] (0,0)--(5,0) node[right]{\redtext{speed of development}};
+    \draw[->,ultra thick] (0,0)--(0,5) node[above]{\bluetext{performance}};
+    \filldraw[NavyBlue] (1,4) circle (2pt) node[anchor=west]{\bluetext{static}};
+    \filldraw[Maroon] (4,1) circle (2pt) node[anchor=west]{\redtext{dynamic}};
+    \filldraw[Plum] (3,3) circle (2pt) node[anchor=west]{\purpletext{gradual}};
+  \end{tikzpicture}
+
+  Principle of Locality: 90\% of execution time in 10\% of the
+  code \footnote{Dr. Ranjani Parthasarathi.
+  \href{https://www.cs.umd.edu/~meesh/411/CA-online/index.html}{\textit{Computer
+      Architecture: Engineering And Technology}}}
+
+  In \purpletext{gradual IFC}, static type information is optional:
+  \begin{itemize}
+    \footnotesize
+    \item Go static in parts of the application where performance matters
+    \item Go dynamic when performance matters less, and ease-of-use matters more
+  \end{itemize}
+
 \end{frame}
 
 %%%%%%%%%% Gradual IFC %%%%%%%%%%%
@@ -932,6 +960,7 @@ Removing \unk from the runtime labels enables the gradual guarantee.
           \mathit{obs}(\ccaddr{n}) =&\, \mathit{addr} \\
           \mathit{obs}(\cccast{(\ccaddr{n})}{\bm{c}}) =&\, \mathit{addr}
         \end{align*}
+        Let $M$ be a well-typed \Surface term: $(x{:}\Bool_{\high});\low\vdash M :\Bool_{\low}$ \\[2ex]
         \fbox{$\mathit{eval}(M, b)=r$}
         \begin{align*}
           \mathit{eval}(M, b) =&\, \mathit{obs}(V)\;&\text{if}\;(\compile{M})[x:=b] \mid \emptyset \Downarrow V \mid \mu \\
@@ -954,17 +983,17 @@ Removing \unk from the runtime labels enables the gradual guarantee.
   \footnotesize
   \begin{array}{rcl}
     c     & ::=  & \id{g} \MID \highlight{highlight}{\up} \MID \inj{\ell} \MID \proj{\ell}{p} \MID \bot^{\bl{p}} \\
-    \bar{c} & ::=  & \id{g} \MID \err{g_1}{g_2}{p} \MID \bar{c} \seq c \\
+    \bar{c} & ::=  & \id{g} \MID \bot^{\bl{p}} \MID \bar{c} \seq c \\
     e & ::= & \ell \MID \blame{p} \MID \cccast{e}{\bar{c}} \\
     c_r  & ::=  & \id{\iota} \MID \refco{\bm{c}}{\bm{c}} \MID \left( \funco{\bar{c}}{\bm{c}}{\bm{c}} \right) \\
     \bm{c} & ::= & (\coerc{c_r}{\bar{c}}) \\
     M & ::=  & x \MID k \MID \cclam{x}{M}\MID \cclet{x}{M}{A}{M}  \\
-    & \MID & \ccaddr{n} \MID \ccprot{e}{\ell}{M}{A} \MID  \blame{p} \\
     & \MID & \highlightred{\cccast{M}{\bm{c}}} \\
     & \MID & M \cdot M \MID \highlight{highlight}{M \cdot^{\star} M} \\
     & \MID & \key{if}\,M\,\key{then}\,M\,\key{else}\,M \MID \highlight{highlight}{\key{if}^{\star}\,M\,\key{then}\,M\,\key{else}\,M} \\
     & \MID & \ccref{\ell}{M} \MID \highlightred{\ccrefproj{\ell}{M}{p}} \MID \ccsyntax{!}\,M \MID \highlight{highlight}{\ccsyntax{!}^\star\,M} \\
-    & \MID & M\,\ccsyntax{:=}\,M \MID \highlightred{M\,\ccsyntax{:=?}^{\bl{p}}\,M}
+    & \MID & M\,\ccsyntax{:=}\,M \MID \highlightred{M\,\ccsyntax{:=?}^{\bl{p}}\,M} \\
+    & \MID &{\color{gray} \ccaddr{n} \MID \ccprot{e}{\ell}{M}{A} \MID  \blame{p}} \\
   \end{array}
   \]
 
@@ -1056,7 +1085,7 @@ Removing \unk from the runtime labels enables the gradual guarantee.
   \item The security labels on constants and memory locations should default to
     \low or \high so that \unk is not included in runtime security labels.
   \item Security checks can be modeled using coercions.
-  \item The Agda mechanization of \Surface is at
+  \item Show me the code! The Agda mechanization of \Surface is at
     \begin{center}
       \url{https://github.com/Gradual-Typing/LambdaIFCStar}
     \end{center}
@@ -1066,6 +1095,36 @@ Removing \unk from the runtime labels enables the gradual guarantee.
 
 \begin{frame}
   \centering \Huge \bluetext{Thank you! \smiley{}}
+\end{frame}
+
+\begin{frame}
+  \frametitle{NSU Checking}
+
+  \begin{figure}
+    \footnotesize
+  \raggedright
+  \fbox{\reduce{M}{\mu}{\PC}{N}{\mu'}} \\[3ex]
+  \begin{gather*}
+  \inference{n \; \mathbf{FreshIn} \; \mu(\ell) & \highlightred{\cccast{\PC}{\unk \Rightarrow^{\bl{p}} \ell} \longrightarrow^{*} \PC'} }
+            {\reduce{\ccrefproj{\ell}{V}{p}}{\mu}{\PC}{\ccaddr{n}}{(\mu , \ell \mapsto n \mapsto V)}}
+  \\[3ex]
+  \inference{\mathbf{NF}\;\bar{c} & \vdash \bm{c} : T_g \Rightarrow S_{\hat{\ell}} & \vdash \bm{d} : S_{\hat{\ell}} \Rightarrow T_g \\ \highlightred{\cccast{(\mathit{stamp!}\;\PC\;|\bar{c}|)}{\unk \Rightarrow^{\bl{p}} \hat{\ell}} \longrightarrow^{*} \PC'} \\ \cccast{V}{\bm{c}} \longrightarrow^{*} W}
+            {\reduce{\left(\cccast{\ccaddr{n}}{\coerc{\refco{\bm{c}}{\bm{d}}}{\bar{c}}}\right)\,\ccsyntax{:=}^{\bl{p}}\,V}{\mu}{\PC}{\unit}{[\hat{\ell} \mapsto n \mapsto W] \; \mu}}
+  \end{gather*}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Aligning Less Precise With More Precise}
+  Consider the following \Surface terms related by precision:
+  \[
+  \true_{\low} : \Bool_{\unk} : \Bool_{\unk} \qquad\text{ and }\qquad
+  \true_{\low} : \Bool_{\high} : \Bool_{\unk}
+  \]
+  We need to show the two coercion sequences are related:
+  \[
+  \vdash \id{\low} \seq \inj{\low} \sqsubseteq \id{\low} \seq \highlight{highlight}{\up} \seq \inj{\high}
+  \]
 \end{frame}
 
 \end{document}
