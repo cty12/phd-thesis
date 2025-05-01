@@ -518,13 +518,13 @@ let input = private-input () in
   \item \textcolor{Green}{Well-typed}\quad~but~\quad\textcolor{Red}{errors at runtime}
   \item Checking happens on the boundaries between static and dynamic fragments
   \item The information flow violation is detected earlier than the dynamic
-    version, as \texttt{flip} returns
+    version, as \texttt{flip} returns.
   \end{itemize}
 
 \end{frame}
 
 %%%%%%%%%% Gradual Guarantee %%%%%%%%%%%
-\begin{frame}[containsverbatim]
+\begin{frame}[containsverbatim,fragile]
   \frametitle{The Gradual Guarantee}
 
   \begin{minipage}{0.3\textwidth}
@@ -564,10 +564,18 @@ let input = private-input () in
 
   \begin{itemize}
   \item In the absense of errors, adding or removing security annotations does
-    not change the result of the program
-  \item Adding security annotations may trigger errors
-  \item Removing security annotations may not trigger errors
+    not change the result of the program.
+  \item Adding security annotations may trigger errors.
+  \item Removing security annotations may not trigger errors.
   \end{itemize}
+
+\onslide<2-> {
+  \begin{center}
+    \color{Red}
+    There is a tension between the gradual guarantee and IFC! \\[2ex] {\Large \frownie{}}
+  \end{center}
+}
+
 \end{frame}
 
 %%%%%%%%%% Static IFC Through Heap %%%%%%%%%%%
@@ -586,7 +594,7 @@ let input = private-input () in
   \end{lstlisting}
 
   \begin{itemize}
-  \item The reference has type $\Refer{(\Bool_{\low})}$. It points to a low memory location
+  \item The reference has type $\Refer{(\Bool_{\low})}$. It points to a low memory location.
   \item The type of the branch condition is $\Bool_{\high}$
   \item[\no] \st{Writing to low memory under a high branch condition}
   \end{itemize}
@@ -815,7 +823,7 @@ Removing \unk from the runtime labels enables the gradual guarantee.
 
   \ul{Free theorem:} The \texttt{mix} function either \textcircled{1} returns a
   value that does not depend on \texttt{priv} or \textcircled{2} produces a
-  runtime error
+  runtime error.
 
   \bigskip
 
@@ -843,7 +851,7 @@ Removing \unk from the runtime labels enables the gradual guarantee.
 
   \ul{Free theorem:} The \texttt{smix} function either \textcircled{1} returns a
   value that does not depend on \texttt{priv} or \textcircled{2}
-    produces a runtime error
+    produces a runtime error.
 
   %% {\footnotesize
   %%   (GLIO: \textcircled{1} not vigilant \textcircled{2} does not classify values using types
@@ -1080,16 +1088,18 @@ Removing \unk from the runtime labels enables the gradual guarantee.
   \frametitle{Conclusion}
 
   \begin{itemize}
-  \item It is possible to satisfy noninterference and the gradual guarantee
-    while supporting type-based reasoning.
+  \item It \hl{is possible} to satisfy noninterference and the
+    gradual guarantee while supporting type-based reasoning.
   \item The security labels on constants and memory locations should default to
     \low or \high so that \unk is not included in runtime security labels.
   \item Security checks can be modeled using coercions.
-  \item Show me the code! The Agda mechanization of \Surface is at
-    \begin{center}
-      \url{https://github.com/Gradual-Typing/LambdaIFCStar}
-    \end{center}
   \end{itemize}
+
+  \vspace{10pt}
+  \begin{center}
+    Show me the code! The Agda mechanization of \Surface is at \\[2ex]
+    \url{https://github.com/Gradual-Typing/LambdaIFCStar}
+  \end{center}
 
 \end{frame}
 
@@ -1115,7 +1125,7 @@ Removing \unk from the runtime labels enables the gradual guarantee.
 \end{frame}
 
 \begin{frame}
-  \frametitle{Aligning Less Precise With More Precise}
+  \frametitle{\large Simulation Between More and Less Precise Coercions}
   Consider the following \Surface terms related by precision:
   \[
   \true_{\low} : \Bool_{\unk} : \Bool_{\unk} \qquad\text{ and }\qquad
