@@ -148,6 +148,8 @@
 \newcommand{\highlight}[2]{\colorbox{#1}{\ensuremath{#2}}}
 \newcommand{\highlightblue}[1]{\highlight{White!90!NavyBlue}{#1}}
 \newcommand{\highlightred}[1]{\highlight{White!90!Maroon}{#1}}
+\newcommand{\hlblue}[1]{{\sethlcolor{White!90!NavyBlue}\hl{#1}}}
+\newcommand{\hlred}[1]{{\sethlcolor{White!90!Maroon}\hl{#1}}}
 
 \definecolor{highlight}{gray}{0.9}
 \sethlcolor{highlight}
@@ -245,7 +247,7 @@
   \frametitle{Road Map}
 
   \begin{itemize}
-  \item[\ding{43}] Background
+  \item[{\color{Red} \ding{43}}] Background
     \begin{itemize}
     \item Explicit flow and implicit flow
     \item Information flow control (IFC): static, dynamic, and gradual
@@ -276,7 +278,7 @@
 \begin{frame}[fragile]
   \frametitle{Explicit Information Flow}
 
-  Can we infer output from input in the following program?
+  Can we infer input from output in the following program?
 
 
 \begin{lstlisting}[autogobble,numbers=none,xleftmargin=.2\textwidth,xrightmargin=.2\textwidth]
@@ -300,7 +302,7 @@ let input = private-input () in
 \begin{frame}[fragile]
   \frametitle{Implicit Information Flow}
 
-  Can we infer output from input in the following program?
+  Can we infer input from output in the following program?
 
 
 \begin{lstlisting}[autogobble,numbers=none,xleftmargin=.05\textwidth]
@@ -521,6 +523,8 @@ let input = private-input () in
     version, as \texttt{flip} returns.
   \end{itemize}
 
+  \footnotetext{\hlblue{Blue:} types with statically-known security.
+    \hlred{Red:} types with unknown security.}
 \end{frame}
 
 %%%%%%%%%% Gradual Guarantee %%%%%%%%%%%
@@ -725,7 +729,7 @@ Removing \unk from the runtime labels enables the gradual guarantee.
 
   \begin{itemize}
   \item Background
-  \item[\ding{43}] \Surface: a gradual IFC calculus
+  \item[{\color{Red} \ding{43}}] \Surface: a gradual IFC calculus
     \begin{itemize}
       \item \Surface enforces IFC while satisfying gradual guarantee
       \item \Surface supports type-based reasoning (free theorems)
@@ -911,7 +915,7 @@ Removing \unk from the runtime labels enables the gradual guarantee.
   \begin{itemize}
   \item Background
   \item \Surface: a gradual IFC calculus
-  \item[\ding{43}] Technical development
+  \item[{\color{Red} \ding{43}}] Technical development
     \begin{itemize}
     \item Formal definition of \Surface
     \item Coercion calculi for IFC
@@ -1015,7 +1019,7 @@ Removing \unk from the runtime labels enables the gradual guarantee.
   \item Background
   \item \Surface: a gradual IFC calculus
   \item Technical development
-  \item[\ding{43}] Meta-theoretic results
+  \item[{\color{Red} \ding{43}}] Meta-theoretic results
     \begin{itemize}
       \item Type safety for \Surface
       \item Gradual guarantee for \Surface
