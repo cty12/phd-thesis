@@ -179,11 +179,11 @@ In the 1970s, the interest in enforcing confidentiality and regulating the flow
 of information in a computer program arose with applications in a military or
 government setting \autocite{bell1976secure,lester2016information}.
 \textcite{denning1976lattice} builds an information flow model using a lattice
-of security labels. \textcite{denning1977certification} describe a static
-analysis for information flow and prove that a certified program will not
-transmit confidential input to non-confidential output. They distinguish between
-two types of information flows: explicit flow and implicit flow. Consider the
-assignment
+of security labels in 1976. \textcite{denning1977certification} describe a
+static analysis for information flow and prove that a certified program will not
+transmit confidential input to non-confidential output in 1977. They distinguish
+between two types of information flows: explicit flow and implicit flow.
+Consider the assignment
 \begin{verbatim}
   x := y + z
 \end{verbatim}
@@ -281,7 +281,8 @@ control into off-the-shelf programming languages such as Jif for Java
 %% \todo[inline]{What's coarse-grained IFC? What's floating
 %%   label? -Jeremy}
 
-IFC can also be enforced dynamically using runtime monitoring. Values typically
+IFC can also be enforced dynamically using runtime monitoring, an idea presented
+by \textcite{fenton1974memoryless} in 1974. In dynamic IFC, values typically
 have security labels associated with them and the runtime monitor tracks those
 labels during program execution. In the illegal explicit flow example
 \begin{verbatim}
@@ -440,6 +441,8 @@ for an imperative, object-oriented language.
   \hline
   GLIO      & \yes & \cellcolor{Green!10} \tikzmark{c}{\yes} & \tikzmark{d}{\no}  & \yes & $\{ \low, \high \}$ \\[1ex]
   \hline
+  \SurfaceOld      & \yes & \cellcolor{Green!10} \tikzmark{i}{\yes} & \tikzmark{j}{\no}  & \yes & $\{ \low, \high \}$ \\[1ex]
+  \hline
   \WHILEG & \yes & \cellcolor{Green!10} \tikzmark{e}{\yes} & \yes   & \tikzmark{f}{\no} & $\{ \low, \high, \unk \}$ \\[1ex]
   \hline
   \rowcolor{highlight}
@@ -449,6 +452,7 @@ for an imperative, object-oriented language.
 \begin{tikzpicture}[overlay, remember picture, yshift=.25\baselineskip, shorten >=.5pt, shorten <=.5pt]
   \draw[dashed,thick] (a) to [bend right=15] (b);
   \draw[dashed,thick] (c) to [bend right=15] (d);
+  \draw[dashed,thick] (i) to [bend right=15] (j);
   \draw[dashed,thick] (e) to [bend right=10] (f);
   \draw[thick]        (g) to [bend right=8 ] (h);
 \end{tikzpicture}
@@ -476,7 +480,8 @@ and satisfy the gradual guarantee at the same time.
 \GSLRef~\parencite{Toro:2018aa}. They propose a new gradually typed language,
 GLIO, which sacrifices type-guided classification. They prove that GLIO
 satisfies both noninterference and the gradual guarantee using a denotational
-semantics.
+semantics. Our previous design \SurfaceOld~\parencite{Chen:2022aa} follows GLIO
+and also sacrifices type-guided classification.
 %
 \textcite{bichhawat2021gradual} conjecture that \textit{NSU checking} could be
 another possible source of the tension. As an alternative, they propose a hybrid

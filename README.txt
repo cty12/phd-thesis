@@ -51,3 +51,13 @@ design choice with respect to the security of the newly created memory location
 LambdaSEC     LambdaIFCStar       LambdaSEC (in Zdancewic)
     |---------------|--------------------|
  (dynamic)       (gradual)            (static)
+
+
+Some final comments from the committee:
+
+1. use monospace fonts for func, addr, and diverge ✓
+2. define multi-step reduction ✓
+3. new row of the table about lambdasecstar ✓
+4. new intro paragraphs of section 2
+5. check citations of dyn IFC ✓
+6. check citations of static IFC ✓

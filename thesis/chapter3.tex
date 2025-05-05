@@ -1006,6 +1006,21 @@ applying a coercion is pure and does not produce side effects.
 %\todo[inline]{Define a down arrow and an up arrow (diverge)}
 %{\color{NavyBlue}  %%%% new text
 
+\begin{figure}
+  \fbox{$\reducemult{M}{\mu_1}{\PC}{N}{\mu_2}$}
+  \begin{gather*}
+    \inference{}{\reducemult{M}{\mu}{\PC}{M}{\mu}}
+    \quad
+    \inference{\reduce{L}{\mu_1}{\PC}{M}{\mu_2} & \reducemult{M}{\mu_2}{\PC}{N}{\mu_3}}
+    {\reducemult{L}{\mu_1}{\PC}{N}{\mu_3}}
+  \end{gather*}
+  \caption{Multi-step reduction of \CC}
+  \label{fig:multi-step}
+\end{figure}
+
+The multi-step reduction of \CC is defined as the reflexive transitive closure
+of single-step reduction (Figure~\ref{fig:multi-step}).
+
 Finally, we define the evaluation of \CC using the reduction relation:
 {\small
 \begin{align*}

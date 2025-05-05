@@ -6,7 +6,7 @@
 In this chapter, I prove type safety for \Surface
 (Theorem~\ref{thm:type-safety}). Type safety says that untrapped errors (or
 ``undefined behaviors'') never occur in \Surface. In other words, the evaluation
-of a \Surface program will never reach the \textit{stuck} case of \textit{eval}.
+of a \Surface program will never reach the \texttt{stuck} case of \textit{eval}.
 In Section~\ref{sec:cc-type-safety}, I prove that the cast calculus \CC
 satisfies progress and preservation. In Section~\ref{sec:compile-pres}, I prove
 that the compilation from \Surface to \CC preserves types. Finally, in
@@ -106,13 +106,13 @@ Chapter~\ref{ch:compile}) preserves types:
     \inference{k : \iota}{\vdash k : \iota_{\ell}}
     \qquad
     \textit{WT-addr}~
-    \inference{}{\vdash \mathit{addr} : (\Refer{A})_{g}}
+    \inference{}{\vdash \mathtt{addr} : (\Refer{A})_{g}}
     \\[1ex]
     \textit{WT-fun}
-    \inference{}{\vdash \mathit{fun} : (\Fun{A}{g_2}{B})_{g_1}}
+    \inference{}{\vdash \mathtt{fun} : (\Fun{A}{g_2}{B})_{g_1}}
     \qquad
     \textit{WT-diverge}
-    \inference{}{\vdash \mathit{diverge} : A}
+    \inference{}{\vdash \mathtt{diverge} : A}
   \end{gather*}
   \caption{Well-typed evaluation result}
   \label{fig:wt-result}
@@ -195,10 +195,10 @@ result being well-typed means that a \Surface program never gets stuck:
     \textit{WT-const} of Figure~\ref{fig:wt-result}, $\vdash b' : \Bool_{\low}$,
     so $\vdash r : \Bool_{\low}$.
   \item $(\compile{M})[x:=b] \mid \mu \Downarrow \blame{p} \mid \mu'$. By
-    definition, $\mathit{eval}(M,b)=\mathit{diverge}$. By rule
+    definition, $\mathit{eval}(M,b)=\mathtt{diverge}$. By rule
     \textit{WT-diverge}, $\vdash r : \Bool_{\low}$.
   \item $(\compile{M})[x:=b] \mid \mu \Uparrow$. By
-    definition, $\mathit{eval}(M,b)=\mathit{diverge}$. By rule
+    definition, $\mathit{eval}(M,b)=\mathtt{diverge}$. By rule
     \textit{WT-diverge}, $\vdash r : \Bool_{\low}$.
   \end{itemize}
 \end{proof}
