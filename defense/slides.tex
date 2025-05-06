@@ -960,25 +960,25 @@ Removing \unk from the runtime labels enables the gradual guarantee.
     \raggedright
         \[
           \begin{array}{rcll}
-            \text{evaluation result}     & r & ::=  & k \MID \mathit{fun} \MID \mathit{addr} \MID \mathit{diverge} \MID \mathit{stuck}
+            \text{evaluation result}     & r & ::=  & k \MID \mathtt{fun} \MID \mathtt{addr} \MID \mathtt{diverge} \MID \mathtt{stuck}
           \end{array}
         \]
         \fbox{$\mathit{obs}(V)=r$}
         \begin{align*}
           \mathit{obs}(k) =&\, k \\
           \mathit{obs}(\cccast{k}{\bm{c}}) =&\, k \\
-          \mathit{obs}(\cclam{x}{N}) =&\, \mathit{fun} \\
-          \mathit{obs}(\cccast{(\cclam{x}{N})}{\bm{c}}) =&\, \mathit{fun} \\
-          \mathit{obs}(\ccaddr{n}) =&\, \mathit{addr} \\
-          \mathit{obs}(\cccast{(\ccaddr{n})}{\bm{c}}) =&\, \mathit{addr}
+          \mathit{obs}(\cclam{x}{N}) =&\, \mathtt{fun} \\
+          \mathit{obs}(\cccast{(\cclam{x}{N})}{\bm{c}}) =&\, \mathtt{fun} \\
+          \mathit{obs}(\ccaddr{n}) =&\, \mathtt{addr} \\
+          \mathit{obs}(\cccast{(\ccaddr{n})}{\bm{c}}) =&\, \mathtt{addr}
         \end{align*}
         Let $M$ be a well-typed \Surface term: $(x{:}\Bool_{\high});\low\vdash M :\Bool_{\low}$ \\[2ex]
         \fbox{$\mathit{eval}(M, b)=r$}
         \begin{align*}
           \mathit{eval}(M, b) =&\, \mathit{obs}(V)\;&\text{if}\;(\compile{M})[x:=b] \mid \emptyset \Downarrow V \mid \mu \\
-          \mathit{eval}(M, b) =&\, \mathit{diverge} \;&\text{if~}\;(\compile{M})[x:=b] \mid \emptyset \Downarrow \blame{\bl{p}} \mid \mu \\
+          \mathit{eval}(M, b) =&\, \mathtt{diverge} \;&\text{if~}\;(\compile{M})[x:=b] \mid \emptyset \Downarrow \blame{\bl{p}} \mid \mu \\
                                                     & &\text{or}~ (\compile{M})[x:=b] \mid \emptyset \Uparrow \\
-          \mathit{eval}(M, b) =&\, \mathit{stuck}\;&\text{otherwise}
+          \mathit{eval}(M, b) =&\, \mathtt{stuck}\;&\text{otherwise}
         \end{align*}
   \end{figure}
 
@@ -1038,11 +1038,11 @@ Removing \unk from the runtime labels enables the gradual guarantee.
       \small
       \inference{k : \iota}{\vdash k : \iota_{\ell}}
       \qquad
-      \inference{}{\vdash \mathit{addr} : (\Refer{A})_{g}}
+      \inference{}{\vdash \mathtt{addr} : (\Refer{A})_{g}}
       \\[1ex]
-      \inference{}{\vdash \mathit{fun} : (\Fun{A}{g_2}{B})_{g_1}}
+      \inference{}{\vdash \mathtt{fun} : (\Fun{A}{g_2}{B})_{g_1}}
       \qquad
-      \inference{}{\vdash \mathit{diverge} : A}
+      \inference{}{\vdash \mathtt{diverge} : A}
     \end{gather*}
   \end{figure}
 
