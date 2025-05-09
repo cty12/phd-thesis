@@ -183,7 +183,7 @@ evaluation order in a coercion sequence to be from left to right ($\xi_L$ and
 $\xi_R$), because that corresponds to the direction of information flow from
 source to sink: in the example above, $\low \Rightarrow \high \Rightarrow \unk
 \Rightarrow \unk \Rightarrow \low$, we validate that \low can flow to \high
-before we check the flow from \high through \unk to \low.
+before we check and reject the flow from \high through \unk to \low.
 
 \subsection{Monitoring Explicit and Implicit Flows}
 \label{sec:cexpr-comp-stamp}
@@ -429,7 +429,7 @@ to implement NSU checks, which enforce the heap policy for write operations.
   \[
   \begin{array}{rcll}
     \text{base types}               & \iota     & ::= & \Unit \MID \Bool \\
-    \text{raw types}                & T, S      & ::= & \iota \MID \Fun{A}{\gc}{B} \mid \Refer{(T_g)} \\
+    \text{raw types}                & T, S      & ::= & \iota \MID \Fun{A}{g}{B} \mid \Refer{(T_g)} \\
     \text{types}                    & A, B      & ::= & T_g \\
     \text{raw coercions}            & c_r, d_r  & ::=  & \id{\iota} \MID \refco{\bm{c}}{\bm{d}} \MID \left( \funco{\bar{d}}{\bm{c}}{\bm{d}} \right) \\
     \text{coercions}                & \bm{c}, \bm{d} & ::= & \coerc{c_r}{\bar{c}}
@@ -554,7 +554,7 @@ its operational semantics in Section~\ref{sec:cc-semantics}.
                                        \cclet{x}{M}{A}{N} \\
                            &  & \MID & \ccref{\ell}{M} \MID \ccrefproj{\ell}{M}{p} \MID \ccderef{M}{A}{\ell} \MID \ccderefstar{M}{T} \\
                            &  & \MID & \ccassign{L}{M}{T}{\hat{\ell}}{\ell} \MID \ccassignproj{L}{M}{T}{\hat{g}}{p} \\
-                           &   & \MID & \ccprot{\PC}{\ell}{M}{A} \MID \cccast{M}{\bm{c}} \MID \blame{p} \\
+                           &   & \MID & \ccprot{e}{\ell}{M}{A} \MID \cccast{M}{\bm{c}} \MID \blame{p} \\
     \text{raw values} & V_r, W_r & ::=  &  \ccconst{k} \MID \ccaddr{n} \MID \cclam{x}{N} \\
     \text{values}     & V, W     & ::=  & V_r \MID \cccast{V_r}{\bm{c}} \text{, where } \mathbf{Irreducible}\;\bm{c}
   \end{array}
@@ -711,38 +711,36 @@ $\ccaddr{n} \Leftarrow (\Refer{T_{\hat{\ell}}})_\ell$ says that the
 security of the address $n$ itself is $\ell$ and it points to a memory
 cell labeled $\hat{\ell}$.
 
-The typing rules for the static variants are similar to the typing
-rules in a static security type system.  For example, in the static
-function application rule ${\vdash}\textit{app}$, both top-level
-labels on the function type as well as the security label that the
-current PC is typed at are static and the rule mirrors one in a static
-system.  On the other hand, in the dynamic version of application rule
-${\vdash}\textit{app}\star$, both top-level labels as well as the label
-of the co-domain type are \unk and PC is allowed to be typed at \unk,
-indicating the presence of injections.
-As another example, in the static version of memory assignment rule
-${\vdash}\textit{assign}$, all labels to perform the heap policy
-check, including the security of the memory address itself ($\ell$),
-the security of the memory cell that the address references
-($\hat{\ell}$), and the security of PC ($\ell'$) are known statically
-and satisfy $\highlightblue{\ell' \curlyvee \ell \preccurlyeq \hat{\ell}}$.
-At runtime, this static assignment
-can happen directly without any runtime overhead (as is shown in the
-example of Section~\ref{sec:example2}). Its dynamic counterpart rule
-${\vdash}\textit{assign?}$ does not maintain these static security
-invariants and thus requires runtime NSU checking, which is
-implemented as a projection on PC.
+The typing rules for the static variants are similar to the typing rules in a
+static security type system. For example, in the static function application
+rule ${\vdash}\textit{app}$, both top-level labels on the function type ($\ell$
+and $\ell' \curlyvee \ell$) as well as the security label that the current PC is
+typed at ($\ell'$) are static and the rule mirrors one in a static system. On
+the other hand, in the dynamic version of application rule
+${\vdash}\textit{app}\star$, both top-level labels as well as the label of the
+co-domain type are \unk and PC is allowed to be typed at \unk, indicating the
+presence of injections. As another example, in the static version of memory
+assignment rule ${\vdash}\textit{assign}$, all labels to perform the heap policy
+check, including the security of the memory address itself ($\ell$), the
+security of the memory cell that the address references ($\hat{\ell}$), and the
+security of PC ($\ell'$) are known statically and satisfy $\highlightblue{\ell'
+  \curlyvee \ell \preccurlyeq \hat{\ell}}$. At runtime, this static assignment
+can happen directly without any runtime overhead (as is shown in the example of
+Section~\ref{sec:example2}). Its dynamic counterpart rule
+${\vdash}\textit{assign?}$ does not maintain these static security invariants
+and thus requires runtime NSU checking, which is implemented as a projection on
+PC.
 
-As we shall see in the reduction rules, the semantics of the
-protection term \texttt{prot} performs two things: (1) \texttt{prot} promotes
-the security of the value reduced from its body by level $\ell$
-(2) it uses a new PC to reduce its body.
-However, the new PC cannot be any label expression. It has to be one with
-higher security than both the current PC and the security level $\ell$.
-We capture this invariant in side condition $\ell' \curlyvee \ell \preccurlyeq |\PC|$
-in rule ${\vdash}\textit{prot}$, where $\ell'$ is the security of the current PC
-and $|\PC|$ is the security for the new PC.
-The invariant is used in the proof of noninterference.
+As we shall see in the reduction rules, the semantics of the protection term
+\texttt{prot} performs two things: (1) \texttt{prot} promotes the security of
+the value reduced from its body by level $\ell$ (2) it uses a new PC to reduce
+its body. However, the new PC cannot be any label expression. It has to be one
+with higher security than both the current PC and the security level $\ell$. We
+capture this invariant in side condition $\ell' \curlyvee \ell \preccurlyeq
+|\PC|$ in rule ${\vdash}\textit{prot}$, where $\ell'$ is the security of the
+current PC and $|\PC|$ is the security for the new PC. The invariant is used in
+the proof of noninterference (case \textit{prot-ctx} in the proof of
+Lemma~\ref{lem:sim-leq}, which is used by Theorem~\ref{thm:NI-Surface}).
 
 \subsection{Operational Semantics for \CC}
 \label{sec:cc-semantics}
@@ -928,20 +926,22 @@ $n$ whose security level is $\ell$.
 term has two functionalities: (1) it ensures that the reduction inside $M$ does
 not leak information through heap write operations (2) it promotes the security
 level of the computation result of $M$ to at least level $\ell$. The first
-functionality is achieved by switching to \PC' from the current $\PC$ when
+functionality is achieved by switching to $\PC'$ from the current $\PC$ when
 reducing the body $M$ (rule \textit{prot-ctx}). Recall
-Section~\ref{sec:cc-typing}, the typing of \texttt{prot} makes sure that \PC'
+Section~\ref{sec:cc-typing}, the typing of \texttt{prot} makes sure that $\PC'$
 has the correct security that is at least as secure as both $\PC$ and $\ell$.
 The second functionality is achieved by stamping the value produced by the body
 of \texttt{prot} (rule \textit{prot-val}). The stamping of values in \CC
 (Figure~\ref{fig:stamp-val}) is analogous to stamping of label expressions and
 turns to the stamping operation for coercions on labels
-(Figure~\ref{fig:comp-stampc}) in a similar way. Again there are two cases,
-because the value is either (1) a raw value or (2) a coercion-wrapped value.
-Suppose the value is a raw value, if its type has \low security and is stamped
-with \high, the value becomes wrapped with a subtype coercion; otherwise the
-value stays unchanged. Otherwise, if the value is wrapped with an irreducible
-coercion, we stamp the top-level coercion sequence.
+(Figure~\ref{fig:comp-stampc}) in a similar way. The value is either (1) a raw
+value or (2) a coercion-wrapped value. Suppose the value is a raw value, if its
+type has \low security and is stamped with \high, the value becomes wrapped with
+a subtype coercion (the second case of \textit{stamp} in
+Figure~\ref{fig:stamp-val}); otherwise, the value stays unchanged (the first and
+the third cases of \textit{stamp}). If the value is wrapped with an irreducible
+coercion, we stamp the top-level coercion sequence (the fourth case of
+\textit{stamp}).
 
 \paragraph{Function Application.} The $\beta$ rule is standard for IFC languages.
 It generates a \texttt{prot} term with the specific security label $\ell$ that

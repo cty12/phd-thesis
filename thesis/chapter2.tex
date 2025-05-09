@@ -85,7 +85,7 @@ whole programs of \Surface in Section~\ref{sec:surface-programs}.
     \text{specific security labels} & \ell & \in & \{ \low , \high \} \\
     \text{security labels}  & g    & ::= & \unk \MID \ell \\
     \text{base types}               & \iota     & ::= & \Unit \MID \Bool \\
-    \text{raw types}                & T, S      & ::= & \iota \MID \Fun{A}{\gc}{B} \mid \Refer{(T_g)} \\
+    \text{raw types}                & T, S      & ::= & \iota \MID \Fun{A}{g}{B} \mid \Refer{(T_g)} \\
     \text{types}                    & A, B      & ::= & T_g \\
   \end{array}
   \]}
@@ -107,8 +107,8 @@ I also define security types in Figure~\ref{fig:labels-and-types}. Types in
 is the type for booleans with high security, $\Unit_{\low}$ is the type for the
 unit value with low security, and $\Bool_{\unk}$ is the type of a boolean whose
 security level is unknown at compile time. I refer to $\{\high,\low,\unk\}$ as
-\emph{security labels}. A function type $(\Fun{A}{\gc}{B})_g$ carries an
-additional security label \gc, which is the type of the program counter (PC) to
+\emph{security labels}. A function type $(\Fun{A}{g_2}{B})_{g_1}$ carries an
+additional security label $g_2$, which is the type of the program counter (PC) to
 evaluate the body of the function.
 
 \subsection{Syntax of \Surface}
